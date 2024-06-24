@@ -4,7 +4,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Get started
 
-1. Install dependencies (hewo)
+1. Install dependencies (hwowowiuw)
 
    ```bash
    npm install
