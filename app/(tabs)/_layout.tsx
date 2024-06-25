@@ -43,6 +43,16 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="matchLoader"
+        options={{
+          title: 'matches',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+          ),
+        }}
+      />
     </Tabs>
+    
   );
 }
