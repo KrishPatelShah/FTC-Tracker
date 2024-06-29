@@ -15,7 +15,7 @@ interface Match {
     data: Team[];
 }
 
-export default function HomeScreen() {
+export default function MatchLoader() {
     const [teamArray, setTeamArray] = useState([
         { id: '1', name: 'Team 1' },
         { id: '2', name: 'Team 2' },
@@ -63,7 +63,7 @@ export default function HomeScreen() {
             let matchArrayData = data.data.eventByCode.teamMatches;
             //console.log(matchArray)
             const formattedMatchArray: Match[] = matchArrayData.filter((match: any, index: number) => index % 4 === 0).map((match: any, index: number) => ({
-                id: index + 1, // Adjust the ID as needed
+                id: index + 1, 
                 data: match.match.teams.map((team: any) => ({
                     teamNumber: team.teamNumber,
                     alliance: team.alliance
