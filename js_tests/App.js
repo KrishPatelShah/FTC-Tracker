@@ -1,3 +1,14 @@
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, ScrollView, TouchableOpacity, View, Image, Text } from 'react-native';
+import ImageViewer from './components/imageViewer';
+import Button from './components/Button';
+import * as ImagePicker from 'expo-image-picker';
+import { useState } from 'react';
+import CircleButton from './components/CircleButton';
+import IconButton from './components/IconButton';
+import EmojiPicker from './components/EmojiPicker';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 export default function App() {
     const Stack = createNativeStackNavigator();
