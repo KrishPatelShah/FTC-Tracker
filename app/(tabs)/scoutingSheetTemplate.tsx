@@ -10,26 +10,30 @@ type ScoutingSheetProps = {
   navigation: any;
 };
 
+type Team = {
+    id: string,
+    name: string,
+    tot_opr: string,
+    auto_opr: string,
+    rank: string,
+  };
+
 const ScoutingSheet: React.FC<ScoutingSheetProps> = ({ navigation }) => {
   const [eventName, setEventName] = useState("");
-  const [teamArray, setTeamArray] = useState([
-    { id: '1', name: 'Team 1', tot_opr: "0", auto_opr: "0"},
-    { id: '2', name: 'Team 2', tot_opr: "0", auto_opr: "0"},
-    { id: '3', name: 'Team 3', tot_opr: "0", auto_opr: "0"},
-    { id: '4', name: 'Team 4', tot_opr: "0", auto_opr: "0"},
-  ]);
+  const [teamArray, setTeamArray] = useState<Team[]>([]);
   const eventCode = useSelector((state: any) => state.event.eventCode);
-  const [displayStats, setDisplayStats] = useState("total");
-  const [stats, setStats] = useState("total");
+  const [displayStats, setDisplayStats] = useState("TOTAL");
+  const [stats, setStats] = useState("TOTAL");
   const data = [
-    { label: "auto", value: "auto" },
-    { label: "total", value: "total" },
+    { label: "AUTO", value: "AUTO" },
+    { label: "TOTAL", value: "TOTAL" },
+    {label : "RANK", value: "RANK"}
   ];
 
   useEffect(() => {
     const fetchEventData = async () => {
       if (eventCode) {
-        const query = `
+          const query = `
           query getEventByCode($season: Int!, $code: String!) {
             eventByCode(season: $season, code: $code) {
               name
@@ -37,14 +41,15 @@ const ScoutingSheet: React.FC<ScoutingSheetProps> = ({ navigation }) => {
                 team {
                   number
                   name
-                  quickStats(season: $season) {
-                    tot {
-                      value
+                }
+                stats {
+                    ... on TeamEventStats2023{
+                        opr {
+                            totalPointsNp
+                            autoPoints
+                        }
+                        rank
                     }
-                    auto {
-                      value
-                    }
-                  }
                 }
               }
             }
@@ -60,12 +65,14 @@ const ScoutingSheet: React.FC<ScoutingSheetProps> = ({ navigation }) => {
         const data = await response.json();
         //console.log(data.data.eventByCode.teams)
         let teamArray = data.data.eventByCode.teams;
-        let formattedTeamArray: { id: any; name: any; tot_opr: any; auto_opr: any }[] = [];
+        let formattedTeamArray: Team[] = [];
         teamArray.map((team: any) => {
-            console.log(team.team.quickStats)
-          let opr: string = team.team.quickStats?.tot.value ?? "0.000000";
-          let auto_opr: string = team.team.quickStats?.auto.value ?? "0.000000"
-          formattedTeamArray.push({ id: team.team.number, name: team.team.name, tot_opr: opr, auto_opr: auto_opr });
+          let opr: string = team.stats?.opr?.totalPointsNp ?? "0.000000";
+          let auto_opr: string = team.stats?.opr?.autoPoints ?? "0.000000"
+          let rank = team.stats?.rank ?? 999
+          auto_opr = Number(auto_opr).toFixed(2)
+          opr = Number(opr).toFixed(2)
+          formattedTeamArray.push({ id: team.team.number, name: team.team.name, tot_opr: opr, auto_opr: auto_opr, rank: rank });
         });
         setTeamArray(formattedTeamArray);
         setEventName(data.data.eventByCode.name);
@@ -100,11 +107,14 @@ const ScoutingSheet: React.FC<ScoutingSheetProps> = ({ navigation }) => {
           />
         </View>
         <ScrollView style={styles.teamScroller} contentContainerStyle={styles.teamScrollerContainer}>
-          {stats == "auto" && teamArray.map((team) => (
+          {stats == "AUTO" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(b.auto_opr) - Number(a.auto_opr)).map((team) => (
             <TeamView teamName={team.id} teamNumber={team.name} shownValue={team.auto_opr} key={team.id} />
           ))}
-          {stats == "total" && teamArray.map((team) => (
+          {stats == "TOTAL" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(b.tot_opr) - Number(a.tot_opr)).map((team) => (
             <TeamView teamName={team.id} teamNumber={team.name} shownValue={team.tot_opr} key={team.id} />
+          ))}
+          {stats == "RANK" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(a.rank) - Number(b.rank)).map((team) => (
+            <TeamView teamName={team.id} teamNumber={team.name} shownValue={team.rank} key={team.id} />
           ))}
         </ScrollView>
       </View>
@@ -156,7 +166,8 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 0.5,
     borderRadius: 8,
-    width: 120
+    width: 120,
+    padding : 6
   },
   placeholderText: {
     color: "white"
