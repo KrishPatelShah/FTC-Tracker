@@ -12,6 +12,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "js_tests/imageViewer.js"  ]
+    "expo-env.d.ts", 
+    "tests/ImageViewer.tsx"  ]
 }
