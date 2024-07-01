@@ -8,9 +8,9 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { NavigationContainer } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
-import HomeScreen from '@/app/(tabs)/homeScreen';
+import LoginPage from '@/app/(tabs)/loginPage';
 import MatchLoader from './matchLoader';
-import MainScreen from './main'; 
+import HomePage from './homePage'; 
 import ScoutingSheet from './scoutingSheetTemplate';
 
 import { Provider } from 'react-redux';
@@ -30,8 +30,8 @@ export default function TabLayout() {
         }}
       >
         <Tab.Screen
-          name="homeScreen"
-          component={HomeScreen}
+          name="loginPage"
+          component={LoginPage}
           options={{
             title: 'homereal',
             tabBarIcon: ({ color, focused }) => (
@@ -50,8 +50,8 @@ export default function TabLayout() {
           }}
         />
         <Tab.Screen
-          name="main"
-          component={MainScreen}
+          name="homePage"
+          component={HomePage}
           options={{
             title: 'HomeScreen',
             tabBarIcon: ({ color, focused }) => (

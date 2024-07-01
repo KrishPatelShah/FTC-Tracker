@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { global_styles } from '@/styles';
 
-export default function HomeScreen() {
+export default function LoginPage() {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>

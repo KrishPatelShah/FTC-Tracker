@@ -1,6 +1,6 @@
 export type RootTabParamList = {
-  main: undefined;
+  homePage: undefined;
   matchLoader: undefined;
-  homeScreen: undefined;
+  loginpage: undefined;
   scoutingSheetTemplate : undefined;
 };

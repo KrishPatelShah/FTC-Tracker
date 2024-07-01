@@ -9,10 +9,10 @@ import { setEventCode } from '@/eventCodeReducers';
 
 
 type HomeScreenProps = {
-  navigation: NavigationProp<RootTabParamList, 'homeScreen'>;
+  navigation: NavigationProp<RootTabParamList>;
 };
 
-const MainScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+const HomePage: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const eventCode = useSelector((state: any) => state.event.eventCode); 
   const dispatch = useDispatch();
@@ -63,7 +63,7 @@ const MainScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   );
 };
 
-export default MainScreen;
+export default HomePage;
 
 const styles = StyleSheet.create({
   container: {
