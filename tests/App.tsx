@@ -1,5 +1,4 @@
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, ScrollView, TouchableOpacity, View, Image, Text, Button} from 'react-native';
 import ImageViewer from './ImageViewer';
 import * as ImagePicker from 'expo-image-picker';

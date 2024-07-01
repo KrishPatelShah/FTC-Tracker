@@ -1,5 +1,4 @@
 import { StyleSheet, Image } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 interface ImageViewerProps {
   placeholderImageSource: { uri: string };
