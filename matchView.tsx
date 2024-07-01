@@ -9,7 +9,7 @@ interface MatchViewProps {
     team4: number;
   }
   
-
+  
    const MatchView: React.FC<MatchViewProps> = ({ matchNumber, team1, team2, team3, team4 }) => {
     return (
       <View style={styles.container}>
