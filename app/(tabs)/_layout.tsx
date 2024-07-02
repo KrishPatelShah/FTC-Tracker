@@ -12,16 +12,15 @@ import LoginPage from '@/app/(tabs)/loginPage';
 import MatchLoader from './matchLoader';
 import HomePage from './homePage'; 
 import ScoutingSheet from './scoutingSheetTemplate';
+import IndivTeamView from './teamView';
 
 import { Provider } from 'react-redux';
-import { store } from '@/eventCodeStore';
+import { store } from '@/dataStore';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    
-    <NavigationContainer independent = {true}>
       <Provider store = {store}>
       <Tab.Navigator
         screenOptions={{
@@ -69,9 +68,19 @@ export default function TabLayout() {
             ),
           }}
         />
+        <Tab.Screen
+          name="teamView"
+          component={IndivTeamView}
+          options={{
+            title: 'teams',
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            ),
+          }}
+        />
       </Tab.Navigator>
       </Provider>
-    </NavigationContainer>
+    
     
     
   );

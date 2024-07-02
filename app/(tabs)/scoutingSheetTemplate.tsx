@@ -108,13 +108,13 @@ const ScoutingSheet: React.FC<ScoutingSheetProps> = ({ navigation }) => {
         </View>
         <ScrollView style={styles.teamScroller} contentContainerStyle={styles.teamScrollerContainer}>
           {stats == "AUTO" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(b.auto_opr) - Number(a.auto_opr)).map((team) => (
-            <TeamView teamName={team.id} teamNumber={team.name} shownValue={team.auto_opr} key={team.id} />
+            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.auto_opr} key={team.id} navigation={navigation}/>
           ))}
           {stats == "TOTAL" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(b.tot_opr) - Number(a.tot_opr)).map((team) => (
-            <TeamView teamName={team.id} teamNumber={team.name} shownValue={team.tot_opr} key={team.id} />
+            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.tot_opr} key={team.id} navigation={navigation}/>
           ))}
           {stats == "RANK" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(a.rank) - Number(b.rank)).map((team) => (
-            <TeamView teamName={team.id} teamNumber={team.name} shownValue={team.rank} key={team.id} />
+            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.rank} key={team.id} navigation={navigation}/>
           ))}
         </ScrollView>
       </View>

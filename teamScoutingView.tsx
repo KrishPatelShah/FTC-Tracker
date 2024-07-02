@@ -1,22 +1,45 @@
 
+import { memo, useEffect } from "react";
 import {Text, View, StyleSheet} from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useDispatch, useSelector } from "react-redux";
+import { setTeamNumber } from "./teamNumberReducers";
 
 
 interface teamScoutingViewProps {
     teamNumber : string;
     teamName : string;
     shownValue : string;
+    navigation : any;
 }
 
-const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownValue}) => {
+const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownValue, navigation}) => {
+
+
+    
 
     const displayValue = shownValue.toString()
+    const storedTeamNumber = useSelector((state: any) => state.teamNumber.teamNumber); 
+    const dispatch = useDispatch();
+
+    const check = () => {
+        
+        dispatch(setTeamNumber(teamNumber))
+    }
+
+    useEffect(() => {
+        
+        navigation.navigate("teamView")
+      }, [storedTeamNumber]);
     
     return (
-        <View style={styles.container}>
-          <Text style={styles.text}>{teamName} - {teamNumber}</Text>
-          <Text style={styles.value}>{displayValue.slice(0, 6)}</Text> 
-        </View>
+        
+        <TouchableOpacity style={styles.container} onPress = {check}>
+            <View style = {styles.view}>
+                <Text style={styles.text}>{teamNumber} - {teamName}</Text>
+                <Text style={styles.value}>{displayValue.slice(0, 6)}</Text> 
+            </View>
+        </TouchableOpacity>
       );
 }
 
@@ -30,6 +53,9 @@ const styles = StyleSheet.create({
         width : "95%",
         margin : 2,
         borderRadius : 8
+    },
+    view : {
+        flex : 1
     },
     text : {
         fontSize : 14,
@@ -45,4 +71,4 @@ const styles = StyleSheet.create({
 
 })
 
-export default TeamView;
+export default memo(TeamView);
