@@ -2,13 +2,15 @@ import { RootTabParamList } from "@/routes";
 import { NavigationProp } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { GestureHandlerRootView, TextInput } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 import { Checkbox } from 'react-native-paper';
 import { Dropdown } from "react-native-element-dropdown";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Slider from "@react-native-community/slider";
 
 
 type HomeScreenProps = {
@@ -30,11 +32,27 @@ type HomeScreenProps = {
   }
 
   type TeamMatchData = {
-    purplePixelScore : string
+    purplePixelCheck : string,
+    yellowPixelCheck : string,
+    parkCheck : string,
+    driveUnderStageDoorCheck : string,
+    cycle : string,
+    backDropLine : string,
+    mosaic : string,
+    climbCheck : string,
+    drone : string
   }
 
   type TeamEventData = {
-    match1 : TeamMatchData
+    match1 : TeamMatchData,
+    match2 : TeamMatchData,
+    match3 : TeamMatchData,
+    match4 : TeamMatchData,
+    match5 : TeamMatchData,
+    extraNotes : string,
+    intake : number,
+    deposit : number,
+    drivetrain : number
   }
 
   
@@ -50,7 +68,14 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
     const storedTeamNumber = useSelector((state: any) => state.teamNumber.teamNumber); 
     const storedEventCode = useSelector((state: any) => state.event.eventCode); 
     const [teamData, setTeamData] = useState<TeamData>({number : "", name : "", city : "", state : "", rookieYear : "", school : "", tot_opr : "", auto_opr : "", tele_opr : "", eg_opr : "", rank : ""})
-    const [teamEventData, setTeamEventData] = useState<TeamEventData>({match1 : {purplePixelScore : "N/A"}})
+    const [teamEventData, setTeamEventData] = useState<TeamEventData>(
+        {match1 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""}, 
+        match2 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "" , climbCheck : "n/a", drone : ""},
+        match3 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""},
+        match4 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""},
+        match5 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""},
+        extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5
+        })
     const [showingInfo, setShowingInfo] = useState(false)
     const [matchView, setMatchView] = useState("Match 1")
     const [displayMatchView, setDisplayMatchView] = useState("Match 1")
@@ -58,9 +83,160 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
     const [yellowPixelCheck, setYellowPixelCheck] = useState("n/a")
     const [parkCheck, setParkCheck] = useState("n/a")
     const [driveUnderStageDoorCheck, setDriveUnderStageDoorCheck] = useState("n/a")
+    const [cyclesText, setCyclesText] = useState("")
+    const [backDropLineText, setBackDropLineText] = useState("")
+    const [mosaicText, setMosaicText] = useState("")
+    const [climbCheck, setClimbCheck] = useState("n/a")
+    const [droneText, setDroneText] = useState("")
+    const [extraNotes, setExtraNotes] = useState("")
+    
+    const [intakeVal, setIntakeVal] = useState(5)
+    const [depositVal, setDepositVal] = useState(5)
+    const [drivetrainVal, setDrivetrainVal] = useState(5)
+
     const toggleShowingInfo = () => {
         setShowingInfo(!showingInfo)
     }
+
+    const logTeamEventData = () => {
+        console.log(teamEventData)
+    }
+
+    useEffect(() => {
+        switch (matchView) {
+            case "Match 1":
+                setPurplePixelCheck(teamEventData.match1.purplePixelCheck)
+                setYellowPixelCheck(teamEventData.match1.yellowPixelCheck)
+                setParkCheck(teamEventData.match1.parkCheck)
+                setDriveUnderStageDoorCheck(teamEventData.match1.driveUnderStageDoorCheck)
+                setCyclesText(teamEventData.match1.cycle)
+                setBackDropLineText(teamEventData.match1.backDropLine)
+                setMosaicText(teamEventData.match1.mosaic)
+                setClimbCheck(teamEventData.match1.climbCheck)
+                setDroneText(teamEventData.match1.drone)
+                break;
+            case "Match 2":
+                setPurplePixelCheck(teamEventData.match2.purplePixelCheck)
+                setYellowPixelCheck(teamEventData.match2.yellowPixelCheck)
+                setParkCheck(teamEventData.match2.parkCheck)
+                setDriveUnderStageDoorCheck(teamEventData.match2.driveUnderStageDoorCheck)
+                setCyclesText(teamEventData.match2.cycle)
+                setBackDropLineText(teamEventData.match2.backDropLine)
+                setMosaicText(teamEventData.match2.mosaic)
+                setClimbCheck(teamEventData.match2.climbCheck)
+                setDroneText(teamEventData.match2.drone)
+                break;
+            case "Match 3":
+                setPurplePixelCheck(teamEventData.match3.purplePixelCheck)
+                setYellowPixelCheck(teamEventData.match3.yellowPixelCheck)
+                setParkCheck(teamEventData.match3.parkCheck)
+                setDriveUnderStageDoorCheck(teamEventData.match3.driveUnderStageDoorCheck)
+                setCyclesText(teamEventData.match3.cycle)
+                setBackDropLineText(teamEventData.match3.backDropLine)
+                setMosaicText(teamEventData.match3.mosaic)
+                setClimbCheck(teamEventData.match3.climbCheck)
+                setDroneText(teamEventData.match3.drone)
+                break;
+
+            case "Match 4":
+                setPurplePixelCheck(teamEventData.match4.purplePixelCheck)
+                setYellowPixelCheck(teamEventData.match4.yellowPixelCheck)
+                setParkCheck(teamEventData.match4.parkCheck)
+                setDriveUnderStageDoorCheck(teamEventData.match4.driveUnderStageDoorCheck)
+                setCyclesText(teamEventData.match4.cycle)
+                setBackDropLineText(teamEventData.match4.backDropLine)
+                setMosaicText(teamEventData.match4.mosaic)
+                setClimbCheck(teamEventData.match4.climbCheck)
+                setDroneText(teamEventData.match4.drone)
+                break;
+            
+            case "Match 5":
+                setPurplePixelCheck(teamEventData.match5.purplePixelCheck)
+                setYellowPixelCheck(teamEventData.match5.yellowPixelCheck)
+                setParkCheck(teamEventData.match5.parkCheck)
+                setDriveUnderStageDoorCheck(teamEventData.match5.driveUnderStageDoorCheck)
+                setCyclesText(teamEventData.match5.cycle)
+                setBackDropLineText(teamEventData.match5.backDropLine)
+                setMosaicText(teamEventData.match5.mosaic)
+                setClimbCheck(teamEventData.match5.climbCheck)
+                setDroneText(teamEventData.match5.drone)
+                break;
+            default : 
+                console.log(matchView)
+        }
+    }, [matchView])
+
+    useEffect(() => {
+        switch (matchView) {
+            case "Match 1":
+                teamEventData.match1.purplePixelCheck = purplePixelCheck
+                teamEventData.match1.yellowPixelCheck = yellowPixelCheck
+                teamEventData.match1.parkCheck = parkCheck
+                teamEventData.match1.driveUnderStageDoorCheck = driveUnderStageDoorCheck
+                teamEventData.match1.cycle = cyclesText
+                teamEventData.match1.backDropLine = backDropLineText
+                teamEventData.match1.mosaic = mosaicText
+                teamEventData.match1.climbCheck = climbCheck
+                teamEventData.match1.drone = droneText
+               
+                break;
+            case "Match 2":
+                teamEventData.match2.purplePixelCheck = purplePixelCheck
+                teamEventData.match2.yellowPixelCheck = yellowPixelCheck
+                teamEventData.match2.parkCheck = parkCheck
+                teamEventData.match2.driveUnderStageDoorCheck = driveUnderStageDoorCheck
+                teamEventData.match2.cycle = cyclesText
+                teamEventData.match2.backDropLine = backDropLineText
+                teamEventData.match2.mosaic = mosaicText
+                teamEventData.match2.climbCheck = climbCheck
+                teamEventData.match2.drone = droneText
+                break;
+            case "Match 3":
+                teamEventData.match3.purplePixelCheck = purplePixelCheck
+                teamEventData.match3.yellowPixelCheck = yellowPixelCheck
+                teamEventData.match3.parkCheck = parkCheck
+                teamEventData.match3.driveUnderStageDoorCheck = driveUnderStageDoorCheck
+                teamEventData.match3.cycle = cyclesText
+                teamEventData.match3.backDropLine = backDropLineText
+                teamEventData.match3.mosaic = mosaicText
+                teamEventData.match3.climbCheck = climbCheck
+                teamEventData.match3.drone = droneText
+                break;
+
+            case "Match 4":
+                teamEventData.match4.purplePixelCheck = purplePixelCheck
+                teamEventData.match4.yellowPixelCheck = yellowPixelCheck
+                teamEventData.match4.parkCheck = parkCheck
+                teamEventData.match4.driveUnderStageDoorCheck = driveUnderStageDoorCheck
+                teamEventData.match4.cycle = cyclesText
+                teamEventData.match4.backDropLine = backDropLineText
+                teamEventData.match4.mosaic = mosaicText
+                teamEventData.match4.climbCheck = climbCheck
+                teamEventData.match4.drone = droneText
+                break;
+
+            case "Match 5":
+                teamEventData.match5.purplePixelCheck = purplePixelCheck
+                teamEventData.match5.yellowPixelCheck = yellowPixelCheck
+                teamEventData.match5.parkCheck = parkCheck
+                teamEventData.match5.driveUnderStageDoorCheck = driveUnderStageDoorCheck
+                teamEventData.match5.cycle = cyclesText
+                teamEventData.match5.backDropLine = backDropLineText
+                teamEventData.match5.mosaic = mosaicText
+                teamEventData.match5.climbCheck = climbCheck
+                teamEventData.match5.drone = droneText
+                break;
+
+            default : 
+                console.log(matchView)
+        }
+
+        teamEventData.extraNotes = extraNotes
+        teamEventData.intake = intakeVal
+        teamEventData.deposit = depositVal
+        teamEventData.drivetrain = drivetrainVal
+
+    }, [purplePixelCheck, yellowPixelCheck, parkCheck, driveUnderStageDoorCheck, cyclesText, backDropLineText, mosaicText, climbCheck, droneText, extraNotes, intakeVal, depositVal, drivetrainVal])
 
 
     
@@ -151,17 +327,31 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
                     </View>
                 )}
                 <ScrollView>
-                    <EventStatsHeader></EventStatsHeader>
+                    <EventStatsHeader log={logTeamEventData}/>
                     <EventStatsContainer teamData={teamData}></EventStatsContainer>
                     <EventDataHeader matchVar={matchView} setMatchVar={setMatchView} displayMatchVar={displayMatchView} setDisplayMatchVar={setDisplayMatchView}></EventDataHeader>
                     <View style = {styles.eventDataContainer}>
                         <EventDataSubHeader headerName="Autonomous"></EventDataSubHeader>
-                        <EventDataFieldCheckBox name= "Purple Pixel" checkBoxBoolean = {purplePixelCheck} setCheckBoxBoolean={setPurplePixelCheck}></EventDataFieldCheckBox>
-                        <EventDataFieldCheckBox name= "Yellow Pixel" checkBoxBoolean = {yellowPixelCheck} setCheckBoxBoolean={setYellowPixelCheck}></EventDataFieldCheckBox>
-                        <EventDataFieldCheckBox name= "Park" checkBoxBoolean = {parkCheck} setCheckBoxBoolean={setParkCheck}></EventDataFieldCheckBox>
+                            <EventDataFieldCheckBox name= "Purple Pixel" checkBoxBoolean = {purplePixelCheck} setCheckBoxBoolean={setPurplePixelCheck}></EventDataFieldCheckBox>
+                            <EventDataFieldCheckBox name= "Yellow Pixel" checkBoxBoolean = {yellowPixelCheck} setCheckBoxBoolean={setYellowPixelCheck}></EventDataFieldCheckBox>
+                            <EventDataFieldCheckBox name= "Park" checkBoxBoolean = {parkCheck} setCheckBoxBoolean={setParkCheck}></EventDataFieldCheckBox>
                         <EventDataSubHeader headerName="Tele-Op"></EventDataSubHeader>
-                        <EventDataFieldCheckBox name= "Drive under Stage Door" checkBoxBoolean = {driveUnderStageDoorCheck} setCheckBoxBoolean={setDriveUnderStageDoorCheck}></EventDataFieldCheckBox>
+                            <EventDataFieldCheckBox name= "Drive under Stage Door" checkBoxBoolean = {driveUnderStageDoorCheck} setCheckBoxBoolean={setDriveUnderStageDoorCheck}></EventDataFieldCheckBox>
+                            <EventDataFieldTextBox name = "Cycles" valueText={cyclesText} setValueText={setCyclesText}></EventDataFieldTextBox>
+                            <EventDataFieldTextBox name = "Backdrop Line Crossed" valueText={backDropLineText} setValueText={setBackDropLineText}></EventDataFieldTextBox>
+                            <EventDataFieldTextBox name = "Mosaics Formed" valueText={mosaicText} setValueText={setMosaicText}></EventDataFieldTextBox>
+                        <EventDataSubHeader headerName="Endgame"></EventDataSubHeader>
+                            <EventDataFieldCheckBox name = "Climb" checkBoxBoolean={climbCheck} setCheckBoxBoolean={setClimbCheck}></EventDataFieldCheckBox>
+                            <EventDataFieldTextBox name = "Drone" valueText={droneText} setValueText={setDroneText}></EventDataFieldTextBox>
+                            <EventDataFieldExtraNotes name = "Extra Notes" notesText={extraNotes} setNotesText={setExtraNotes}></EventDataFieldExtraNotes>
                     </View>
+                    <BotAnalysisHeader/>
+                    <View style = {[styles.eventDataContainer, {top : 40}]}>
+                        <BotAnalysisSlider name = "Intake Mechanism" sliderVal={intakeVal} setSliderVal={setIntakeVal}></BotAnalysisSlider>
+                        <BotAnalysisSlider name = "Deposit Mechanism" sliderVal={depositVal} setSliderVal={setDepositVal}></BotAnalysisSlider>
+                        <BotAnalysisSlider name = "Drivetrain" sliderVal={drivetrainVal} setSliderVal={setDrivetrainVal}></BotAnalysisSlider>
+                    </View>
+                    <View style = {{height : 60, top : 40}}></View>
                 </ScrollView>
             </View>
         </GestureHandlerRootView>
@@ -169,11 +359,21 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
 
 }
 
-const EventStatsHeader = () => {
+type LogFunction = {
+    log : () => void
+}
+
+const EventStatsHeader: React.FC<LogFunction> = ({log}) => {
+
     return (
         <View style = {styles.eventHeader}>
             <MaterialCommunityIcons name="lightning-bolt" size={36} color="#328AFF" style = {styles.eventIcon}/>
-            <Text style = {styles.eventStatsHeaderText}> Event OPR </Text>
+            <Text style = {styles.eventHeaderText}> Event OPR </Text>
+                <TouchableOpacity style = {{left : 80}} onPress={log}>
+                    <View style = {{backgroundColor : "#328AFF", height : 30, width : 60, display : "flex", justifyContent : "center", alignItems : "center"}}>
+                        <Text style = {{color : "white", fontSize : 20}}>Log</Text>
+                    </View>
+                </TouchableOpacity>
         </View>
     )
 }
@@ -190,7 +390,7 @@ const EventDataHeader: React.FC<EventDataHeaderProps> = ({matchVar, setMatchVar,
     return (
         <View style = {styles.eventHeader}>
             <Entypo name="bar-graph" size={36} color="#328AFF"  style = {styles.eventIcon}/>
-            <Text style = {styles.eventStatsHeaderText}> Event Data </Text>
+            <Text style = {styles.eventHeaderText}> Event Data </Text>
             <Dropdown 
                 style = {styles.matchDropdown}
                 placeholder={displayMatchVar}
@@ -292,6 +492,122 @@ const EventDataFieldCheckBox: React.FC<EventDataFieldCheckBoxProps> = ({name, ch
     )
 }
 
+type EventDataFieldTextBoxProps = {
+    name : string, 
+    valueText : string,
+    setValueText : (text : string) => void
+}
+
+const EventDataFieldTextBox : React.FC<EventDataFieldTextBoxProps> = ({name, valueText, setValueText}) => {
+
+    const handleKeyPress = (event: any) => {
+        if (event.nativeEvent.key === "Enter") {
+          setValueText(valueText)
+        }
+      };
+    
+      const handleTextChange = (text: string) => {
+        setValueText(text)
+      };
+
+    return (
+        <View style = {styles.eventDataFieldContainer}>
+            <Text style = {styles.eventDataFieldText}>{name}</Text>
+            <View style = {styles.eventDataFieldTextBoxContainer}>
+                <TextInput
+                onKeyPress={handleKeyPress}
+                onChangeText={handleTextChange}
+                style={styles.eventDataFieldTextBox}
+                placeholder=""
+                value={valueText}
+                onSubmitEditing={handleKeyPress}
+                inputMode = "numeric"
+                maxLength={2}
+                />
+            </View>
+        </View>
+    )
+}
+
+type EventDataFieldExtraNotesProps = {
+    name : string,
+    notesText : string,
+    setNotesText : (notes: string) => void
+}
+
+const EventDataFieldExtraNotes: React.FC<EventDataFieldExtraNotesProps> = ({name, notesText, setNotesText}) => {
+
+    const handleKeyPress = (event: any) => {
+        if (event.nativeEvent.key === "Enter") {
+          setNotesText(notesText)
+        }
+      };
+    
+      const handleTextChange = (text: string) => {
+        setNotesText(text)
+        
+      };
+    
+      
+
+    return (
+        <View>
+            <Text style = {styles.eventDataFieldText}>{name}</Text>
+            <View style = {styles.extraNotesContainer}>
+                <TextInput
+                    onKeyPress={handleKeyPress}
+                    onChangeText={handleTextChange}
+                    style={styles.extraNotes}
+                    placeholder=""
+                    value={notesText}
+                    onSubmitEditing={handleKeyPress}
+                    multiline = {true}
+                />
+            </View>
+        </View>
+    )
+}
+
+const BotAnalysisHeader = () => {
+    return (
+        <View style = {[styles.eventHeader, {left : 20, top : 20}]}>
+            <FontAwesome6 name="gears" size={36} color="#328AFF" />
+            <Text style = {styles.eventHeaderText}> Bot Analysis </Text>
+        </View>
+    )
+}
+
+type BotAnalysisHeaderProps = {
+    name : string,
+    sliderVal : number,
+    setSliderVal : (val : number) => void
+}
+
+const BotAnalysisSlider: React.FC<BotAnalysisHeaderProps> = ({name, sliderVal, setSliderVal}) =>{
+    return (
+        <View style = {styles.BotAnalysisFieldContainer}>
+            <Text style = {styles.eventDataFieldText}>{name} : {sliderVal}</Text>
+            <View style = {styles.sliderContainer}>
+                <Text style = {{color : "white", fontSize : 22}}> 0 </Text>
+            <Slider
+                style={{width: 240, height: 40}}
+                minimumValue={0}
+                maximumValue={10}
+                minimumTrackTintColor="#328AFF"
+                maximumTrackTintColor="white"
+                thumbTintColor="#328AFF"
+                step={1}
+                value={sliderVal}
+                onValueChange={setSliderVal}
+            />
+            <Text style = {{color : "white", fontSize : 22}}> 10 </Text>
+            </View>
+        </View>
+    )
+}
+
+
+
 const styles = StyleSheet.create({
     container: {
         display : "flex",
@@ -356,7 +672,7 @@ const styles = StyleSheet.create({
         flexDirection : "row",
         alignItems : "center"
     },
-    eventStatsHeaderText : {
+    eventHeaderText : {
         color : "white",
         fontSize : 26
     },
@@ -417,7 +733,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         borderBottomColor: 'white',
-        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomWidth: 2,
     },
     eventDataLabelContainer : {
         display: 'flex',
@@ -434,6 +750,10 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingHorizontal: 0,
         paddingTop : 10
+    },
+    BotAnalysisFieldContainer : {
+        display: 'flex',
+        flexDirection : "column"
     },
     eventDataFieldText : {
         color : "white",
@@ -458,10 +778,47 @@ const styles = StyleSheet.create({
         color: "white"
     },
     checkBoxBorder : {
-        borderWidth : 2,
+        borderWidth : 3,
         borderColor : "#328AFF",
         borderRadius : 8,
         transform : [{scale : 0.75}]
+    },
+    eventDataFieldTextBox: {
+        borderColor: 'white',
+        backgroundColor: "#191919",
+        borderBottomWidth: 2,
+        paddingHorizontal: 10,
+        color: 'white',
+        fontSize: 20,
+        textAlign : "center"
+      },
+    eventDataFieldTextBoxContainer: {
+        backgroundColor : "white",
+        position : "absolute",
+        right : 34,
+        width : "14%"
+    }, 
+    extraNotesContainer : {
+        backgroundColor : "#101010",
+        width : "95%",
+        alignSelf : "center",
+        borderRadius : 8
+    },
+    extraNotes : {
+        borderColor: 'white',
+        backgroundColor: "#101010",
+        borderWidth: 2,
+        paddingHorizontal: 10,
+        color: 'white',
+        fontSize: 20,
+        height : 200,
+        borderRadius : 8
+    }, 
+    sliderContainer : {
+        display : "flex",
+        flexDirection : "row",
+        justifyContent : "center",
+        alignItems : "center"
     }
 })
 
