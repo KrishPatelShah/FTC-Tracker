@@ -29,6 +29,23 @@ type HomeScreenProps = {
     tele_opr : string,
     eg_opr : string,
     rank : string,
+    matches : Match[],
+  }
+
+  type Match = {
+    matchNum : number,
+    redTeams : Team[],
+    blueTeams : Team[],
+    blueScore : number, 
+    redScore : number,
+    matchType : string
+    hasBeenPlayed : boolean
+  }
+
+  type Team = {
+    teamNumber : number,
+    teamName : string,
+    alliance : string
   }
 
   type TeamMatchData = {
@@ -67,7 +84,7 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
 
     const storedTeamNumber = useSelector((state: any) => state.teamNumber.teamNumber); 
     const storedEventCode = useSelector((state: any) => state.event.eventCode); 
-    const [teamData, setTeamData] = useState<TeamData>({number : "", name : "", city : "", state : "", rookieYear : "", school : "", tot_opr : "", auto_opr : "", tele_opr : "", eg_opr : "", rank : ""})
+    const [teamData, setTeamData] = useState<TeamData>({number : "", name : "", city : "", state : "", rookieYear : "", school : "", tot_opr : "", auto_opr : "", tele_opr : "", eg_opr : "", rank : "", matches : []})
     const [teamEventData, setTeamEventData] = useState<TeamEventData>(
         {match1 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""}, 
         match2 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "" , climbCheck : "n/a", drone : ""},
@@ -245,7 +262,7 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
         const fetchTeamData = async () => {
             if(storedTeamNumber){
                 const query = `
-                query getTeamByNumber($season: Int!, $number: Int!) {
+                query getTeamByNumber($season: Int!, $number: Int!, $eventCode: String) {
                     teamByNumber(number: $number) {
                         name
                         schoolName
@@ -268,6 +285,31 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
                                 }
                             }
                         }
+                        matches(season: $season, eventCode: $eventCode){
+                            alliance
+                            match{
+                                tournamentLevel
+                                hasBeenPlayed
+                                matchNum
+                                teams{
+                                    alliance
+                                    team{
+                                        number
+                                        name
+                                    }
+                                }
+                                scores {
+                                    ... on MatchScores2023{
+                                        red{
+                                            totalPoints
+                                        }
+                                        blue{
+                                            totalPoints
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }`;
                 const response = await fetch("https://api.ftcscout.org/graphql", {
@@ -275,11 +317,31 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
                     headers: {
                       "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ query, variables: { season: 2023, number: storedTeamNumber } })
+                    body: JSON.stringify({ query, variables: { season: 2023, number: storedTeamNumber, eventCode : storedEventCode } })
                 });
                 const data = await response.json();
                 let eventStats : any[] = data.data.teamByNumber.events
                 eventStats = eventStats.filter((item) => item.eventCode == storedEventCode)
+
+                let matchArray: any[] = data.data.teamByNumber.matches
+                let formattedMatchArray: Match[] = []
+                matchArray.map((item) => {
+                    let newMatch: Match = {matchNum : item.match.matchNum, redTeams : [], blueTeams : [], 
+                        redScore : item.match.scores.red.totalPoints, blueScore : item.match.scores.blue.totalPoints, 
+                        matchType : item.match.tournamentLevel, hasBeenPlayed : item.match.hasBeenPlayed}
+                    let teamArray = item.match.teams
+                    teamArray.map((team: any) => {
+                        let newTeam: Team = {teamName : team.team.name, teamNumber : team.team.number, alliance : team.alliance}
+                        if(newTeam.alliance === "Red") {
+                            newMatch.redTeams.push(newTeam)
+                        } else if(newTeam.alliance === "Blue") {
+                            newMatch.blueTeams.push(newTeam)
+                        }
+                    })
+                    formattedMatchArray.push(newMatch)
+                })
+
+                
                 let formattedTeamData: TeamData = {number : storedTeamNumber, 
                                                     name : data.data.teamByNumber.name, 
                                                     city : data.data.teamByNumber.location.city, 
@@ -290,10 +352,10 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
                                                     auto_opr : Number(eventStats[0].stats.opr.autoPoints).toFixed(2),
                                                     tele_opr : Number(eventStats[0].stats.opr.dcPoints).toFixed(2),
                                                     eg_opr : Number(eventStats[0].stats.opr.egPoints).toFixed(2), 
-                                                    rank : eventStats[0].stats.rank}
+                                                    rank : eventStats[0].stats.rank, matches : formattedMatchArray}
                     
                 setTeamData(formattedTeamData)
-                //console.log(formattedTeamData)
+
             }
         }
         const unsubscribe = navigation.addListener('focus', () => {
