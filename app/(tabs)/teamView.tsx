@@ -11,6 +11,7 @@ import { Checkbox } from 'react-native-paper';
 import { Dropdown } from "react-native-element-dropdown";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Slider from "@react-native-community/slider";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 
 type HomeScreenProps = {
@@ -45,7 +46,8 @@ type HomeScreenProps = {
   type Team = {
     teamNumber : number,
     teamName : string,
-    alliance : string
+    alliance : string,
+    onField : boolean
   }
 
   type TeamMatchData = {
@@ -293,6 +295,7 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
                                 matchNum
                                 teams{
                                     alliance
+                                    onField
                                     team{
                                         number
                                         name
@@ -331,7 +334,7 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
                         matchType : item.match.tournamentLevel, hasBeenPlayed : item.match.hasBeenPlayed}
                     let teamArray = item.match.teams
                     teamArray.map((team: any) => {
-                        let newTeam: Team = {teamName : team.team.name, teamNumber : team.team.number, alliance : team.alliance}
+                        let newTeam: Team = {teamName : team.team.name, teamNumber : team.team.number, alliance : team.alliance, onField : team.onField}
                         if(newTeam.alliance === "Red") {
                             newMatch.redTeams.push(newTeam)
                         } else if(newTeam.alliance === "Blue") {
@@ -413,7 +416,15 @@ const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
                         <BotAnalysisSlider name = "Deposit Mechanism" sliderVal={depositVal} setSliderVal={setDepositVal}></BotAnalysisSlider>
                         <BotAnalysisSlider name = "Drivetrain" sliderVal={drivetrainVal} setSliderVal={setDrivetrainVal}></BotAnalysisSlider>
                     </View>
-                    <View style = {{height : 60, top : 40}}></View>
+                    <MatchScheduleHeader></MatchScheduleHeader>
+                    <View style = {[styles.eventDataContainer, {top : 80}]}>
+                        {teamData.matches.map((item, index) => (
+                            <Match match = {item} key = {index} viewingTeamNum={storedTeamNumber}></Match>
+                        ))}
+
+                    </View>
+                    <View style = {{height : 80, top : 60}}></View>
+                    
                 </ScrollView>
             </View>
         </GestureHandlerRootView>
@@ -663,6 +674,58 @@ const BotAnalysisSlider: React.FC<BotAnalysisHeaderProps> = ({name, sliderVal, s
                 onValueChange={setSliderVal}
             />
             <Text style = {{color : "white", fontSize : 22}}> 10 </Text>
+            </View>
+        </View>
+    )
+}
+
+const MatchScheduleHeader = () => {
+    return (
+        <View style = {[styles.eventHeader, {left : 20, top : 60}]}>
+            <MaterialIcons name="schedule" size={36} color="#328AFF" />
+            <Text style = {styles.eventHeaderText}> Match Schedule </Text>
+        </View>
+    )
+}
+
+type matchViewProps = {
+    match : Match,
+    viewingTeamNum : string
+}
+
+const Match: React.FC<matchViewProps> = ({match, viewingTeamNum}) => {
+    
+    let matchPrefix = match.matchType === "Quals" ? "Q" : match.matchType === "Semis" ? "SF" : "F"
+    let whoWon = match.blueScore > match.redScore ? "Blue" : match.redScore > match.blueScore ? "Red" : "Tie"
+    return (
+        <View style = {{display : "flex", flexDirection : "column"}}>
+            <View style = {{display : "flex", flexDirection : "row", justifyContent : "flex-start", alignItems : "center"}}>
+                <Text style = {{fontSize : 22, color : "white"}}>{matchPrefix}-{match.matchNum}</Text>
+                <View style = {{display : "flex", flexDirection : "row", left : 80, position : "absolute"}}>
+                <Text style = {whoWon == "Red" ? {fontSize : 18, color : "#CF3427", fontStyle : "italic", fontWeight : "bold"} : whoWon == "Tie" ? {fontSize : 18, color : "#7136bf"} : {fontSize : 18, color : "#CF3427"}}>{match.redScore}</Text>
+                    <Text style = {{fontSize : 18, color : "white"}}>-</Text>
+                    <Text style = {whoWon == "Blue" ? {fontSize : 18, color : "#328AFF", fontStyle : "italic", fontWeight : "bold"} : whoWon == "Tie" ? {fontSize : 18, color : "#7136bf"} : {fontSize : 18, color : "#328AFF"}}>{match.blueScore}</Text>
+                </View>
+            </View>
+            <View style = {{display : "flex", flexDirection : "row"}}>
+                <View style = {{backgroundColor : "#CF3427", height : 4, flex : 1}}></View>
+                <View style = {{backgroundColor : "#328AFF", height : 4, flex : 1}}></View>
+            </View>
+            <View style = {{display : "flex", flexDirection : "row", flex : 1}}>
+                <View style = {{flex : 1}}>
+                    {match.redTeams.map((item, index) => (
+                        <View style = {{display: "flex", backgroundColor : item.teamNumber === Number(viewingTeamNum) ? "#AF1D1D" : index % 2 == 0 ? "#5E1E19" : "#713833", height : 30, flex : 1, justifyContent : "flex-start", alignItems : "center", flexDirection : "row"}} key = {index}>
+                            <Text style = {{fontSize : 9, color : item.onField ? "white" : "#A0A0A0", left : 10}}>{item.teamNumber} - {item.teamName}</Text>
+                        </View>
+                    ))}
+                </View>
+                <View style = {{flex : 1}}>
+                    {match.blueTeams.map((item, index) => (
+                        <View style = {{display: "flex", backgroundColor : item.teamNumber === Number(viewingTeamNum) ? "#1B57B3" : index % 2 == 0 ? "#1B385F" : "#344F72", height : 30, flex : 1, justifyContent : "flex-start", alignItems : "center", flexDirection : "row"}} key = {index}>
+                            <Text style = {{fontSize : 9, color : item.onField ? "white" : "#A0A0A0", left : 10}}>{item.teamNumber} - {item.teamName}</Text>
+                        </View>
+                    ))}
+                </View>
             </View>
         </View>
     )
