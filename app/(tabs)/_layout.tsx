@@ -9,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 import LoginPage from '@/app/(tabs)/loginPage';
+import CreateAccountPage from '@/app/(tabs)/createAccountPage';
 import MatchLoader from './matchLoader';
 import HomePage from './homePage'; 
 import ScoutingSheet from './scoutingSheetTemplate';
@@ -33,6 +34,16 @@ export default function TabLayout() {
           component={LoginPage}
           options={{
             title: 'homereal',
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="createAccount"
+          component={CreateAccountPage}
+          options={{
+            title: 'createAccount',
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
             ),

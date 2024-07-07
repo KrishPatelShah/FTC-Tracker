@@ -1,8 +1,16 @@
-import React from 'react';
-import { Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { global_styles } from '@/styles';
+import React, { useState } from 'react';
+import { Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Modal } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import ForgotPassword from './forgotPassword';
 
 export default function LoginPage() {
+  const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleCreateAccount = () => {
+    navigation.navigate('createAccount');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -23,13 +31,21 @@ export default function LoginPage() {
         placeholderTextColor="#ccc"
         secureTextEntry
       />
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.loginButton}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
       <Text style={styles.orText}>Or</Text>
-      <TouchableOpacity style={styles.googleButton}>
-        <Text style={styles.googleButtonText}>Sign in with Google</Text>
+      <TouchableOpacity onPress={handleCreateAccount}>
+        <Text style={styles.createAccountText}>Create an account</Text>
       </TouchableOpacity>
+
+      <ForgotPassword
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
     </View>
   );
 }
@@ -45,7 +61,7 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 50,
   },
   logo: {
     width: 100,
@@ -57,22 +73,28 @@ const styles = StyleSheet.create({
     fontSize: 35,
   },
   input: {
-    width: '80%',
-    height: 40,
+    width: '85%',
+    height: 45,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
-    marginVertical: 10,
+    marginVertical: 15,
     paddingHorizontal: 10,
     color: Platform.OS === 'web' ? '#000' : '#fff',
+  },
+  forgotPasswordText: {
+    color: '#1E90FF',
+    fontSize: 16,
+    textAlign: 'center',
+    marginVertical: 10,
   },
   loginButton: {
     backgroundColor: '#1E90FF',
     borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginVertical: 10,
-    width: '80%',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    marginVertical: 15,
+    width: '85%',
     alignItems: 'center',
   },
   loginButtonText: {
@@ -83,19 +105,10 @@ const styles = StyleSheet.create({
   orText: {
     color: '#fff',
     fontSize: 16,
-    marginVertical: 10,
+    marginVertical: 15,
   },
-  googleButton: {
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginVertical: 10,
-    width: '80%',
-    alignItems: 'center',
-  },
-  googleButtonText: {
-    color: '#000',
+  createAccountText: {
+    color: '#1E90FF',
     fontSize: 16,
     textAlign: 'center',
   },
