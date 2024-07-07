@@ -40,7 +40,7 @@ export default function SignUpScreen() {
       </TouchableOpacity>
       <View style={styles.termsContainer}>
         <Text style={styles.termsText}>
-          By creating your account you agree to our{' '}
+          By creating your account, you agree to our{' '}
           <Text style={styles.linkText} onPress={handleTermsOfServicePress}>
             Terms of Service
           </Text>{' '}

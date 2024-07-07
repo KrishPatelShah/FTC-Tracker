@@ -11,7 +11,7 @@ export default function LoginScreen() {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleCreateAccount = () => {
-    navigation.navigate('SignUp');
+    navigation.navigate('SignUpScreen');
   };
 
   const handleForgotPassword = () => {
