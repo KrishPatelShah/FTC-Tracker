@@ -2,7 +2,7 @@ import { Image, View, Text, StyleSheet, Button, TouchableOpacity } from 'react-n
 import { global_styles } from '@/styles';
 import { useState } from 'react';
 import { TextInput, GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
-import MatchView from '@/matchView';
+import MatchView from '@/example_tabs/matchView';
 
 
 interface Team {

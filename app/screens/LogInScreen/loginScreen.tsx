@@ -18,6 +18,10 @@ export default function LoginScreen() {
     setModalVisible(true);
   };
 
+  const handleHomePage = () => {
+    navigation.navigate("HomeScreen")
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -41,7 +45,7 @@ export default function LoginScreen() {
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.loginButton}>
+      <TouchableOpacity style={styles.loginButton} onPress = {handleHomePage}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
       <Text style={styles.orText}>Or</Text>

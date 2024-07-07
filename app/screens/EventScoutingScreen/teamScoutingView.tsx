@@ -1,9 +1,9 @@
 
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import {Text, View, StyleSheet} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
-import { setTeamNumber } from "./teamNumberReducers";
+import { setTeamNumber } from "../../../teamNumberReducers";
 
 
 interface teamScoutingViewProps {
@@ -17,19 +17,20 @@ const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownV
 
 
     
-
+    const [isPressed, setIsPressed] = useState(false)
     const displayValue = shownValue.toString()
     const storedTeamNumber = useSelector((state: any) => state.teamNumber.teamNumber); 
     const dispatch = useDispatch();
 
     const check = () => {
-        
+        setIsPressed(true)
         dispatch(setTeamNumber(teamNumber))
     }
 
     useEffect(() => {
-        
-        navigation.navigate("teamView")
+        if(isPressed){
+            navigation.navigate("TeamScoutingScreen")
+        }
       }, [storedTeamNumber]);
     
     return (

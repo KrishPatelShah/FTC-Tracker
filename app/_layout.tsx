@@ -12,6 +12,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from '@/app/screens/LogInScreen/loginScreen';
 import SignUpScreen from '@/app/screens/SignUpScreen/signUpScreen';
+import EventScoutingScreen from './screens/EventScoutingScreen/scoutingSheetTemplate';
+import TeamScoutingScreen from './screens/TeamScoutingScreen/teamView';
+import HomeScreen from './screens/HomeScreen/homePage';
+import { Provider } from 'react-redux';
+import { store } from '@/dataStore';
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -35,12 +41,17 @@ export default function RootLayout() {
   }
 
   return (
+    <Provider store = {store}>
     <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent = {true}>
       <Stack.Navigator>
-      <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="EventScoutingScreen" component={EventScoutingScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} options={{ headerShown: false }} />
         {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
       </Stack.Navigator>
     </NavigationContainer>
+    </Provider>
   );
 }

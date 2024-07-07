@@ -3,16 +3,16 @@ import { View, Text, StyleSheet } from 'react-native';
 import { GestureHandlerRootView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootTabParamList } from '@/routes';
+import { RootStackParamList } from '@/app/navigation/types';
 import { NavigationProp } from '@react-navigation/native';
 import { setEventCode } from '@/eventCodeReducers';
 
 
 type HomeScreenProps = {
-  navigation: NavigationProp<RootTabParamList>;
+  navigation: NavigationProp<RootStackParamList>;
 };
 
-const HomePage: React.FC<HomeScreenProps> = ({ navigation }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const eventCode = useSelector((state: any) => state.event.eventCode); 
   const dispatch = useDispatch();
@@ -55,7 +55,7 @@ const HomePage: React.FC<HomeScreenProps> = ({ navigation }) => {
             style={styles.textInput}
             placeholder="Enter Event Code"
             value={eventCode}
-            onSubmitEditing={() => navigation.navigate("scoutingSheetTemplate")}
+            onSubmitEditing={() => navigation.navigate("EventScoutingScreen")}
           />
         </View>
       )}
@@ -63,7 +63,7 @@ const HomePage: React.FC<HomeScreenProps> = ({ navigation }) => {
   );
 };
 
-export default HomePage;
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {

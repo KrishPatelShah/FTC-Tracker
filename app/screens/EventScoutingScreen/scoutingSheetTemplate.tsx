@@ -2,7 +2,7 @@ import React, { useEffect, useState, } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { global_styles } from '@/styles';
 import { useSelector } from 'react-redux';
-import TeamView from '@/teamScoutingView';
+import TeamView from '@/app/screens/EventScoutingScreen/teamScoutingView';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -18,7 +18,7 @@ type Team = {
     rank: string,
   };
 
-const ScoutingSheet: React.FC<ScoutingSheetProps> = ({ navigation }) => {
+const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
   const [eventName, setEventName] = useState("");
   const [teamArray, setTeamArray] = useState<Team[]>([]);
   const eventCode = useSelector((state: any) => state.event.eventCode);
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScoutingSheet;
+export default EventScoutingScreen;

@@ -1,4 +1,4 @@
-import { RootTabParamList } from "@/routes";
+import { RootStackParamList } from "@/app/navigation/types";
 import { NavigationProp } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
@@ -15,7 +15,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 
 type HomeScreenProps = {
-    navigation: NavigationProp<RootTabParamList>;
+    navigation: NavigationProp<RootStackParamList>;
   };
 
   type TeamData = {
@@ -82,7 +82,7 @@ const MatchView = [{label : "Match 1", value : "Match 1"},
     {label : "Match 4", value : "Match 4"}, 
     {label : "Match 5", value : "Match 5"}]
 
-const IndivTeamView: React.FC<HomeScreenProps> = ({navigation}) => {
+const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
     const storedTeamNumber = useSelector((state: any) => state.teamNumber.teamNumber); 
     const storedEventCode = useSelector((state: any) => state.event.eventCode); 
@@ -947,4 +947,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default IndivTeamView
+export default TeamScoutingScreen

@@ -10,10 +10,10 @@ import { NavigationContainer } from '@react-navigation/native';
 const Tab = createBottomTabNavigator();
 import LoginPage from '@/app/(tabs)/loginPage';
 import CreateAccountPage from '@/app/(tabs)/createAccountPage';
-import MatchLoader from './matchLoader';
-import HomePage from './homePage'; 
-import ScoutingSheet from './scoutingSheetTemplate';
-import IndivTeamView from './teamView';
+import MatchLoader from '../../example_tabs/matchLoader';
+import HomeScreen from '../screens/HomeScreen/homePage'; 
+import EventScoutingScreen from '../screens/EventScoutingScreen/scoutingSheetTemplate';
+import TeamScoutingScreen from '../screens/TeamScoutingScreen/teamView';
 
 import { Provider } from 'react-redux';
 import { store } from '@/dataStore';
@@ -61,7 +61,7 @@ export default function TabLayout() {
         />
         <Tab.Screen
           name="homePage"
-          component={HomePage}
+          component={HomeScreen}
           options={{
             title: 'HomeScreen',
             tabBarIcon: ({ color, focused }) => (
@@ -71,7 +71,7 @@ export default function TabLayout() {
         />
         <Tab.Screen
           name="scoutingSheetTemplate"
-          component={ScoutingSheet}
+          component={EventScoutingScreen}
           options={{
             title: 'Scouting',
             tabBarIcon: ({ color, focused }) => (
@@ -81,7 +81,7 @@ export default function TabLayout() {
         />
         <Tab.Screen
           name="teamView"
-          component={IndivTeamView}
+          component={TeamScoutingScreen}
           options={{
             title: 'teams',
             tabBarIcon: ({ color, focused }) => (
