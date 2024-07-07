@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
-import { Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Modal } from 'react-native';
+import { Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
 import ForgotPassword from './forgotPassword';
 
 export default function LoginPage() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleCreateAccount = () => {
     navigation.navigate('createAccount');
+  };
+
+  const handleForgotPassword = () => {
+    setModalVisible(true);
   };
 
   return (
@@ -31,7 +38,7 @@ export default function LoginPage() {
         placeholderTextColor="#ccc"
         secureTextEntry
       />
-      <TouchableOpacity onPress={() => setModalVisible(true)}>
+      <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.loginButton}>
@@ -42,10 +49,7 @@ export default function LoginPage() {
         <Text style={styles.createAccountText}>Create an account</Text>
       </TouchableOpacity>
 
-      <ForgotPassword
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-      />
+      <ForgotPassword modalVisible={modalVisible} setModalVisible={setModalVisible} />
     </View>
   );
 }
@@ -86,7 +90,7 @@ const styles = StyleSheet.create({
     color: '#1E90FF',
     fontSize: 16,
     textAlign: 'center',
-    marginVertical: 10,
+    marginBottom: 10,
   },
   loginButton: {
     backgroundColor: '#1E90FF',

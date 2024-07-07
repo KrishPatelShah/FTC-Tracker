@@ -1,20 +1,22 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 
 type ForgotPasswordProps = {
   modalVisible: boolean;
-  setModalVisible: (visible: boolean) => void;
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function ForgotPassword({ modalVisible, setModalVisible }: ForgotPasswordProps) {
+const ForgotPassword: React.FC<ForgotPasswordProps> = ({ modalVisible, setModalVisible }) => {
   return (
     <Modal
       animationType="slide"
       transparent={true}
       visible={modalVisible}
-      onRequestClose={() => setModalVisible(!modalVisible)}
+      onRequestClose={() => {
+        setModalVisible(!modalVisible);
+      }}
     >
-      <View style={styles.modalContainer}>
+      <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.modalTitle}>Password Reset</Text>
           <TextInput
@@ -25,25 +27,25 @@ export default function ForgotPassword({ modalVisible, setModalVisible }: Forgot
           <TouchableOpacity style={styles.resetButton}>
             <Text style={styles.resetButtonText}>Reset your password</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setModalVisible(false)}>
+          <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
             <Text style={styles.backToSignInText}>Back to sign in</Text>
           </TouchableOpacity>
         </View>
       </View>
     </Modal>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  modalContainer: {
+  centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
     width: '90%',
-    backgroundColor: '#000',
+    backgroundColor: '#333',
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -62,14 +64,14 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   input: {
-    width: '90%',
+    width: '100%',
     height: 45,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
-    marginVertical: 15,
+    marginBottom: 15,
     paddingHorizontal: 10,
-    color: Platform.OS === 'web' ? '#000' : '#fff',
+    color: '#fff',
   },
   resetButton: {
     backgroundColor: '#1E90FF',
@@ -77,7 +79,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 25,
     marginVertical: 15,
-    width: '90%',
+    width: '100%',
     alignItems: 'center',
   },
   resetButtonText: {
@@ -89,6 +91,8 @@ const styles = StyleSheet.create({
     color: '#1E90FF',
     fontSize: 16,
     textAlign: 'center',
-    marginVertical: 10,
+    marginTop: 10,
   },
 });
+
+export default ForgotPassword;
