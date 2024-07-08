@@ -11,7 +11,7 @@ const Tab = createBottomTabNavigator();
 import LoginPage from '@/app/(tabs)/loginPage';
 import CreateAccountPage from '@/app/(tabs)/createAccountPage';
 import MatchLoader from '../../example_tabs/matchLoader';
-import HomeScreen from '../screens/HomeScreen/homePage'; 
+import HomeScreen from '../screens/HomeScreen/homeScreen'; 
 import EventScoutingScreen from '../screens/EventScoutingScreen/scoutingSheetTemplate';
 import TeamScoutingScreen from '../screens/TeamScoutingScreen/teamView';
 

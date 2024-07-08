@@ -9,24 +9,27 @@ import Animated, {
     useDerivedValue,
 } from 'react-native-reanimated';
 
+const height = 48;
+const textVertAlignment = height/1.2;
+const width = 425;
+const switchTrackLength = width/2.014218009;
+const borderRadius = 6;
+
 type SwitchProps = {
     activeColor : string,
     inactiveColor : string,
+    active : boolean,
+    setActive : (item : boolean) => void,
 };
-const CustomSwitch: React.FC<SwitchProps> = ({activeColor, inactiveColor}) =>{
-    const [active, setActive] = useState(false);
-    const [displayText, setDisplayText] = useState('');
+const CustomSwitch: React.FC<SwitchProps> = ({activeColor, inactiveColor, active, setActive}) =>{
     const switchTranslate = useSharedValue(0);
 
     useEffect(()=>{
         if(active){
-            switchTranslate.value = 200; 
-            setDisplayText('<Events here>');
-            
+            switchTranslate.value = switchTrackLength;             
         }
         else{
             switchTranslate.value = 0;
-            setDisplayText('<Teams here>');
         }
     }, [active, switchTranslate])
 
@@ -53,7 +56,6 @@ const CustomSwitch: React.FC<SwitchProps> = ({activeColor, inactiveColor}) =>{
     });
     const backgroundColorStyle = useAnimatedStyle(() => {
         const backgroundColor = interpolateColor(progress.value, [0,1], [activeColor, inactiveColor])
-
         return {
             backgroundColor
         };
@@ -65,28 +67,33 @@ const CustomSwitch: React.FC<SwitchProps> = ({activeColor, inactiveColor}) =>{
                 <Animated.View style={[styles.container, backgroundColorStyle]}> 
                     <Animated.View style={[styles.circle, customSpringStyles]}/>
                 </Animated.View>
-                <Text style={[styles.buttonText]} onPress={() => {setActive(!active)}}>Teams</Text>
-                <Text style={[styles.buttonText, {left: 250}]} onPress={() => {setActive(!active)}}>Events</Text> 
+
+                <View style={styles.textPositioning}>
+                    <Text style={[styles.buttonText]}>Teams</Text>
+                    <Text style={[styles.buttonText, {}]}>Events</Text>
+                </View>
             </Pressable>
-            <Text style={styles.text}>{displayText}</Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    textPositioning:{
+        flexDirection: 'row',
+        bottom: 42,
+        justifyContent: 'space-around',
+    },
     container:{
-        width: 400,
-        height: 60,
-        borderRadius: 10,
-        borderColor: '#454444',
-        borderWidth: 1,
-        justifyContent: 'center',
+        width: width,
+        height: height,
+        borderRadius: borderRadius,
+
     },
     circle:{
-        width:200,
-        height:60,
+        width:width/2,
+        height:height,
         backgroundColor: '#328aff',
-        borderRadius: 10, 
+        borderRadius: borderRadius, 
         shadowColor: 'black',
         shadowOffset: {
             width: 0,
@@ -94,19 +101,10 @@ const styles = StyleSheet.create({
         },  
     },
     buttonText:{
-        fontSize: 35,
+        fontSize: 25,
         color: 'white',
-        position: 'absolute',
-        left: 38,
-        top: 5
     },
-    text: {
-        fontSize: 35,
-        top: 35,
-        color: 'white',
-        position: 'relative',
-        alignSelf: 'center',
-      },
+
 });
 
 export default CustomSwitch; // has to be the same as the file name
