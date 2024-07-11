@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
 
 type ForgotPasswordProps = {
   modalVisible: boolean;
@@ -7,6 +9,18 @@ type ForgotPasswordProps = {
 };
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({ modalVisible, setModalVisible }) => {
+  const [email, setEmail] = useState('');
+
+  const handlePasswordReset = () => {
+    try{
+      sendPasswordResetEmail(FIREBASE_AUTH, email)
+      alert('Check your email to confirm your password reset!')
+      setModalVisible(!modalVisible)
+    } catch(error : any){
+      alert('😓 Password reset failed:\n' + error.message)
+    } 
+  }
+
   return (
     <Modal
       animationType="slide"
@@ -19,14 +33,20 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ modalVisible, setModalV
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.modalTitle}>Password Reset</Text>
+
           <TextInput
             style={styles.input}
+            value={email}
             placeholder="Email"
             placeholderTextColor="#ccc"
+            autoCapitalize='none'
+            onChangeText={(text)=>{setEmail(text)}}
           />
-          <TouchableOpacity style={styles.resetButton}>
+
+          <TouchableOpacity style={styles.resetButton} onPress={handlePasswordReset}>
             <Text style={styles.resetButtonText}>Reset your password</Text>
           </TouchableOpacity>
+
           <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
             <Text style={styles.backToSignInText}>Back to sign in</Text>
           </TouchableOpacity>
