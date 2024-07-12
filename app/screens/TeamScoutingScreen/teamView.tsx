@@ -63,38 +63,28 @@ type HomeScreenProps = {
   }
 
   type TeamEventData = {
-    match1 : TeamMatchData,
-    match2 : TeamMatchData,
-    match3 : TeamMatchData,
-    match4 : TeamMatchData,
-    match5 : TeamMatchData,
+    matchData : TeamMatchData[]
     extraNotes : string,
     intake : number,
     deposit : number,
     drivetrain : number
   }
 
-  
 
-const MatchView = [{label : "Match 1", value : "Match 1"}, 
-    {label : "Match 2", value : "Match 2"}, 
-    {label : "Match 3", value : "Match 3"}, 
-    {label : "Match 4", value : "Match 4"}, 
-    {label : "Match 5", value : "Match 5"}]
+  type dropdownMatches = {
+
+    label : string,
+    value : string
+  }
+
+
 
 const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
-
+    const [DropdownMatchView, setDropdownMatch] = useState<dropdownMatches[]>([])
     const storedTeamNumber = useSelector((state: any) => state.teamNumber.teamNumber); 
     const storedEventCode = useSelector((state: any) => state.event.eventCode); 
     const [teamData, setTeamData] = useState<TeamData>({number : "", name : "", city : "", state : "", rookieYear : "", school : "", tot_opr : "", auto_opr : "", tele_opr : "", eg_opr : "", rank : "", matches : []})
-    const [teamEventData, setTeamEventData] = useState<TeamEventData>(
-        {match1 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""}, 
-        match2 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "" , climbCheck : "n/a", drone : ""},
-        match3 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""},
-        match4 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""},
-        match5 : {purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""},
-        extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5
-        })
+    const [teamEventData, setTeamEventData] = useState<TeamEventData>({extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : []})
     const [showingInfo, setShowingInfo] = useState(false)
     const [matchView, setMatchView] = useState("Match 1")
     const [displayMatchView, setDisplayMatchView] = useState("Match 1")
@@ -112,144 +102,51 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const [intakeVal, setIntakeVal] = useState(5)
     const [depositVal, setDepositVal] = useState(5)
     const [drivetrainVal, setDrivetrainVal] = useState(5)
-
+    
+    const [dataFetched, setDataFetched] = useState(false)
+    
     const toggleShowingInfo = () => {
         setShowingInfo(!showingInfo)
     }
 
     const logTeamEventData = () => {
-        console.log(teamEventData)
+        console.log("raw : " + teamEventData)
+        console.log("JSON : " + JSON.stringify(teamEventData))
     }
 
     useEffect(() => {
-        switch (matchView) {
-            case "Match 1":
-                setPurplePixelCheck(teamEventData.match1.purplePixelCheck)
-                setYellowPixelCheck(teamEventData.match1.yellowPixelCheck)
-                setParkCheck(teamEventData.match1.parkCheck)
-                setDriveUnderStageDoorCheck(teamEventData.match1.driveUnderStageDoorCheck)
-                setCyclesText(teamEventData.match1.cycle)
-                setBackDropLineText(teamEventData.match1.backDropLine)
-                setMosaicText(teamEventData.match1.mosaic)
-                setClimbCheck(teamEventData.match1.climbCheck)
-                setDroneText(teamEventData.match1.drone)
-                break;
-            case "Match 2":
-                setPurplePixelCheck(teamEventData.match2.purplePixelCheck)
-                setYellowPixelCheck(teamEventData.match2.yellowPixelCheck)
-                setParkCheck(teamEventData.match2.parkCheck)
-                setDriveUnderStageDoorCheck(teamEventData.match2.driveUnderStageDoorCheck)
-                setCyclesText(teamEventData.match2.cycle)
-                setBackDropLineText(teamEventData.match2.backDropLine)
-                setMosaicText(teamEventData.match2.mosaic)
-                setClimbCheck(teamEventData.match2.climbCheck)
-                setDroneText(teamEventData.match2.drone)
-                break;
-            case "Match 3":
-                setPurplePixelCheck(teamEventData.match3.purplePixelCheck)
-                setYellowPixelCheck(teamEventData.match3.yellowPixelCheck)
-                setParkCheck(teamEventData.match3.parkCheck)
-                setDriveUnderStageDoorCheck(teamEventData.match3.driveUnderStageDoorCheck)
-                setCyclesText(teamEventData.match3.cycle)
-                setBackDropLineText(teamEventData.match3.backDropLine)
-                setMosaicText(teamEventData.match3.mosaic)
-                setClimbCheck(teamEventData.match3.climbCheck)
-                setDroneText(teamEventData.match3.drone)
-                break;
-
-            case "Match 4":
-                setPurplePixelCheck(teamEventData.match4.purplePixelCheck)
-                setYellowPixelCheck(teamEventData.match4.yellowPixelCheck)
-                setParkCheck(teamEventData.match4.parkCheck)
-                setDriveUnderStageDoorCheck(teamEventData.match4.driveUnderStageDoorCheck)
-                setCyclesText(teamEventData.match4.cycle)
-                setBackDropLineText(teamEventData.match4.backDropLine)
-                setMosaicText(teamEventData.match4.mosaic)
-                setClimbCheck(teamEventData.match4.climbCheck)
-                setDroneText(teamEventData.match4.drone)
-                break;
-            
-            case "Match 5":
-                setPurplePixelCheck(teamEventData.match5.purplePixelCheck)
-                setYellowPixelCheck(teamEventData.match5.yellowPixelCheck)
-                setParkCheck(teamEventData.match5.parkCheck)
-                setDriveUnderStageDoorCheck(teamEventData.match5.driveUnderStageDoorCheck)
-                setCyclesText(teamEventData.match5.cycle)
-                setBackDropLineText(teamEventData.match5.backDropLine)
-                setMosaicText(teamEventData.match5.mosaic)
-                setClimbCheck(teamEventData.match5.climbCheck)
-                setDroneText(teamEventData.match5.drone)
-                break;
-            default : 
-                console.log(matchView)
+        if(dataFetched){
+            let matchArr: string[] = []
+            DropdownMatchView.map((item) => {matchArr.push(item.value)})
+            let dropDownIndex = matchArr.indexOf(matchView)
+            setPurplePixelCheck(teamEventData.matchData[dropDownIndex].purplePixelCheck)
+            setYellowPixelCheck(teamEventData.matchData[dropDownIndex].yellowPixelCheck)
+            setParkCheck(teamEventData.matchData[dropDownIndex].parkCheck)
+            setDriveUnderStageDoorCheck(teamEventData.matchData[dropDownIndex].driveUnderStageDoorCheck)
+            setCyclesText(teamEventData.matchData[dropDownIndex].cycle)
+            setBackDropLineText(teamEventData.matchData[dropDownIndex].backDropLine)
+            setMosaicText(teamEventData.matchData[dropDownIndex].mosaic)
+            setClimbCheck(teamEventData.matchData[dropDownIndex].climbCheck)
+            setDroneText(teamEventData.matchData[dropDownIndex].drone)
         }
+        
     }, [matchView])
 
     useEffect(() => {
-        switch (matchView) {
-            case "Match 1":
-                teamEventData.match1.purplePixelCheck = purplePixelCheck
-                teamEventData.match1.yellowPixelCheck = yellowPixelCheck
-                teamEventData.match1.parkCheck = parkCheck
-                teamEventData.match1.driveUnderStageDoorCheck = driveUnderStageDoorCheck
-                teamEventData.match1.cycle = cyclesText
-                teamEventData.match1.backDropLine = backDropLineText
-                teamEventData.match1.mosaic = mosaicText
-                teamEventData.match1.climbCheck = climbCheck
-                teamEventData.match1.drone = droneText
-               
-                break;
-            case "Match 2":
-                teamEventData.match2.purplePixelCheck = purplePixelCheck
-                teamEventData.match2.yellowPixelCheck = yellowPixelCheck
-                teamEventData.match2.parkCheck = parkCheck
-                teamEventData.match2.driveUnderStageDoorCheck = driveUnderStageDoorCheck
-                teamEventData.match2.cycle = cyclesText
-                teamEventData.match2.backDropLine = backDropLineText
-                teamEventData.match2.mosaic = mosaicText
-                teamEventData.match2.climbCheck = climbCheck
-                teamEventData.match2.drone = droneText
-                break;
-            case "Match 3":
-                teamEventData.match3.purplePixelCheck = purplePixelCheck
-                teamEventData.match3.yellowPixelCheck = yellowPixelCheck
-                teamEventData.match3.parkCheck = parkCheck
-                teamEventData.match3.driveUnderStageDoorCheck = driveUnderStageDoorCheck
-                teamEventData.match3.cycle = cyclesText
-                teamEventData.match3.backDropLine = backDropLineText
-                teamEventData.match3.mosaic = mosaicText
-                teamEventData.match3.climbCheck = climbCheck
-                teamEventData.match3.drone = droneText
-                break;
-
-            case "Match 4":
-                teamEventData.match4.purplePixelCheck = purplePixelCheck
-                teamEventData.match4.yellowPixelCheck = yellowPixelCheck
-                teamEventData.match4.parkCheck = parkCheck
-                teamEventData.match4.driveUnderStageDoorCheck = driveUnderStageDoorCheck
-                teamEventData.match4.cycle = cyclesText
-                teamEventData.match4.backDropLine = backDropLineText
-                teamEventData.match4.mosaic = mosaicText
-                teamEventData.match4.climbCheck = climbCheck
-                teamEventData.match4.drone = droneText
-                break;
-
-            case "Match 5":
-                teamEventData.match5.purplePixelCheck = purplePixelCheck
-                teamEventData.match5.yellowPixelCheck = yellowPixelCheck
-                teamEventData.match5.parkCheck = parkCheck
-                teamEventData.match5.driveUnderStageDoorCheck = driveUnderStageDoorCheck
-                teamEventData.match5.cycle = cyclesText
-                teamEventData.match5.backDropLine = backDropLineText
-                teamEventData.match5.mosaic = mosaicText
-                teamEventData.match5.climbCheck = climbCheck
-                teamEventData.match5.drone = droneText
-                break;
-
-            default : 
-                console.log(matchView)
+        if(dataFetched){
+            let matchArr: string[] = []
+            DropdownMatchView.map((item) => {matchArr.push(item.value)})
+            let dropDownIndex = matchArr.indexOf(matchView)
+            teamEventData.matchData[dropDownIndex].purplePixelCheck = purplePixelCheck
+            teamEventData.matchData[dropDownIndex].yellowPixelCheck = yellowPixelCheck
+            teamEventData.matchData[dropDownIndex].parkCheck = parkCheck
+            teamEventData.matchData[dropDownIndex].driveUnderStageDoorCheck = driveUnderStageDoorCheck
+            teamEventData.matchData[dropDownIndex].cycle = cyclesText
+            teamEventData.matchData[dropDownIndex].backDropLine = backDropLineText
+            teamEventData.matchData[dropDownIndex].mosaic = mosaicText
+            teamEventData.matchData[dropDownIndex].climbCheck = climbCheck
+            teamEventData.matchData[dropDownIndex].drone = droneText
         }
-
         teamEventData.extraNotes = extraNotes
         teamEventData.intake = intakeVal
         teamEventData.deposit = depositVal
@@ -327,6 +224,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                 eventStats = eventStats.filter((item) => item.eventCode == storedEventCode)
 
                 let matchArray: any[] = data.data.teamByNumber.matches
+                for(let i = 1; i <= matchArray.length; i++){
+                    DropdownMatchView.push({label : "Match " + i, value : "Match " + i})
+                    teamEventData.matchData.push({purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""})
+                }
+                setDataFetched(true)
                 let formattedMatchArray: Match[] = []
                 matchArray.map((item) => {
                     let newMatch: Match = {matchNum : item.match.matchNum, redTeams : [], blueTeams : [], 
@@ -394,7 +296,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                 <ScrollView>
                     <EventStatsHeader log={logTeamEventData}/>
                     <EventStatsContainer teamData={teamData}></EventStatsContainer>
-                    <EventDataHeader matchVar={matchView} setMatchVar={setMatchView} displayMatchVar={displayMatchView} setDisplayMatchVar={setDisplayMatchView}></EventDataHeader>
+                    <EventDataHeader matchVar={matchView} setMatchVar={setMatchView} displayMatchVar={displayMatchView} setDisplayMatchVar={setDisplayMatchView} dropDownMatches={DropdownMatchView}></EventDataHeader>
                     <View style = {styles.eventDataContainer}>
                         <EventDataSubHeader headerName="Autonomous"></EventDataSubHeader>
                             <EventDataFieldCheckBox name= "Purple Pixel" checkBoxBoolean = {purplePixelCheck} setCheckBoxBoolean={setPurplePixelCheck}></EventDataFieldCheckBox>
@@ -456,10 +358,10 @@ type EventDataHeaderProps = {
     setMatchVar : (item : string) => void,
     displayMatchVar : string,
     setDisplayMatchVar : (item : string) => void,
-
+    dropDownMatches : dropdownMatches[]
 }
 
-const EventDataHeader: React.FC<EventDataHeaderProps> = ({matchVar, setMatchVar, displayMatchVar, setDisplayMatchVar}) => {
+const EventDataHeader: React.FC<EventDataHeaderProps> = ({matchVar, setMatchVar, displayMatchVar, setDisplayMatchVar, dropDownMatches}) => {
     return (
         <View style = {styles.eventHeader}>
             <Entypo name="bar-graph" size={36} color="#328AFF"  style = {styles.eventIcon}/>
@@ -469,7 +371,7 @@ const EventDataHeader: React.FC<EventDataHeaderProps> = ({matchVar, setMatchVar,
                 placeholder={displayMatchVar}
                 placeholderStyle={styles.dropDownText}
                 selectedTextStyle={styles.dropDownText}
-                data={MatchView}
+                data={dropDownMatches}
                 labelField="label"
                 valueField="value"
                 onChange={item => {

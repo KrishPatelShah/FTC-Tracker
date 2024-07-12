@@ -8,10 +8,13 @@ import Animated, {
     withTiming,
     useDerivedValue,
 } from 'react-native-reanimated';
+import {Dimensions} from 'react-native';
 
+
+const windowWidth = Dimensions.get('window').width;
 const height = 48;
 const textVertAlignment = height/1.2;
-const width = 425;
+const width = windowWidth/1.1;
 const switchTrackLength = width/2.014218009;
 const borderRadius = 6;
 
