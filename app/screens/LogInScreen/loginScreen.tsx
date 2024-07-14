@@ -4,23 +4,40 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import ForgotPassword from './forgotPasswordScreen';
+import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
+import { ActivityIndicator } from 'react-native-paper';
+import { signInWithEmailAndPassword, updatePassword } from 'firebase/auth';
 
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  // USER INFO STATE HANDLING
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  // SETTING AUTHENTICATION VARIABLE
+  const auth = FIREBASE_AUTH; // this variable was already created in FirebaseConfig.tsx so we only need to import
+  
   const [modalVisible, setModalVisible] = useState(false);
+
+  const handleForgotPassword = () => {
+    setModalVisible(true);
+  }
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try{
+      const response = await signInWithEmailAndPassword(auth, email, password);
+    } catch(error : any){
+      alert('😓 Login failed:\n' + error.message)
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleCreateAccount = () => {
     navigation.navigate('SignUpScreen');
   };
-
-  const handleForgotPassword = () => {
-    setModalVisible(true);
-  };
-
-  const handleHomePage = () => {
-    navigation.navigate("HomeScreen")
-  }
 
   return (
     <View style={styles.container}>
@@ -31,40 +48,55 @@ export default function LoginScreen() {
         />
         <Text style={styles.title}>FTC Tracker</Text>
       </View>
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
+
+      <TextInput style={styles.input}
+        placeholder="Email"
+        value={email}
         placeholderTextColor="#ccc"
+        autoCapitalize='none'
+        onChangeText={(text)=>{setEmail(text)}}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#ccc"
-        secureTextEntry
+
+      <TextInput style={styles.input} 
+        placeholder="Password" 
+        value={password}
+        placeholderTextColor="#ccc" 
+        autoCapitalize='none'
+        onChangeText={(password)=>{setPassword(password)}}
+        secureTextEntry={true}
       />
-      <TouchableOpacity onPress={handleForgotPassword}>
+
+      <TouchableOpacity style={{alignSelf:'flex-start', left: 35}} onPress={handleForgotPassword}>
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.loginButton} onPress = {handleHomePage}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
+
+      {loading ? <ActivityIndicator size="large" color='#fff' />
+        : 
+        <>
+        <TouchableOpacity style={styles.loginButton} onPress = {handleLogin}>
+           <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+        </>
+      }
+
       <Text style={styles.orText}>Or</Text>
+
       <TouchableOpacity onPress={handleCreateAccount}>
         <Text style={styles.createAccountText}>Create an account</Text>
       </TouchableOpacity>
 
-      <ForgotPassword modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <ForgotPassword modalVisible={modalVisible} setModalVisible={setModalVisible}/>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#000',
+    flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    alignItems:'center',
+    backgroundColor: '#101010',
+    flex: 1,
   },
   logoContainer: {
     flexDirection: 'row',
@@ -93,17 +125,17 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     color: '#1E90FF',
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: 'left',
     marginBottom: 10,
+    marginTop: -5,
   },
   loginButton: {
     backgroundColor: '#1E90FF',
     borderRadius: 5,
     paddingVertical: 12,
     paddingHorizontal: 25,
-    marginVertical: 15,
+    marginTop: 25,
     width: '85%',
-    alignItems: 'center',
   },
   loginButtonText: {
     color: '#fff',
@@ -113,7 +145,8 @@ const styles = StyleSheet.create({
   orText: {
     color: '#fff',
     fontSize: 16,
-    marginVertical: 15,
+    marginBottom: 15,
+    marginTop: 20,
   },
   createAccountText: {
     color: '#1E90FF',

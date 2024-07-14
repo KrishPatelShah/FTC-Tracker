@@ -6,6 +6,6 @@ export type RootStackParamList = {
     EventScoutingScreen: undefined;
     TeamScoutingScreen: undefined;
     HomeScreen: undefined;
-  
+    Inside: undefined;
   };
   

@@ -1,5 +1,7 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Linking } from 'react-native';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
+import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Linking, ActivityIndicator } from 'react-native';
 
 export default function SignUpScreen() {
   const handleTermsOfServicePress = () => {
@@ -10,34 +12,54 @@ export default function SignUpScreen() {
     Linking.openURL('https://example-privacy-policy-url.com');
   };
 
+const auth = FIREBASE_AUTH;
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+const [loading, setLoading] = useState(false);
+
+const createAccount = async () => {
+  setLoading(true);
+  try{
+    const response = await createUserWithEmailAndPassword(auth, email, password);
+    alert('Account created!')
+  } catch(error : any){
+    alert('😓, creation failed:\n' + error.message)
+  } finally {
+    setLoading(false);
+  }
+}
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create your account</Text>
-      <TextInput
-        style={styles.input}
+
+      <TextInput style={styles.input}
         placeholder="Email"
+        value={email}
         placeholderTextColor="#ccc"
+        autoCapitalize='none'
+        onChangeText={(text)=>{setEmail(text)}}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        placeholderTextColor="#ccc"
+
+      <TextInput style={styles.input} 
+         placeholder="Password" 
+         value={password}
+         placeholderTextColor="#ccc" 
+         autoCapitalize='none'
+         onChangeText={(password)=>{setPassword(password)}}
+         secureTextEntry={true}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#ccc"
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        placeholderTextColor="#ccc"
-        secureTextEntry
-      />
-      <TouchableOpacity style={styles.createAccountButton}>
-        <Text style={styles.createAccountButtonText}>Create your account</Text>
-      </TouchableOpacity>
+
+      {loading ? <ActivityIndicator size="large" color='#fff' />
+        : 
+        <>
+          <TouchableOpacity style={styles.createAccountButton} onPress={createAccount}>
+            <Text style={styles.createAccountButtonText}>Create your account</Text>
+          </TouchableOpacity>
+        </>
+      }
+      
+
       <View style={styles.termsContainer}>
         <Text style={styles.termsText}>
           By creating your account, you agree to our{' '}
@@ -57,7 +79,7 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#101010',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
