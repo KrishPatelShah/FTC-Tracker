@@ -4,7 +4,8 @@ import {Text, View, StyleSheet} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { setTeamNumber } from "../../../teamNumberReducers";
-
+import { useAtom } from "jotai";
+import { teamNumberAtom } from "@/dataStore";
 
 interface teamScoutingViewProps {
     teamNumber : string;
@@ -15,7 +16,7 @@ interface teamScoutingViewProps {
 
 const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownValue, navigation}) => {
 
-
+    const [teamNumberJotai, setTeamNumberJotai] = useAtom(teamNumberAtom)
     
     const [isPressed, setIsPressed] = useState(false)
     const displayValue = shownValue.toString()
@@ -25,13 +26,15 @@ const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownV
     const check = () => {
         setIsPressed(true)
         dispatch(setTeamNumber(teamNumber))
+        setTeamNumberJotai(teamNumber)
     }
+    
 
     useEffect(() => {
         if(isPressed){
             navigation.navigate("TeamScoutingScreen")
         }
-      }, [storedTeamNumber]);
+      }, [storedTeamNumber, teamNumberJotai]);
     
     return (
         

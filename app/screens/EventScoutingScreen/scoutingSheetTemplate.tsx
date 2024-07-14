@@ -1,10 +1,13 @@
 import React, { useEffect, useState, } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { global_styles } from '@/styles';
 import { useSelector } from 'react-redux';
 import TeamView from '@/app/screens/EventScoutingScreen/teamScoutingView';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-element-dropdown';
+import { atom, useAtom } from 'jotai'
+import { eventCodeAtom, persistentEventData, teamDataAtom } from '@/dataStore';
+import { TeamEventData } from '../TeamScoutingScreen/teamView';
 
 type ScoutingSheetProps = {
   navigation: any;
@@ -21,9 +24,11 @@ type Team = {
 const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
   const [eventName, setEventName] = useState("");
   const [teamArray, setTeamArray] = useState<Team[]>([]);
-  const eventCode = useSelector((state: any) => state.event.eventCode);
+  const [eventData, setEventData] = useAtom(persistentEventData)
+  const [eventCodeJotai, setEventCodeAtom] = useAtom(eventCodeAtom)
   const [displayStats, setDisplayStats] = useState("TOTAL");
   const [stats, setStats] = useState("TOTAL");
+  const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
   const data = [
     { label: "AUTO", value: "AUTO" },
     { label: "TOTAL", value: "TOTAL" },
@@ -31,8 +36,17 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
   ];
 
   useEffect(() => {
+    let storedTeamArray: number[] = []
+    eventData.map((item) => {storedTeamArray.push(item.teamNumber)})
+    if(storedTeamArray.indexOf(persistentTeamData.teamNumber) < 0){
+      eventData.push(persistentTeamData)
+    }
+  }, [persistentTeamData])
+
+
+  useEffect(() => {
     const fetchEventData = async () => {
-      if (eventCode) {
+      if (eventCodeJotai) {
           const query = `
           query getEventByCode($season: Int!, $code: String!) {
             eventByCode(season: $season, code: $code) {
@@ -60,7 +74,7 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ query, variables: { season: 2023, code: eventCode } })
+          body: JSON.stringify({ query, variables: { season: 2023, code: eventCodeJotai } })
         });
         const data = await response.json();
         //console.log(data.data.eventByCode.teams)
@@ -84,7 +98,12 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
     });
 
     return unsubscribe;
-  }, [navigation, eventCode]);
+  }, [navigation, eventCodeJotai]);
+
+
+  const logEventData = () => {
+    console.log(eventData)
+  }
 
   return (
     <GestureHandlerRootView>
@@ -92,6 +111,9 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
         <Text style={styles.eventName}>{eventName}</Text>
         <View style={styles.headerContainer}>
           <Text style={styles.headings}>Teams</Text>
+          <TouchableOpacity onPress={logEventData}> 
+             <Text style = {{color : "white", fontSize : 22}}> Log </Text> 
+          </TouchableOpacity>
           <Dropdown
             style={styles.dropdown}
             placeholder={displayStats}

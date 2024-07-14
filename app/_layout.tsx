@@ -16,6 +16,7 @@ import EventScoutingScreen from './screens/EventScoutingScreen/scoutingSheetTemp
 import TeamScoutingScreen from './screens/TeamScoutingScreen/teamView';
 import HomeScreen from './screens/HomeScreen/homeScreen';
 import { Provider } from 'react-redux';
+import { Provider as JotaiProvider } from 'jotai';
 import { store } from '@/dataStore';
 
 
@@ -43,6 +44,7 @@ export default function RootLayout() {
   // name="<actual name of file's function>"
   return (
     <Provider store = {store}>
+      <JotaiProvider>
     <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent = {true}>
       <Stack.Navigator>
         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
@@ -53,6 +55,7 @@ export default function RootLayout() {
         {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
       </Stack.Navigator>
     </NavigationContainer>
+    </JotaiProvider>
     </Provider>
   );
 }

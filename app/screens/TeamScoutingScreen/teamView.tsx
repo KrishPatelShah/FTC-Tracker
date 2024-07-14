@@ -1,5 +1,5 @@
 import { RootStackParamList } from "@/app/navigation/types";
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp, useFocusEffect, useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { GestureHandlerRootView, TextInput } from "react-native-gesture-handler";
@@ -12,6 +12,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Slider from "@react-native-community/slider";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useAtom, useAtomValue } from "jotai";
+import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData } from "@/dataStore";
 
 
 type HomeScreenProps = {
@@ -62,7 +64,8 @@ type HomeScreenProps = {
     drone : string
   }
 
-  type TeamEventData = {
+  export type TeamEventData = {
+    teamNumber : number,
     matchData : TeamMatchData[]
     extraNotes : string,
     intake : number,
@@ -72,7 +75,6 @@ type HomeScreenProps = {
 
 
   type dropdownMatches = {
-
     label : string,
     value : string
   }
@@ -81,10 +83,13 @@ type HomeScreenProps = {
 
 const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const [DropdownMatchView, setDropdownMatch] = useState<dropdownMatches[]>([])
-    const storedTeamNumber = useSelector((state: any) => state.teamNumber.teamNumber); 
-    const storedEventCode = useSelector((state: any) => state.event.eventCode); 
+    const [eventCode, setEventCode] = useAtom(eventCodeAtom)
+    const [teamNumber, setTeamNumber] = useAtom(teamNumberAtom)
+    const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
     const [teamData, setTeamData] = useState<TeamData>({number : "", name : "", city : "", state : "", rookieYear : "", school : "", tot_opr : "", auto_opr : "", tele_opr : "", eg_opr : "", rank : "", matches : []})
-    const [teamEventData, setTeamEventData] = useState<TeamEventData>({extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : []})
+    const [teamEventData, setTeamEventData] = useState<TeamEventData>({teamNumber : Number(teamNumber), extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : []})
+    const loadedEventData = useAtomValue(persistentEventData)
+    
     const [showingInfo, setShowingInfo] = useState(false)
     const [matchView, setMatchView] = useState("Match 1")
     const [displayMatchView, setDisplayMatchView] = useState("Match 1")
@@ -102,20 +107,102 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const [intakeVal, setIntakeVal] = useState(5)
     const [depositVal, setDepositVal] = useState(5)
     const [drivetrainVal, setDrivetrainVal] = useState(5)
+    const [isLoadedFromMain, setIsLoadedFromMain] = useState("false")
     
     const [dataFetched, setDataFetched] = useState(false)
+    const [matchNums, setMatchNums] = useState(0)
+    const [isMatchNumsFinished, setIsMatchNumsFinished] = useState(false)
+    const [shouldReRender, setShouldReRender] = useState(false)
+
+
+    const loadData = () => {
+        /* let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))
+        teamEventData.matchData = loadingTeamArray[0].matchData
+        //console.log(loadingTeamArray) */
+    }
+
+    useEffect(() => {
+        if(shouldReRender){
+        setIntakeVal(teamEventData.intake)
+        setDepositVal(teamEventData.deposit)
+        setDrivetrainVal(teamEventData.drivetrain)
+        setPurplePixelCheck(teamEventData.matchData[0].purplePixelCheck)
+        setYellowPixelCheck(teamEventData.matchData[0].yellowPixelCheck)
+        setParkCheck(teamEventData.matchData[0].parkCheck)
+        setDriveUnderStageDoorCheck(teamEventData.matchData[0].driveUnderStageDoorCheck)
+        setCyclesText(teamEventData.matchData[0].cycle)
+        setBackDropLineText(teamEventData.matchData[0].backDropLine)
+        setMosaicText(teamEventData.matchData[0].mosaic)
+        setClimbCheck(teamEventData.matchData[0].climbCheck)
+        setDroneText(teamEventData.matchData[0].drone)
+        }
+    }, [shouldReRender])
+
+    useEffect(() => {
+        if(isLoadedFromMain === "true"){
+            let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))
+            teamEventData.matchData = loadingTeamArray[0].matchData
+            teamEventData.intake = loadingTeamArray[0].intake
+            teamEventData.deposit = loadingTeamArray[0].deposit
+            teamEventData.drivetrain = loadingTeamArray[0].drivetrain
+            console.log("Found")
+            console.log("Loading Intake : " + loadingTeamArray[0].intake)
+            setShouldReRender(true)
+        }else if (isLoadedFromMain === "false"){
+            console.log("Not Found")
+        }
+        console.log("Main " + teamEventData.intake)
+        
+    }, [isLoadedFromMain])
+
+    useEffect(() => {
+        console.log("running add matches")
+        if(isLoadedFromMain == "false"){
+            console.log("match Nums " + matchNums)
+            for(let i = 0; i< matchNums; i++){
+                teamEventData.matchData.push({purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""})
+                console.log("added")
+            }
+        }
+    }, [isMatchNumsFinished])
+
+    useFocusEffect(
+        React.useCallback(() => {
+          // This will run when the screen is focused
+          console.log('Screen is focused');
+          setDataFetched(false)
+          let storedTeamArray: number[] = []
+          loadedEventData.map((item) => {storedTeamArray.push(item.teamNumber)})
+          if(storedTeamArray.indexOf(teamEventData.teamNumber) >= 0){
+            
+            loadData();
+            setIsLoadedFromMain("true")
+          } else {
+            
+            setIsLoadedFromMain("false")
+          }
+          /* console.log(loadedEventData) */
     
+          return () => {
+            setPersistentTeamData(teamEventData)
+            //console.log(teamEventData)
+          };
+        }, [])
+      );
+
     const toggleShowingInfo = () => {
         setShowingInfo(!showingInfo)
     }
 
     const logTeamEventData = () => {
         console.log("raw : " + teamEventData)
-        console.log("JSON : " + JSON.stringify(teamEventData))
+        console.log("JSON : " + JSON.stringify(teamEventData))  
+        console.log("team matches number : " + teamEventData.matchData.length)
     }
 
     useEffect(() => {
         if(dataFetched){
+            //console.log(teamEventData.matchData)
             let matchArr: string[] = []
             DropdownMatchView.map((item) => {matchArr.push(item.value)})
             let dropDownIndex = matchArr.indexOf(matchView)
@@ -128,16 +215,23 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
             setMosaicText(teamEventData.matchData[dropDownIndex].mosaic)
             setClimbCheck(teamEventData.matchData[dropDownIndex].climbCheck)
             setDroneText(teamEventData.matchData[dropDownIndex].drone)
+            setIntakeVal(teamEventData.intake)
+            setDepositVal(teamEventData.deposit)
+            setDrivetrainVal(teamEventData.drivetrain)
         }
-        
     }, [matchView])
 
     useEffect(() => {
         if(dataFetched){
+            //console.log(teamEventData.matchData)
             let matchArr: string[] = []
             DropdownMatchView.map((item) => {matchArr.push(item.value)})
+            //console.log(DropdownMatchView)
             let dropDownIndex = matchArr.indexOf(matchView)
+            //console.log("index" + dropDownIndex)
+            //console.log(teamEventData.matchData)
             teamEventData.matchData[dropDownIndex].purplePixelCheck = purplePixelCheck
+            //console.log("ran purple check")
             teamEventData.matchData[dropDownIndex].yellowPixelCheck = yellowPixelCheck
             teamEventData.matchData[dropDownIndex].parkCheck = parkCheck
             teamEventData.matchData[dropDownIndex].driveUnderStageDoorCheck = driveUnderStageDoorCheck
@@ -159,7 +253,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
     useEffect(() => {
         const fetchTeamData = async () => {
-            if(storedTeamNumber){
+            if(teamNumber){
                 const query = `
                 query getTeamByNumber($season: Int!, $number: Int!, $eventCode: String) {
                     teamByNumber(number: $number) {
@@ -217,17 +311,20 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                     headers: {
                       "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ query, variables: { season: 2023, number: storedTeamNumber, eventCode : storedEventCode } })
+                    body: JSON.stringify({ query, variables: { season: 2023, number: teamNumber, eventCode : eventCode } })
                 });
                 const data = await response.json();
                 let eventStats : any[] = data.data.teamByNumber.events
-                eventStats = eventStats.filter((item) => item.eventCode == storedEventCode)
+                eventStats = eventStats.filter((item) => item.eventCode == eventCode)
 
                 let matchArray: any[] = data.data.teamByNumber.matches
                 for(let i = 1; i <= matchArray.length; i++){
                     DropdownMatchView.push({label : "Match " + i, value : "Match " + i})
-                    teamEventData.matchData.push({purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""})
+                    setMatchNums(i)
                 }
+                setIsMatchNumsFinished(true)
+
+                //console.log("created matches : " + teamEventData.matchData)
                 setDataFetched(true)
                 let formattedMatchArray: Match[] = []
                 matchArray.map((item) => {
@@ -247,7 +344,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                 })
 
                 
-                let formattedTeamData: TeamData = {number : storedTeamNumber, 
+                let formattedTeamData: TeamData = {number : teamNumber, 
                                                     name : data.data.teamByNumber.name, 
                                                     city : data.data.teamByNumber.location.city, 
                                                     state : data.data.teamByNumber.location.state, 
@@ -268,7 +365,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
           });
 
           return unsubscribe;
-    }, [navigation, storedTeamNumber])
+    }, [navigation, teamNumber])
 
 
     return (
@@ -321,7 +418,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                     <MatchScheduleHeader></MatchScheduleHeader>
                     <View style = {[styles.eventDataContainer, {top : 80}]}>
                         {teamData.matches.map((item, index) => (
-                            <Match match = {item} key = {index} viewingTeamNum={storedTeamNumber}></Match>
+                            <Match match = {item} key = {index} viewingTeamNum={teamNumber}></Match>
                         ))}
 
                     </View>

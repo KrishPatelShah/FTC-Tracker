@@ -6,6 +6,8 @@ import { TextInput, View, StyleSheet, Modal, Text } from "react-native"
 import { useDispatch, useSelector } from "react-redux";
 import OutsideClickHandler from 'react-outside-click-handler';
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useAtom } from "jotai";
+import { eventCodeAtom } from "@/dataStore";
 
 type EventCodeInputProps = {
     navigation: NavigationProp<RootStackParamList>;
@@ -18,18 +20,21 @@ type EventCodeInputProps = {
 
 const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisible, setModalVisible }) => {
 
-    const eventCode = useSelector((state: any) => state.event.eventCode); 
+  const [eventCodeJotai, setEventCodeJotai ] = useAtom(eventCodeAtom)
+  const eventCode = useSelector((state: any) => state.event.eventCode); 
   const dispatch = useDispatch();
 
     const handleKeyPress = (event: any) => {
         if (event.nativeEvent.key === "Enter") {
           dispatch(setEventCode(eventCode));
+          setEventCodeJotai(eventCodeJotai)
         }
       };
     
       const handleTextChange = (text: string) => {
         //console.log("text : " + text)
         dispatch(setEventCode(text));
+        setEventCodeJotai(text)
         //console.log("event code : " + eventCode)
       };
 
