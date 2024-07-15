@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
+import { ASYNC_STORAGE, FIREBASE_AUTH } from '@/FirebaseConfig'; 
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Linking, ActivityIndicator } from 'react-native';
 
 export default function SignUpScreen() {
@@ -21,6 +21,7 @@ const createAccount = async () => {
   setLoading(true);
   try{
     const response = await createUserWithEmailAndPassword(auth, email, password);
+    await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email, password}));
     alert('Account created!')
   } catch(error : any){
     alert('😓, creation failed:\n' + error.message)

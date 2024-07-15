@@ -13,7 +13,7 @@ import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler
 import {Dimensions} from 'react-native';
 import EventSearchView from './EventSearchView';
 import TeamSearchView from './TeamSearchView';
-import { FIREBASE_AUTH } from '@/FirebaseConfig';
+import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
 
 type HomeScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -105,6 +105,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     console.log(showCodeInput)
   };
 
+  const handleSignOut = async () => {
+    FIREBASE_AUTH.signOut()
+    await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email : null, password : null}));
+  }
+
   const handleKeyPress = (event: any) => {
     if (event.nativeEvent.key === "Enter") {
       dispatch(setEventCode(eventCode));
@@ -153,7 +158,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
         <EventCodeInput navigation = {navigation} modalVisible = {showCodeInput} setModalVisible={setShowCodeInput}></EventCodeInput>
 
-        <Text style={[styles.text, {marginTop: 20}]} onPress={()=>{FIREBASE_AUTH.signOut()}}>
+        <Text style={[styles.text, {marginTop: 20}]} onPress={handleSignOut}>
           Sign out
         </Text>
     
