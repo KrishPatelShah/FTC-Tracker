@@ -4,16 +4,21 @@ import {Text, View, StyleSheet} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { setTeamNumber } from "../../../teamNumberReducers";
+import { NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "@/app/navigation/types";
+import { useAtom, useSetAtom } from "jotai";
+import { teamNumberAtom } from "@/dataStore";
 
 
 interface TeamSearchViewProps {
     teamName : string;
     number : string;
+    navigation : NavigationProp<RootStackParamList>;
 }
 
-const TeamSearchView: React.FC<TeamSearchViewProps> = ({teamName, number}) => {
+const TeamSearchView: React.FC<TeamSearchViewProps> = ({teamName, number, navigation}) => {
 
-
+    const [teamNumber, setTeamNumber] = useAtom(teamNumberAtom)
     
     const [isPressed, setIsPressed] = useState(false)
     
@@ -21,6 +26,8 @@ const TeamSearchView: React.FC<TeamSearchViewProps> = ({teamName, number}) => {
 
     const check = () => {
         console.log(teamName)
+        setTeamNumber(number)
+        navigation.navigate("TeamInfoScreen")
     }
 
 

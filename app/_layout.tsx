@@ -17,6 +17,7 @@ import { Provider as JotaiProvider } from 'jotai';
 import { store } from '@/dataStore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
+import TeamInfoScreen from './screens/TeamInfoScreen/TeamInfoScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const InsideStack = createNativeStackNavigator<RootStackParamList>();
@@ -77,6 +78,7 @@ function InsideLayout(){
           <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} /> 
           <Stack.Screen name="EventScoutingScreen" component={EventScoutingScreen} options={{ headerShown: false }} />
           <Stack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="TeamInfoScreen" component={TeamInfoScreen} options={{ headerShown: false }} />
         </InsideStack.Navigator>
       </NavigationContainer>
     </Provider>

@@ -140,7 +140,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             <EventSearchView eventName={item.name} date={item.data} key = {index}></EventSearchView>
           ))}
           {!active && searchData.map((item, index) => (
-            <TeamSearchView teamName={item.name} number={item.data} key = {index}></TeamSearchView>
+            <TeamSearchView teamName={item.name} number={item.data} key = {index} navigation={navigation}></TeamSearchView>
           ))}
         </ScrollView>
       </View>}
