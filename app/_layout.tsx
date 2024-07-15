@@ -15,7 +15,7 @@ import HomeScreen from './screens/HomeScreen/homeScreen';
 import { Provider } from 'react-redux';
 import { Provider as JotaiProvider } from 'jotai';
 import { store } from '@/dataStore';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User} from 'firebase/auth';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -50,7 +50,7 @@ export default function RootLayout() {
 
   return (
     <Provider store = {store}>
-        <JotaiProvider>
+    <JotaiProvider>
     <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent = {true}>
         <Stack.Navigator>
           {user ?
@@ -61,7 +61,6 @@ export default function RootLayout() {
               <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
             </>)
           }
-          {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
         </Stack.Navigator>
       </NavigationContainer>
     </JotaiProvider>
@@ -82,3 +81,5 @@ function InsideLayout(){
     </Provider>
   );
 }
+
+{/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}

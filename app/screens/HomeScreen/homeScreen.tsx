@@ -13,6 +13,7 @@ import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler
 import {Dimensions} from 'react-native';
 import EventSearchView from './EventSearchView';
 import TeamSearchView from './TeamSearchView';
+import { FIREBASE_AUTH } from '@/FirebaseConfig';
 
 type HomeScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -151,6 +152,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </View>
         </TouchableOpacity>
         <EventCodeInput navigation = {navigation} modalVisible = {showCodeInput} setModalVisible={setShowCodeInput}></EventCodeInput>
+
+        <Text style={[styles.text, {marginTop: 20}]} onPress={()=>{FIREBASE_AUTH.signOut()}}>
+          Sign out
+        </Text>
     
     </GestureHandlerRootView> 
     
