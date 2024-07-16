@@ -4,17 +4,17 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import ForgotPassword from './forgotPasswordScreen';
-import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
+import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig'; 
 import { ActivityIndicator } from 'react-native-paper';
 import { signInWithEmailAndPassword, updatePassword } from 'firebase/auth';
 
-export default function LoginScreen() {
+export default function LoginScreen (){
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   // USER INFO STATE HANDLING
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // don't confuse this with appLoading
   // SETTING AUTHENTICATION VARIABLE
   const auth = FIREBASE_AUTH; // this variable was already created in FirebaseConfig.tsx so we only need to import
   
@@ -27,7 +27,8 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     setLoading(true);
     try{
-      const response = await signInWithEmailAndPassword(auth, email, password);
+      await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email, password }));
+      await signInWithEmailAndPassword(auth, email, password);
     } catch(error : any){
       alert('😓 Login failed:\n' + error.message)
     } finally {
