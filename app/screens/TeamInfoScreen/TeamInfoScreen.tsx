@@ -20,10 +20,11 @@ export type EventData = {
     matches : Match[],
     wins : string,
     losses : string,
-    ties : string
+    ties : string,
+    date : string
 }
 
-type Match = {
+export type Match = {
     matchNum : number,
     redTeams : Team[],
     blueTeams : Team[],
@@ -67,13 +68,11 @@ const TeamInfoScreen : React.FC = () => {
                         value
                     }
                 }
-                matches{
-                    eventCode
-                }
                 events(season: $season){
                     eventCode
                     event{
                         name
+                        start
                     }
                     stats {
                         ... on TeamEventStats2023{
@@ -87,6 +86,31 @@ const TeamInfoScreen : React.FC = () => {
                             wins
                             losses
                             ties
+                        }
+                    }
+                    matches{
+                        match{
+                            hasBeenPlayed
+                            matchNum
+                            teams{
+                                teamNumber
+                                alliance
+                                onField
+                                team{
+                                    name
+                                }
+                            }
+                            tournamentLevel
+                            scores {
+                                ... on MatchScores2023{
+                                    red{
+                                        totalPoints
+                                    }
+                                    blue{
+                                        totalPoints
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -110,14 +134,36 @@ const TeamInfoScreen : React.FC = () => {
             })
         }
 
-        const pushEventData = (item : any) => {
+        const pushMatchData = (match: any, array: Match[]) => {
+            let blueTeams: Team[] = []
+            let redTeams: Team[] = []
+            //console.log(match.matchNum)
+            match.teams.map((item: any) => {
+                if(item.alliance == "Red"){
+                    redTeams.push({teamName : item.team.name, teamNumber : item.teamNumber, alliance : item.alliance, onField : item.onField})
+                }
+                if(item.alliance == "Blue"){
+                    blueTeams.push({teamName : item.team.name, teamNumber : item.teamNumber, alliance : item.alliance, onField : item.onField})
+                }
+            })
+            //console.log(redTeams)
+            //console.log(blueTeams)
+            if(match.scores != null){
+                array.push({matchNum : match.matchNum, redTeams : redTeams, blueTeams : blueTeams, matchType : match.tournamentLevel, blueScore : match.scores.blue.totalPoints, redScore : match.scores.red.totalPoints, hasBeenPlayed : match.hasBeenPlayed})
+            }
+        }
+
+        const pushEventData = (item :any) => {
+            let matchArray: any[] = item.matches
+            //console.log(matchArray)
+            let formattedMatchArray: Match[] = []
+            matchArray.map((item) => (pushMatchData(item.match, formattedMatchArray)))
             if(item.stats != null){
                 formattedEventData.push({eventCode: item.eventCode, 
                     eventName: item.event.name, rank : item.stats.rank, 
                     eventStats : {total : item.stats.opr.totalPointsNp, auto: item.stats.opr.autoPoints, tele : item.stats.opr.dcPoints, endgame : item.stats.opr.egPoints}, 
-                    matches : [], wins : item.stats.wins, losses : item.stats.losses, ties : item.stats.ties})
+                    matches : formattedMatchArray, wins : item.stats.wins, losses : item.stats.losses, ties : item.stats.ties, date : item.event.start})
             }
-            
         }
         //console.log(data.data.teamByNumber.events)
         let eventArray: any[] = data.data.teamByNumber.events
@@ -126,9 +172,8 @@ const TeamInfoScreen : React.FC = () => {
             pushEventData(item)
         ))
         setEventDisplay(formattedEventData)
-        console.log(eventDisplay)
-        console.log(eventDisplay.length)
-        console.log("format" + formattedEventData.length)
+        
+        
         //console.log(data.data.teamByNumber.name)
     }
 
@@ -140,21 +185,25 @@ const TeamInfoScreen : React.FC = () => {
     return (
         <GestureHandlerRootView>
         <View style = {{display : "flex", flex : 1, backgroundColor : "black", flexDirection : "column", justifyContent : "flex-start", alignItems : "center"}}>
-            <View style = {{height : "10%", marginTop : 32, top : 12 , width : "95%", display : "flex", flexDirection : "column"}}>
+            <View style = {{height : "10%", marginTop : 32, top : 12 , width : "95%", display : "flex", flexDirection : "column", marginBottom : 12}}>
                 <Text style = {{color : "white", fontSize : 36}}>{teamName}</Text>
                 <Text style = {{color : "#328AFF", fontSize : 28}}>{teamNumber}</Text>
             </View>
-            <Header text = {"Stats"}></Header>
-            <View style = {{height : "10%", marginHorizontal : 32, top : 2,  width : "95%", display : "flex", flexDirection : "row", backgroundColor : "#101010", justifyContent : "space-evenly", borderRadius : 12, alignItems : "center"}}>
-                <ColumnStats name = {"Total"} value = {overallOPR.total}></ColumnStats>
-                <ColumnStats name = {"Auto"} value = {overallOPR.auto}></ColumnStats>
-                <ColumnStats name = {"Tele"} value = {overallOPR.tele}></ColumnStats>
-                <ColumnStats name = {"Endgame"} value = {overallOPR.endgame}></ColumnStats>
-            </View>
-            <ScrollView style = {{width : "95%", backgroundColor : "#101010"}}>
-                {eventDisplay.map((item, index) => (
-                    <EventDisplay data={item} key={index}></EventDisplay>
-                ))}
+            <ScrollView style = {{width : "95%", display : "flex", flexDirection : "column"}} contentContainerStyle = {{alignItems : "center"}} >
+                <Header text = {"Stats"}></Header>
+                <View style = {{marginHorizontal : 32, top : 2,  width : "95%", display : "flex", flexDirection : "row", justifyContent : "space-evenly", borderRadius : 12, alignItems : "center"}}>
+                    <ColumnStats name = {"Total"} value = {overallOPR.total}></ColumnStats>
+                    <ColumnStats name = {"Auto"} value = {overallOPR.auto}></ColumnStats>
+                    <ColumnStats name = {"Tele"} value = {overallOPR.tele}></ColumnStats>
+                    <ColumnStats name = {"Endgame"} value = {overallOPR.endgame}></ColumnStats>
+                </View>
+                <Header text = {"Events"}></Header>
+                <View style = {{display : "flex", width : "100%", alignSelf : "center", flexDirection : "column", borderRadius : 12, justifyContent : "space-between", paddingHorizontal : 10}}>
+                    {eventDisplay.sort((a, b) => {const dateA = new Date(a.date).getTime(); const dateB = new Date(b.date).getTime(); return dateA - dateB;}).map((item, index) => (
+                        <EventDisplay data={item} key={index}></EventDisplay>
+                    ))}
+                </View>
+                <View style = {{height : "1%"}}></View>
             </ScrollView>
             
         </View>
@@ -183,11 +232,13 @@ type HeaderType = {
 
 const Header: React.FC<HeaderType> = ({text}) => {
     return (
-        <View style = {{height : "10%", marginHorizontal : 28, top : 2,  width : "95%", display : "flex", flexDirection : "row", justifyContent : "flex-start", alignItems : "center"}}>
+        <View style = {{marginHorizontal : 28, top : 2,  width : "95%", display : "flex", flexDirection : "row", justifyContent : "flex-start", alignItems : "center"}}>
             <Text style = {{color : "white", fontSize : 32}}>{text}</Text>
         </View>
     )
 }
+
+
 
 
 

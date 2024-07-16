@@ -18,6 +18,7 @@ import { Provider as JotaiProvider } from 'jotai';
 import { store } from '@/dataStore';
 import { onAuthStateChanged, signInWithEmailAndPassword, User} from 'firebase/auth';
 import { ASYNC_STORAGE, FIREBASE_AUTH } from '@/FirebaseConfig';
+import TeamInfoScreen from './screens/TeamInfoScreen/TeamInfoScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const InsideStack = createNativeStackNavigator<RootStackParamList>();
