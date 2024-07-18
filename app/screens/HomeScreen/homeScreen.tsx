@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 // import { GestureHandlerRootView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootStackParamList } from '@/app/navigation/types';
 import { NavigationProp } from '@react-navigation/native';
+import  CustomDropdown  from '@/components/CustomDropdown';
 import { setEventCode } from '@/eventCodeReducers';
 import CustomSwitch from "@/components/CustomSwitch";
 import { Ionicons } from '@expo/vector-icons';
@@ -124,7 +125,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <GestureHandlerRootView style = {styles.container}>
-      
       <CustomSwitch  activeColor= '#191919' inactiveColor= '#191919' active={active} setActive={setActive}/>
       <View style={styles.textInputContainer}>
         <Ionicons style={[styles.iconStyling, {left : 20}]} name= {active ? "calendar" : "people"} size={30} color="grey"/>
@@ -140,6 +140,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Ionicons  style={styles.iconStyling}  name= {'close'} size={30} color="grey"/>   
         </TouchableOpacity>
       </View>
+
       {searchDataVisible && <View style = {styles.infoScreen}>
         <ScrollView style = {styles.searchResults}>
           {active && searchData.map((item, index) => (
@@ -150,24 +151,100 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           ))}
         </ScrollView>
       </View>}
-      <TouchableOpacity onPress={toggleShowCodeInput} style = {{top : 10}}>
-          <View style={styles.button}>
-            <AntDesign name="pluscircleo" size={24} color="#328AFF" style={styles.icon} />
-            <Text style={styles.buttonText}>Create Scouting Sheet</Text>
-          </View>
-        </TouchableOpacity>
-        <EventCodeInput navigation = {navigation} modalVisible = {showCodeInput} setModalVisible={setShowCodeInput}></EventCodeInput>
 
-        <Text style={[styles.text, {marginTop: 20}]} onPress={handleSignOut}>
-          Sign out
-        </Text>
+      <CustomDropdown marginTop={10} marginBottom={10}/>
+
+      <View style={{ marginTop:'5%', flexDirection: 'row', width:'100%', justifyContent:'space-evenly', alignItems:'center', backgroundColor: '#101010'}}>
+        <View style={{width: '30%', left: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
+        <Text style={{fontSize: 35, color:'white' }}>Scouting</Text>
+        <View style={{width: '30%', right: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
+      </View>
+      
+      <TouchableOpacity onPress={toggleShowCodeInput} style = {styles.button}>
+          <AntDesign name="pluscircleo" size={30} color="#328AFF" style={styles.icon} />
+          <Text style={styles.buttonText}>Create Scouting Sheet</Text>
+      </TouchableOpacity>
+        
+      <EventCodeInput navigation = {navigation} modalVisible = {showCodeInput} setModalVisible={setShowCodeInput}></EventCodeInput>
+
+      <Text style={[styles.text, {marginTop: 20}]} onPress={handleSignOut}>
+        Sign out
+      </Text>
     
     </GestureHandlerRootView> 
-    
   );
 };
 
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+  container:{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems : "center",
+    backgroundColor: '#101010',
+    paddingTop: 110,
+    flex : 1
+  },
+  textInputContainer:{
+    backgroundColor: '#191919',
+    display : "flex",
+    flexDirection : "row",
+    alignItems : "center",
+    justifyContent : "flex-start",
+    width : "90%",
+    height: windowHeight/17,
+    borderRadius: 10,
+    marginTop: '-5.5%',
+  },
+  iconStyling:{
+    position:'relative',
+  },
+  input:{
+    fontSize: 22,
+    color: 'white',
+    height : "100%",
+    left : 38,
+    flex : 1
+  },
+  text:{
+    fontSize: 20,
+    color: 'white'
+  },
+  dropDownText:{
+    fontSize: 20,
+    color: 'white'
+  },
+  button: {
+    backgroundColor: '#191919',
+    borderRadius: 10,
+    marginTop:'5%',
+    flexDirection: "row",
+    alignItems: "center",
+    width: '90%',
+    height: '8%',
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 24,
+    paddingRight: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  icon: {
+    padding: 14,
+  },
+  infoScreen : {
+    backgroundColor : "#191919",
+    alignSelf : "center",
+    height : "20%",
+    width : "90%",
+    borderRadius : 12
+},
+searchResults : {
+  display: "flex",
+  flexDirection : "column",
+}
 
 /*
 <GestureHandlerRootView style={styles.container}>
@@ -195,77 +272,6 @@ export default HomeScreen;
       )}
 </GestureHandlerRootView>
 */
-
-const styles = StyleSheet.create({
-  // Homepage Styling
-  container:{
-    display: 'flex',
-    flexDirection: 'column',
-    //flexWrap: 'wrap',
-    alignItems : "center",
-    paddingTop: 48,
-    flex : 1
-  },
-  textInputContainer:{
-    backgroundColor: '#101010',
-    display : "flex",
-    flexDirection : "row",
-    alignItems : "center",
-    justifyContent : "flex-start",
-    //width: 425,
-    width : "90%",
-    height: windowHeight/14,
-    borderRadius: 10,
-    //marginTop: -20
-    
-  },
-  iconStyling:{
-    
-    position:'relative',
-    //left: 10,
-    //bottom:30, 
-  },
-  input:{
-    fontSize: 22,
-    color: 'white',
-    height : "100%",
-    left : 38,
-    
-    flex : 1
-  },
-  text:{
-    fontSize: 20,
-    color: 'white'
-  },
-  button: {
-    backgroundColor: '#191919',
-    borderRadius: 12,
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center"
-  },
-  buttonText: {
-    color: "#328AFF",
-    fontSize: 24,
-    paddingRight: 14,
-    paddingTop: 14,
-    paddingBottom: 14,
-  },
-  icon: {
-    padding: 14,
-  },
-  infoScreen : {
-    backgroundColor : "#191919",
-    alignSelf : "center",
-    height : "20%",
-    width : "90%",
-    borderRadius : 12
-},
-searchResults : {
-  display: "flex",
-  flexDirection : "column",
-  
-}
 
 
 /*
