@@ -13,7 +13,6 @@ import {Dimensions} from 'react-native';
 
 const windowWidth = Dimensions.get('window').width;
 const height = 48;
-const textVertAlignment = height/1.2;
 const width = windowWidth/1.1;
 const switchTrackLength = width/2.014218009;
 const borderRadius = 6;
@@ -90,7 +89,6 @@ const styles = StyleSheet.create({
         width: width,
         height: height,
         borderRadius: borderRadius,
-
     },
     circle:{
         width:width/2,
