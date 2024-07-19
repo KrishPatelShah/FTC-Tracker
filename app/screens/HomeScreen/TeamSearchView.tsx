@@ -13,6 +13,7 @@ import { teamNumberAtom } from "@/dataStore";
 interface TeamSearchViewProps {
     teamName : string;
     number : string;
+    
     navigation : NavigationProp<RootStackParamList>;
 }
 

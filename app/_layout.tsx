@@ -18,6 +18,7 @@ import { store } from '@/dataStore';
 import { onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/auth';
 import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
 import TeamInfoScreen from './screens/TeamInfoScreen/TeamInfoScreen';
+import EventInfoScreen from './screens/EventInfoScreen/EventInfoScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const InsideStack = createNativeStackNavigator<RootStackParamList>();
@@ -102,7 +103,8 @@ function InsideLayout() {
           <InsideStack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
           <InsideStack.Screen name="EventScoutingScreen" component={EventScoutingScreen} options={{ headerShown: false }} />
           <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="TeamInfoScreen" component={TeamInfoScreen} options={{ headerShown: false }} />
+          <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen} options={{ headerShown: false }} />
+          <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen} options={{ headerShown: false }} />
         </InsideStack.Navigator>
       </NavigationContainer>
     </Provider>

@@ -4,23 +4,30 @@ import {Text, View, StyleSheet} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { setTeamNumber } from "../../../teamNumberReducers";
+import { NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "@/app/navigation/types";
+import { useAtom } from "jotai";
+import { eventCodeAtom } from "@/dataStore";
 
 
 interface EventSearchViewProps {
     eventName : string;
     date : string;
+    code : string;
+    navigation : NavigationProp<RootStackParamList>;
 }
 
-const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date}) => {
+const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code, navigation}) => {
 
-
+    const [eventCode, setEventCode] = useAtom(eventCodeAtom)
     
     const [isPressed, setIsPressed] = useState(false)
     
     
 
     const check = () => {
-        console.log(eventName)
+        setEventCode(code)
+        navigation.navigate("EventInfoScreen")
     }
 
 

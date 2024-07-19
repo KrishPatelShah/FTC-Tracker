@@ -9,5 +9,6 @@ export type RootStackParamList = {
     HomeScreen: undefined;
     Inside: undefined;
     TeamInfoScreen: undefined;
+    EventInfoScreen: undefined;
   };
   

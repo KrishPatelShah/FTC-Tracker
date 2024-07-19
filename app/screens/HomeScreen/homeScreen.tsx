@@ -20,12 +20,14 @@ type HomeScreenProps = {
 };
 type TeamSearchData = {
   name : string,
-  data : string
+  data : string,
+  code : string
 }
 
 type EventSearchData = {
   name : string,
-  data : string
+  data : string,
+  code : string
 }
 
 const windowHeight = Dimensions.get('window').height;
@@ -44,6 +46,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     eventsSearch(season:$season, searchText: $searchText){
       name
       start
+      code
     }
   }`
 
@@ -70,7 +73,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       //console.log(dataArray)
       let formattedEventData: EventSearchData[] = []
       dataArray.map((item) => {
-        let newData: EventSearchData = {name : item.name, data: item.start}
+        let newData: EventSearchData = {name : item.name, data: item.start, code : item.code}
         formattedEventData.push(newData)
       })
       setSearchData(formattedEventData)
@@ -79,7 +82,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       console.log(dataArray)
       let formattedTeamData: TeamSearchData[] = []
       dataArray.map((item) => {
-        let newData: TeamSearchData = {name : item.name, data: item.number}
+        let newData: TeamSearchData = {name : item.name, data: item.number, code : item.number}
         formattedTeamData.push(newData)
       })
       setSearchData(formattedTeamData)
@@ -87,13 +90,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setSearchDataVisible(true)
   }
 
-  useEffect(() => {
-    console.log(searchData)
-  }, [searchData])
+  
 
-  useEffect(() => {
-    console.log("event code : " + eventCode);
-  }, [eventCode]);
+  
 
   useEffect(() => {
     setSearchDataVisible(false)
@@ -102,7 +101,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   const toggleShowCodeInput = () => {
     setShowCodeInput(!showCodeInput);
-    console.log(showCodeInput)
   };
 
   const handleSignOut = async () => {
@@ -143,7 +141,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {searchDataVisible && <View style = {styles.infoScreen}>
         <ScrollView style = {styles.searchResults}>
           {active && searchData.map((item, index) => (
-            <EventSearchView eventName={item.name} date={item.data} key = {index}></EventSearchView>
+            <EventSearchView eventName={item.name} date={item.data} key = {index} navigation={navigation} code = {item.code}></EventSearchView>
           ))}
           {!active && searchData.map((item, index) => (
             <TeamSearchView teamName={item.name} number={item.data} key = {index} navigation={navigation}></TeamSearchView>
