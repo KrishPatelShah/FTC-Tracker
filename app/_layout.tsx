@@ -19,6 +19,10 @@ import { onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/a
 import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
 import TeamInfoScreen from './screens/TeamInfoScreen/TeamInfoScreen';
 import EventInfoScreen from './screens/EventInfoScreen/EventInfoScreen';
+import 'react-native-gesture-handler';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const InsideStack = createNativeStackNavigator<RootStackParamList>();
