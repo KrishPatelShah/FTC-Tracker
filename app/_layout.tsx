@@ -36,6 +36,7 @@ export default function RootLayout() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
       setUser(user);
+      setAppLoading(false);
     });
 
     const checkAuth = async () => {
