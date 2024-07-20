@@ -1,4 +1,4 @@
-import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer, DrawerActions } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
@@ -21,11 +21,59 @@ import TeamInfoScreen from './screens/TeamInfoScreen/TeamInfoScreen';
 import EventInfoScreen from './screens/EventInfoScreen/EventInfoScreen';
 import 'react-native-gesture-handler';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import Icon from 'react-native-vector-icons/Entypo';
+import DrawerContent from '../components/DrawerContent';
+import { useNavigation } from '@react-navigation/native';
 
+function InsideLayout() {
+  const colorScheme = useColorScheme();
+  const InsideStack = createNativeStackNavigator<RootStackParamList>();
+  const navigation = useNavigation();
 
+  return (
+    <Provider store={store}>
+      <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent={true}>
+        <InsideStack.Navigator>
+          <InsideStack.Screen 
+            name="HomeScreen" 
+            component={HomeScreen} 
+            options={{
+              headerShown: true,
+              headerTitle: '',
+              headerTransparent: true,              
+              headerRight: () => (
+                <Icon
+                  name="menu"
+                  onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                  size={30}
+                  color="#fff"
+                />
+              ),
+            }} 
+          />
+          <InsideStack.Screen name="EventScoutingScreen" component={EventScoutingScreen} options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
+          <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} options={{ headerShown: true }} />
+          <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen} options={{ headerShown: true }} />
+          <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen} options={{ headerShown: true }} />
+        </InsideStack.Navigator>
+      </NavigationContainer>
+    </Provider>
+  );
+}
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
-const InsideStack = createNativeStackNavigator<RootStackParamList>();
+const DrawerNav = () => {
+  const Drawer = createDrawerNavigator();
+  return (
+    <Drawer.Navigator
+      drawerContent={props => <DrawerContent {...props} />}
+      screenOptions={{
+        headerShown: false,
+        drawerPosition: 'right',
+      }}>
+      <Drawer.Screen name="HomeScreen" component={InsideLayout} />
+    </Drawer.Navigator>
+  );
+};
 
 SplashScreen.preventAutoHideAsync();
 
@@ -72,6 +120,7 @@ export default function RootLayout() {
     return null;
   }
 
+  const Stack = createNativeStackNavigator<RootStackParamList>();
   return (
     <Provider store={store}>
       <JotaiProvider>
@@ -82,7 +131,7 @@ export default function RootLayout() {
             ) : (
               <>
                 {user ? (
-                  <Stack.Screen name="Inside" component={InsideLayout} options={{ headerShown: false }} />
+                  <Stack.Screen name="Inside" component={DrawerNav} options={{ headerShown: false }} />
                 ) : (
                   <>
                     <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
@@ -97,24 +146,5 @@ export default function RootLayout() {
     </Provider>
   );
 }
-
-function InsideLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <Provider store={store}>
-      <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent={true}>
-        <InsideStack.Navigator>
-          <InsideStack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
-          <InsideStack.Screen name="EventScoutingScreen" component={EventScoutingScreen} options={{ headerShown: false }} />
-          <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} options={{ headerShown: false }} />
-          <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen} options={{ headerShown: false }} />
-          <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen} options={{ headerShown: false }} />
-        </InsideStack.Navigator>
-      </NavigationContainer>
-    </Provider>
-  );
-}
-
 
 {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}

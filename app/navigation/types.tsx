@@ -10,5 +10,6 @@ export type RootStackParamList = {
     Inside: undefined;
     TeamInfoScreen: undefined;
     EventInfoScreen: undefined;
+    DrawerNav: undefined;
   };
   
