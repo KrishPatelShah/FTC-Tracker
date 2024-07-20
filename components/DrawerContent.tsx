@@ -5,12 +5,20 @@ import { Avatar, Title } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
+
 
 type DrawerListType = {
   icon: string;
   label: string;
   navigateTo: string;
 };
+
+
+const handleSignOut = async () => {
+    FIREBASE_AUTH.signOut()
+    await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email : null, password : null}));
+  }
 
 const DrawerList: DrawerListType[] = [
   { icon: 'home-outline', label: 'Home', navigateTo: 'Home' },
@@ -77,7 +85,7 @@ const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
             <Icon name="exit-to-app" color={color} size={size} />
           )}
           label="Sign Out"
-          onPress={() => {}}
+          onPress={handleSignOut}
         />
       </View>
     </View>
