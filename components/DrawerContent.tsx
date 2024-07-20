@@ -21,7 +21,7 @@ const handleSignOut = async () => {
   }
 
 const DrawerList: DrawerListType[] = [
-  { icon: 'home-outline', label: 'Home', navigateTo: 'Home' },
+  { icon: 'home-outline', label: 'Home', navigateTo: 'HomeScreen' },
   { icon: 'account-multiple', label: 'Profile', navigateTo: 'Profile' },
   { icon: 'account-group', label: 'User', navigateTo: 'User' },
   { icon: 'bookshelf', label: 'Library', navigateTo: '' },

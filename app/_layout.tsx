@@ -33,7 +33,22 @@ function InsideLayout() {
   return (
     <Provider store={store}>
       <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent={true}>
-        <InsideStack.Navigator>
+        
+        <InsideStack.Navigator
+          screenOptions={{
+            headerShown: true,
+            headerTitle: '',
+            headerTransparent: true,              
+            headerRight: () => (
+              <Icon
+                name="menu"
+                onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                size={30}
+                color="#fff"
+              />
+            ),
+          }} 
+          >
           <InsideStack.Screen 
             name="HomeScreen" 
             component={HomeScreen} 
@@ -41,14 +56,14 @@ function InsideLayout() {
               headerShown: true,
               headerTitle: '',
               headerTransparent: true,              
-              headerRight: () => (
-                <Icon
-                  name="menu"
-                  onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-                  size={30}
-                  color="#fff"
-                />
-              ),
+              // headerRight: () => (
+              //   <Icon
+              //     name="menu"
+              //     onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+              //     size={30}
+              //     color="#fff"
+              //   />
+              // ),
             }} 
           />
           <InsideStack.Screen name="EventScoutingScreen" component={EventScoutingScreen} options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
