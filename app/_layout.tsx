@@ -52,9 +52,9 @@ function InsideLayout() {
             }} 
           />
           <InsideStack.Screen name="EventScoutingScreen" component={EventScoutingScreen} options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
-          <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} options={{ headerShown: true }} />
-          <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen} options={{ headerShown: true }} />
-          <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen} options={{ headerShown: true }} />
+          <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen}  options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
+          <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen}  options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
+          <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen}  options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
         </InsideStack.Navigator>
       </NavigationContainer>
     </Provider>
