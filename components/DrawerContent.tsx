@@ -6,6 +6,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
+import { Octicons } from '@expo/vector-icons';
 
 
 type DrawerListType = {
@@ -82,7 +83,7 @@ const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
       <View style={styles.bottomDrawerSection}>
         <DrawerItem
           icon={({ color, size }) => (
-            <Icon name="exit-to-app" color={color} size={size} />
+            <Octicons name="sign-out" color={color} size={size} />
           )}
           label="Sign Out"
           onPress={handleSignOut}

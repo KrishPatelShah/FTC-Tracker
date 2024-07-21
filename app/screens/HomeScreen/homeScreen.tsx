@@ -9,6 +9,7 @@ import  CustomDropdown  from '@/components/CustomDropdown';
 import { setEventCode } from '@/eventCodeReducers';
 import CustomSwitch from "@/components/CustomSwitch";
 import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import EventCodeInput from './eventCodeInputModal';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import {Dimensions} from 'react-native';
@@ -91,10 +92,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setSearchDataVisible(true)
   }
 
-  
-
-  
-
   useEffect(() => {
     setSearchDataVisible(false)
     setInputText("")
@@ -153,6 +150,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <CustomDropdown marginTop={10} marginBottom={10}/>
 
       <View style={{ marginTop:'5%', flexDirection: 'row', width:'100%', justifyContent:'space-evenly', alignItems:'center', backgroundColor: '#101010'}}>
+        <View style={{width: '20%', left: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
+        <Text style={{fontSize: 35, color:'white' }}>Match Schedule</Text>
+        <View style={{width: '20%', right: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
+      </View>
+
+      <TouchableOpacity style = {styles.button}>
+          <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
+          <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
+      </TouchableOpacity>
+
+      <View style={{ marginTop:'5%', flexDirection: 'row', width:'100%', justifyContent:'space-evenly', alignItems:'center', backgroundColor: '#101010'}}>
         <View style={{width: '30%', left: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
         <Text style={{fontSize: 35, color:'white' }}>Scouting</Text>
         <View style={{width: '30%', right: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
@@ -165,10 +173,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         
       <EventCodeInput navigation = {navigation} modalVisible = {showCodeInput} setModalVisible={setShowCodeInput}></EventCodeInput>
 
-      <Text style={[styles.text, {marginTop: 20}]} onPress={handleSignOut}>
-        Sign out
-      </Text>
-    
+      <TouchableOpacity style = {styles.button}>
+          <Ionicons name="document-text-outline" size={30} color="#328AFF" style={styles.icon} />
+          <Text style={styles.buttonText}>My Scouting Sheets</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style = {styles.button}>
+          <MaterialCommunityIcons name="import" size={30} color="#328AFF" style={styles.icon} />
+          <Text style={styles.buttonText}>Import Scouting Sheet</Text>
+      </TouchableOpacity>
+
     </GestureHandlerRootView> 
   );
 };
