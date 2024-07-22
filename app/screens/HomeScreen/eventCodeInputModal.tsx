@@ -1,102 +1,212 @@
-import { RootStackParamList } from "@/app/navigation/types";
-import { setEventCode } from "@/eventCodeReducers";
-import { NavigationProp } from "@react-navigation/native";
-import React from "react";
-import { TextInput, View, StyleSheet, Modal, Text } from "react-native"
-import { useDispatch, useSelector } from "react-redux";
-import OutsideClickHandler from 'react-outside-click-handler';
+import React, { useEffect, useState } from "react";
+import { TextInput, View, StyleSheet, Modal, Text, FlatList } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useAtom } from "jotai";
+import { NavigationProp } from "@react-navigation/native";
 import { eventCodeAtom } from "@/dataStore";
+import EventSearchView from "./EventSearchView";
+import { RootStackParamList } from "@/app/navigation/types";
 
 type EventCodeInputProps = {
-    navigation: NavigationProp<RootStackParamList>;
-    modalVisible: boolean,
-    setModalVisible: (item: boolean) => void
-}
+  navigation: NavigationProp<RootStackParamList>;
+  modalVisible: boolean;
+  setModalVisible: (item: boolean) => void;
+};
 
-
-
+type EventSearchData = {
+  name: string;
+  data: string;
+  code: string;
+};
 
 const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisible, setModalVisible }) => {
+  const [eventCodeJotai, setEventCodeJotai] = useAtom(eventCodeAtom);
+  const [searchData, setSearchData] = useState<EventSearchData[]>([]);
+  const [searchText, setSearchText] = useState("");
+  const [searchDataVisible, setSearchDataVisible] = useState(false);
+  const [textInputValue, setTextInputValue] = useState("");
 
-  const [eventCodeJotai, setEventCodeJotai ] = useAtom(eventCodeAtom)
-  const eventCode = useSelector((state: any) => state.event.eventCode); 
-  const dispatch = useDispatch();
+  const eventQuery = `query eventsSearch($season: Int!, $searchText: String!, $limit: Int!, $region: RegionOption!) {
+    eventsSearch(season: $season, searchText: $searchText, limit: $limit, region: $region) {
+      name
+      start
+      code
+    }
+  }`;
 
-    const handleKeyPress = (event: any) => {
-        if (event.nativeEvent.key === "Enter") {
-          dispatch(setEventCode(eventCode));
-          setEventCodeJotai(eventCodeJotai)
-        }
-      };
+  const eventCodeQuery = `query getEventByCode($season: Int!, $code: String!) {
+    eventByCode(season: $season, code: $code) {
+      name
+      start
+      code
+    }
+  }`;
+
+  useEffect(() => {
+    if (searchText) {
+      fetchData();
+    }
+  }, [searchText]);
+
+  const fetchData = async () => {
+    setSearchData([]);
+    let formattedEventData: EventSearchData[] = [];
+    let foundByCode = false;
     
-      const handleTextChange = (text: string) => {
-        //console.log("text : " + text)
-        dispatch(setEventCode(text));
-        setEventCodeJotai(text)
-        //console.log("event code : " + eventCode)
-      };
+    try {
+      const response = await fetch("https://api.ftcscout.org/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query: eventCodeQuery, variables: { season: 2023, code: searchText } })
+      });
+      const data = await response.json();
+      if (data.data.eventByCode) {
+        const newEvent: EventSearchData = { name: data.data.eventByCode.name, data: data.data.eventByCode.start, code: data.data.eventByCode.code };
+        formattedEventData.push(newEvent);
+        foundByCode = true;
+      }
 
-    return (
-        <Modal
+      if (!foundByCode) {
+        const response = await fetch("https://api.ftcscout.org/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ query: eventQuery, variables: { season: 2023, searchText: searchText, limit: 10, region: "All" } })
+        });
+        const data = await response.json();
+        const dataArray: any[] = data.data.eventsSearch;
+        dataArray.forEach((item) => {
+          const newData: EventSearchData = { name: item.name, data: item.start, code: item.code };
+          formattedEventData.push(newData);
+        });
+      }
+
+      setSearchData(formattedEventData);
+      setSearchDataVisible(true);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("TextInput value changed:", textInputValue);
+  }, [textInputValue]);
+
+  const renderItem = ({ item }: { item: EventSearchData }) => (
+    <EventSearchView eventName={item.name} date={item.data} navigation={navigation} code={item.code} navigateTo={() => {
+      navigation.navigate("EventScoutingScreen")
+      setModalVisible(false);
+    }}/>
+  );
+
+  return (
+    <Modal
       animationType="slide"
       transparent={true}
       visible={modalVisible}
       onRequestClose={() => {
         setModalVisible(!modalVisible);
-      }}>
-        <View style = {styles.centeredView}>
-        <View style={styles.textInputContainer}>
+      }}
+    >
+      <View style={styles.centeredView}>
+        <View style={searchDataVisible ? styles.textInputContainer : styles.textInputContainerInvisData}>
           <TextInput
-            onKeyPress={handleKeyPress}
-            onChangeText={handleTextChange}
             style={styles.textInput}
-            placeholder="Enter Event Code"
-            value={eventCode}
-            onSubmitEditing={() => {navigation.navigate("EventScoutingScreen")
-                setModalVisible(false)
-              }}
+            placeholder={"Enter Event"}
+            placeholderTextColor={"white"}
+            value={textInputValue}
+            onChangeText={(text) => {
+              setTextInputValue(text);
+            }}
+            cursorColor={"#328aff"}
+            onSubmitEditing={() => {
+              if(textInputValue == ""){
+                console.log("set to invis")
+                setSearchDataVisible(false)
+              }
+              setSearchText(textInputValue);
+            }}
           />
-          <TouchableOpacity onPress={() => {setModalVisible(false)}}>
-            <Text style = {{top : 10, color : "#328AFF", fontSize : 20}}>Exit</Text>
-
+          {searchDataVisible && (
+            <View style={styles.infoScreen}>
+              <FlatList
+                data={searchData}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.code}
+              />
+            </View>
+          )}
+          <TouchableOpacity onPress={() => { setModalVisible(false); }}>
+            <Text style={{ color: "#328AFF", fontSize: 20, top : searchDataVisible ? -20 : 20}}>Exit</Text>
           </TouchableOpacity>
         </View>
-        </View>
+      </View>
     </Modal>
-    )
-}
+  );
+};
 
 const styles = StyleSheet.create({
-    centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-      },
-    textInputContainer: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        position: "absolute",
-        backgroundColor: "#191919",
-        borderWidth: 4,
-        borderRadius: 12,
-        borderColor: "#328AFF",
-        width: "60%",
-        height: "10%"
-      },
-      textInput: {
-        borderColor: 'gray',
-        backgroundColor: "#328AFF",
-        borderWidth: 1,
-        paddingHorizontal: 10,
-        color: 'white',
-        fontSize: 20,
-        borderRadius: 4
-      },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  textInputContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    position: "absolute",
+    backgroundColor: "#191919",
+    borderWidth: 4,
+    borderRadius: 12,
+    borderColor: "#328AFF",
+    maxWidth: "90%",
+    minHeight: "30%",
+    maxHeight: "40%",
+    minWidth: "90%",
+  },
 
-})
+  textInputContainerInvisData: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    position: "absolute",
+    backgroundColor: "#191919",
+    borderWidth: 4,
+    borderRadius: 12,
+    borderColor: "#328AFF",
+    height: "10%",
+    width: "60%",
+  },
 
-export default EventCodeInput
+  textInput: {
+    top: 10,
+    borderColor: "gray",
+    backgroundColor: "#328AFF",
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    color: "white",
+    fontSize: 20,
+    borderRadius: 4,
+  },
+  searchResults: {
+    flex: 1,
+    width: "100%",
+  },
+  infoScreen: {
+    backgroundColor: "white",
+    alignSelf: "center",
+    width: "90%",
+    height: "70%",
+    borderRadius: 12,
+    marginVertical : 20
+  },
+});
+
+export default EventCodeInput;

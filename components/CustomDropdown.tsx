@@ -6,23 +6,17 @@ import React, { useState } from 'react';
   type DropDownProps={
     marginTop : number
     marginBottom : number
+    dropdownValue : string
+    setDropDownValue : (item: string) => void
+    dropdownData : {label : string, value : string}[]
   }
 
-  const data = [
-    { label: 'Region 1', value: '1' },
-    { label: 'Region 2', value: '2' },
-    { label: 'Region 3', value: '3' },
-    { label: 'Region 4', value: '4' },
-    { label: 'Region 5', value: '5' },
-    { label: 'Region 6', value: '6' },
-    { label: 'Region 7', value: '7' },
-    { label: 'Region 8', value: '8' },
-  ];
+  
 
   const windowHeight = Dimensions.get('window').height;
 
-  const CustomDropDown: React.FC<DropDownProps> = ({marginTop, marginBottom}) => {
-    const [value, setValue] = useState('');
+  const CustomDropDown: React.FC<DropDownProps> = ({marginTop, marginBottom, dropdownValue, setDropDownValue, dropdownData}) => {
+    
 
     return (
       <Dropdown
@@ -31,16 +25,16 @@ import React, { useState } from 'react';
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={data}
+        data={dropdownData}
         search
         maxHeight={windowHeight/2.5}
         labelField="label"
         valueField="value"
         placeholder="Select region"
         searchPlaceholder="Search..."
-        value={value}
+        value={dropdownValue}
         onChange={item => {
-          setValue(item.value);
+          setDropDownValue(item.value);
         }}
       />
     );

@@ -15,9 +15,10 @@ interface EventSearchViewProps {
     date : string;
     code : string;
     navigation : NavigationProp<RootStackParamList>;
+    navigateTo : () => void
 }
 
-const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code, navigation}) => {
+const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code, navigation, navigateTo}) => {
 
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
     
@@ -27,7 +28,7 @@ const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code,
 
     const check = () => {
         setEventCode(code)
-        navigation.navigate("EventInfoScreen")
+        navigateTo()
     }
 
 
