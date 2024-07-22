@@ -39,14 +39,6 @@ function InsideLayout() {
             headerShown: true,
             headerTitle: '',
             headerTransparent: true,              
-            headerRight: () => (
-              <Icon
-                name="menu"
-                onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-                size={30}
-                color="#fff"
-              />
-            ),
           }} 
           >
           <InsideStack.Screen 
@@ -56,20 +48,22 @@ function InsideLayout() {
               headerShown: true,
               headerTitle: '',
               headerTransparent: true,              
-              // headerRight: () => (
-              //   <Icon
-              //     name="menu"
-              //     onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-              //     size={30}
-              //     color="#fff"
-              //   />
-              // ),
+              headerRight: () => (
+                <Icon
+                  name="menu"
+                  onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                  size={30}
+                  color="#fff"
+                />
+              ),
             }} 
           />
-          <InsideStack.Screen name="EventScoutingScreen" component={EventScoutingScreen} options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
-          <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen}  options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
-          <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen}  options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
-          <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen}  options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} />
+          
+          <InsideStack.Screen name="EventScoutingScreen" component={EventScoutingScreen} />
+          <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} />
+          <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen} />
+          <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen} />
+          {/* options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} */}
         </InsideStack.Navigator>
       </NavigationContainer>
     </Provider>
