@@ -2,6 +2,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import React, { useState } from 'react';
 import { ASYNC_STORAGE, FIREBASE_AUTH } from '@/FirebaseConfig'; 
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Linking, ActivityIndicator } from 'react-native';
+import { doc, getFirestore, setDoc } from 'firebase/firestore';
 
 export default function SignUpScreen() {
   const handleTermsOfServicePress = () => {
@@ -13,6 +14,7 @@ export default function SignUpScreen() {
   };
 
 const auth = FIREBASE_AUTH;
+const db = getFirestore();
 const [email, setEmail] = useState('');
 const [password, setPassword] = useState('');
 const [loading, setLoading] = useState(false);
@@ -20,8 +22,16 @@ const [loading, setLoading] = useState(false);
 const createAccount = async () => {
   setLoading(true);
   try{
-    const response = await createUserWithEmailAndPassword(auth, email, password);
+    await createUserWithEmailAndPassword(auth, email, password);
     await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email, password}));
+
+    if(FIREBASE_AUTH.currentUser){
+      const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+      setDoc(userRef, { // basically means "create a document in the collection titled 'user_data' with the fields: 'email:' etc."
+        email: email,
+      });
+    }
+
     alert('Account created!')
   } catch(error : any){
     alert('😓, creation failed:\n' + error.message)

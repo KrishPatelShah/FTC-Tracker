@@ -17,7 +17,8 @@ import EventSearchView from './EventSearchView';
 import TeamSearchView from './TeamSearchView';
 import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
 import { RegionOption } from './RegionOptions';
-
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+ 
 type HomeScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
 };
