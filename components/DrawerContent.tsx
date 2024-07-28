@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FIREBASE_AUTH, ASYNC_STORAGE, FIRESTORE_DB } from '@/FirebaseConfig';
 import { Octicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { collection, doc, getDoc } from 'firebase/firestore';
 
 type DrawerListType = {
@@ -22,17 +23,19 @@ const handleSignOut = async () => {
 };
 
 const DrawerList: DrawerListType[] = [
-  { icon: 'home-outline', label: 'Home', navigateTo: 'HomeScreen' },
-  { icon: 'account-multiple', label: 'Profile', navigateTo: 'Profile' },
-  { icon: 'account-group', label: 'User', navigateTo: 'User' },
-  { icon: 'bookshelf', label: 'Library', navigateTo: '' },
+  // { icon: 'home-outline', label: 'Home', navigateTo: 'HomeScreen' },
+  { icon: 'account', label: 'Profile', navigateTo: 'Profile' },
+  // { icon: 'account-group', label: 'User', navigateTo: 'User' },
+  { icon: 'shield-check-outline', label: 'Privacy Policy', navigateTo: '' },
+  { icon: 'file-document-outline', label: 'Terms of Service', navigateTo: '' },
+  { icon: 'cog-outline', label: 'Settings', navigateTo: '' },
 ];
 
 const DrawerLayout: React.FC<DrawerListType> = ({ icon, label, navigateTo }) => {
   const navigation = useNavigation<NavigationProp<any>>();
   return (
     <DrawerItem
-      icon={({ color, size }) => <Icon name={icon} color={color} size={size} />}
+      icon={({ color, size }) => <MaterialCommunityIcons name={icon as any} color={color} size={size} />}
       label={label}
       onPress={() => {
         navigation.navigate(navigateTo);
