@@ -160,13 +160,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setShowCodeInput(!showCodeInput);
   };
 
-  const handleSignOut = async () => {
-    FIREBASE_AUTH.signOut()
-    await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email : null, password : null}));
-  }
+  // const handleSignOut = async () => {
+  //   FIREBASE_AUTH.signOut()
+  //   await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email : null, password : null}));
+  // }
 
   return (
     <GestureHandlerRootView style = {styles.container}>
+      {/* <ScrollView style = {styles.containerScroll}> */}
       <CustomSwitch  activeColor= '#191919' inactiveColor= '#191919' active={active} setActive={setActive}/>
       <View style={styles.textInputContainer}>
         <Ionicons style={[styles.iconStyling, {left : 20}]} name= {active ? "calendar" : "people"} size={30} color="grey"/>
@@ -237,7 +238,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <MaterialCommunityIcons name="import" size={30} color="#328AFF" style={styles.icon} />
           <Text style={styles.buttonText}>Import Scouting Sheet</Text>
       </TouchableOpacity>
-
+      {/* </ScrollView> */}
     </GestureHandlerRootView> 
   );
 };
@@ -311,5 +312,12 @@ const styles = StyleSheet.create({
 searchResults : {
   display: "flex",
   flexDirection : "column",
-}
+  backgroundColor: '#191919',
+},
+
+containerScroll : {
+  display: "flex",
+  flexDirection : "column",
+},
+
 });
