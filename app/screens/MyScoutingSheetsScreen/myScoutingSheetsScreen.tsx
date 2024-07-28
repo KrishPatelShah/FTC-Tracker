@@ -18,6 +18,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
             My Scouting Sheets
         </Text>
 
+
         <View style={{width: '80%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
         <TouchableOpacity style = {styles.button}>
