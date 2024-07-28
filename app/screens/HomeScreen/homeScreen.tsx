@@ -171,7 +171,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {/* <ScrollView style = {styles.containerScroll}> */}
       <CustomSwitch  activeColor= '#191919' inactiveColor= '#191919' active={active} setActive={setActive}/>
       <View style={styles.textInputContainer}>
-        <Ionicons style={[styles.iconStyling, {left : 20}]} name= {active ? "calendar" : "people"} size={30} color="grey"/>
+        <Ionicons style={[styles.iconStyling, {left : 20}]} name= {active ? "calendar" : "people"} size={25} color="grey"/>
         <TextInput style={styles.input} 
           placeholder={active ? 'Search for events' : 'Search for teams'} 
           placeholderTextColor={'grey'} 
@@ -207,9 +207,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <CustomDropdown marginTop={10} marginBottom={10} dropdownValue={regionDropdown} setDropDownValue = {setRegionDropdown} dropdownData={regionDropdownData}/>
 
       <View style={{ marginTop:'5%', flexDirection: 'row', width:'100%', justifyContent:'space-evenly', alignItems:'center', backgroundColor: '#101010'}}>
-        <View style={{width: '20%', left: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
-        <Text style={{fontSize: 35, color:'white' }}>Match Schedule</Text>
-        <View style={{width: '20%', right: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
+        <View style={{width: '25%', left: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
+        <Text style={styles.headings}>Match Schedule</Text>
+        <View style={{width: '25%', right: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
       </View>
 
       <TouchableOpacity style = {styles.button}>
@@ -218,9 +218,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       </TouchableOpacity>
 
       <View style={{ marginTop:'5%', flexDirection: 'row', width:'100%', justifyContent:'space-evenly', alignItems:'center', backgroundColor: '#101010'}}>
-        <View style={{width: '30%', left: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
-        <Text style={{fontSize: 35, color:'white' }}>Scouting</Text>
-        <View style={{width: '30%', right: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
+        <View style={{width: '35%', left: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
+        <Text style={styles.headings}>Scouting</Text>
+        <View style={{width: '35%', right: -15, height: 2.5, marginBottom: -5, backgroundColor:'#328AFF', borderRadius: 10}}/>
       </View>
       
       <TouchableOpacity onPress={toggleShowCodeInput} style = {styles.button}>
@@ -276,6 +276,12 @@ const styles = StyleSheet.create({
     left : 38,
     flex : 1
   },
+
+  headings: {
+    fontSize: 30, 
+    color:'white',
+  },
+
   text:{
     fontSize: 20,
     color: 'white'
@@ -295,7 +301,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    fontSize: 24,
+    fontSize: 20,
     paddingRight: 10,
     paddingTop: 10,
     paddingBottom: 10,
@@ -306,7 +312,7 @@ const styles = StyleSheet.create({
   infoScreen : {
     backgroundColor : "#191919",
     alignSelf : "center",
-    height : "20%",
+    height : "25%",
     width : "90%",
     borderRadius : 12
 },

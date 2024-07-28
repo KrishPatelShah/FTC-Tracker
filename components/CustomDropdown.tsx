@@ -63,7 +63,7 @@ import React, { useState } from 'react';
       marginLeft: 10,
     },
     selectedTextStyle: {
-      fontSize: 22,
+      fontSize: 20,
       color: 'grey',
       marginLeft: 10,
     },
