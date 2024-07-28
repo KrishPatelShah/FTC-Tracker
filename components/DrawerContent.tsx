@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { DrawerContentScrollView, DrawerItem, DrawerContentComponentProps } from '@react-navigation/drawer';
 import { Avatar, Title } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {LinearGradient} from 'expo-linear-gradient';
-import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
+import { LinearGradient } from 'expo-linear-gradient';
+import { FIREBASE_AUTH, ASYNC_STORAGE, FIRESTORE_DB } from '@/FirebaseConfig';
 import { Octicons } from '@expo/vector-icons';
+import { collection, doc, getDoc } from 'firebase/firestore';
 
 type DrawerListType = {
   icon: string;
@@ -51,10 +52,40 @@ const DrawerItems: React.FC = () => {
 };
 
 const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
+  const [userName, setUserName] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user = FIREBASE_AUTH.currentUser;
+        if (user) {
+          const userRef = doc(collection(FIRESTORE_DB, 'user_data'), user.uid);
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUserName(userData.name);
+            setUserEmail(userData.email);
+          } else {
+            console.warn("No User Info");
+            setUserName("No Data");
+            setUserEmail("No Data");
+          }
+        } else {
+          console.warn("No user logged in!");
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
-        colors={['#191919', '#1f1f1f', '#191919']} // '#121212', '#1f1f1f', '#282828
+        colors={['#191919', '#1f1f1f', '#191919']}
         style={styles.gradient}
       >
         <DrawerContentScrollView {...props}>
@@ -62,15 +93,10 @@ const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
             <TouchableOpacity activeOpacity={0.8}>
               <View style={styles.userInfoSection}>
                 <View style={styles.userInfo}>
-                  {/* <Avatar.Image
-                    source={{}}
-                    size={50}
-                    style={{ marginTop: 5 }}
-                  /> */}
                   <View style={styles.userInfoText}>
-                    <Title style={styles.title}>Krish</Title>
+                    <Title style={styles.title}>{userName || "Loading..."}</Title>
                     <Text style={styles.caption} numberOfLines={1}>
-                      Krish.patelshah@gmail.com
+                      {userEmail || "Loading..."}
                     </Text>
                   </View>
                 </View>
