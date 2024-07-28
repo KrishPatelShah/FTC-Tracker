@@ -6,6 +6,8 @@ import { doc, getFirestore, setDoc } from 'firebase/firestore';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '@/app/navigation/types';
 import { Ionicons } from '@expo/vector-icons';
+import { eventCodeAtom, persistentEventData, ScoutingSheetArrayType } from '@/dataStore';
+import { useAtom } from 'jotai';
 
 type MyScoutingSheetsScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -13,6 +15,28 @@ type MyScoutingSheetsScreenProps = {
 
 
 const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigation}) => {
+
+  //let fetchedData: ScoutingSheetArrayType[] = firebase.fetch().map((item) => JSON.parse(item))
+
+  const [eventData, setEventData] = useAtom(persistentEventData)
+  const [eventCodeJotai, setEventCode] = useAtom(eventCodeAtom)
+
+  type test1 = {
+    name : string;
+  }
+
+  type test2 = {
+    name : string;
+  }
+
+  const run: (arg0: ScoutingSheetArrayType) => void = (item) => {
+    navigation.navigate("EventScoutingScreen")
+    setEventCode(item.code)
+    setEventData(item.eventData)
+  }
+
+  
+
   return (
       <View style={styles.container}>
         <Text style={styles.title}>
@@ -22,13 +46,24 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
         <View style={{width: '80%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
+        {/* {fetchedData.map((item, index) => (
+          <TouchableOpacity style = {styles.button} key = {index} onPress = {() => run(item)}>
+            <Ionicons name="calendar-outline" size={35} color="#328AFF" style={styles.icon} />
+            <View style={styles.buttonTextContainer}>
+              <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>
+              <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>{item.date}</Text>
+            </View>
+          </TouchableOpacity>
+        ))} */}
+
         <TouchableOpacity style = {styles.button}>
-          <Ionicons name="calendar-outline" size={35} color="#328AFF" style={styles.icon} />
-          <View style={styles.buttonTextContainer}>
-            <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
-            <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>2/13/22</Text>
-          </View>
-        </TouchableOpacity>
+            <Ionicons name="calendar-outline" size={35} color="#328AFF" style={styles.icon} />
+            <View style={styles.buttonTextContainer}>
+              <Text numberOfLines={1} style={styles.buttonText}>SC</Text>
+              <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>123</Text>
+            </View>
+          </TouchableOpacity>
+
       </View>
   );
 }

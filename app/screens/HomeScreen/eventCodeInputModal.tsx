@@ -99,7 +99,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
     <EventSearchView eventName={item.name} date={item.data} navigation={navigation} code={item.code} navigateTo={() => {
       navigation.navigate("EventScoutingScreen")
       setModalVisible(false);
-    }}/>
+    }} location="modal"/>
   );
 
   return (

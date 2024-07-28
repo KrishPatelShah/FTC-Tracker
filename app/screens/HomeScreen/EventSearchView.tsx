@@ -7,7 +7,7 @@ import { setTeamNumber } from "../../../teamNumberReducers";
 import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/app/navigation/types";
 import { useAtom } from "jotai";
-import { eventCodeAtom } from "@/dataStore";
+import { eventCodeAtom, scoutingSheetArray } from "@/dataStore";
 
 
 interface EventSearchViewProps {
@@ -15,19 +15,24 @@ interface EventSearchViewProps {
     date : string;
     code : string;
     navigation : NavigationProp<RootStackParamList>;
-    navigateTo : () => void
+    navigateTo : () => void;
+    location : string
 }
 
-const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code, navigation, navigateTo}) => {
+const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code, navigation, navigateTo, location}) => {
 
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
-    
+    const [globalSheetArray, setScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [isPressed, setIsPressed] = useState(false)
     
     
 
     const check = () => {
         setEventCode(code)
+        if(location === "modal"){
+            globalSheetArray.push({code: code, name : eventName, date : date, eventData : []})
+            let stringified: string[] = globalSheetArray.map((item) => JSON.stringify(item))
+        }
         navigateTo()
     }
 

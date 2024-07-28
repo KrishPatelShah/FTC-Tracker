@@ -168,7 +168,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
     useFocusEffect(
         React.useCallback(() => {
-          // This will run when the screen is focused
+          
           console.log('Screen is focused');
           setDataFetched(false)
           let storedTeamArray: number[] = []
