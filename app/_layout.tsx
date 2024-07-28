@@ -134,7 +134,7 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <JotaiProvider>
-        <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent={true}>
+        <NavigationContainer theme={DarkTheme} independent={true}>
           <Stack.Navigator>
             {appLoading ? (
               <Stack.Screen name="LoadingScreen" component={LoadingScreen} options={{ headerShown: false }} />

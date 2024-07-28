@@ -20,7 +20,7 @@ const handleSignOut = async () => {
     FIREBASE_AUTH.signOut()
     await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email : null, password : null}));
   }
-
+ 
 const DrawerList: DrawerListType[] = [
   { icon: 'home-outline', label: 'Home', navigateTo: 'HomeScreen' },
   { icon: 'account-multiple', label: 'Profile', navigateTo: 'Profile' },
