@@ -15,6 +15,7 @@ export default function SignUpScreen() {
 
 const auth = FIREBASE_AUTH;
 const db = getFirestore();
+const [name, setName] = useState('');
 const [email, setEmail] = useState('');
 const [password, setPassword] = useState('');
 const [loading, setLoading] = useState(false);
@@ -29,6 +30,7 @@ const createAccount = async () => {
       const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
       setDoc(userRef, { // basically means "create a document in the collection titled 'user_data' with the fields: 'email:' etc."
         email: email,
+        name: name,
       });
     }
 
@@ -70,6 +72,14 @@ const createAccount = async () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create your account</Text>
+
+      <TextInput style={styles.input}
+        placeholder="Name"
+        value={name}
+        placeholderTextColor="#ccc"
+        autoCapitalize='words'
+        onChangeText={(text)=>{setName(text)}}
+      />
 
       <TextInput style={styles.input}
         placeholder="Email"

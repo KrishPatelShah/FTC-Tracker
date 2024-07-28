@@ -70,7 +70,7 @@ const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
                   <View style={styles.userInfoText}>
                     <Title style={styles.title}>Krish</Title>
                     <Text style={styles.caption} numberOfLines={1}>
-                      Krishpatelshah@gmail.com
+                      Krish.patelshah@gmail.com
                     </Text>
                   </View>
                 </View>
