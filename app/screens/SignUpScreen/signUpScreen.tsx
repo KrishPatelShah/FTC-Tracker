@@ -32,6 +32,33 @@ const createAccount = async () => {
       });
     }
 
+    /*\     
+    import { getFirestore, doc, getDoc } from 'firebase/firestore';
+    const auth = FIREBASE_AUTH;
+    const db = getFirestore();
+
+    if(FIREBASE_AUTH.currentUser){
+      const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+
+      try {
+        const docSnap = await getDoc(userRef);
+          if (docSnap.exists()) {
+            const scoutingSheets = docSnap.data().scoutingSheets;
+          } 
+      } 
+      catch (error) {
+        console.error("Error retrieving document:", error);
+      }
+
+      updateDoc(userRef, { 
+        scoutingSheets: scoutingSheets,
+      });
+    }
+
+    // const scoutingSheets: eventData[] = [. . .];
+    // scoutingSheets.push(eventData);
+    \*/
+
     alert('Account created!')
   } catch(error : any){
     alert('😓, creation failed:\n' + error.message)

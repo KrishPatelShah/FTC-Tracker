@@ -12,6 +12,7 @@ import SignUpScreen from '@/app/screens/SignUpScreen/signUpScreen';
 import EventScoutingScreen from './screens/EventScoutingScreen/scoutingSheetTemplate';
 import TeamScoutingScreen from './screens/TeamScoutingScreen/teamView';
 import HomeScreen from './screens/HomeScreen/homeScreen';
+import MyScoutingSheetsScreen from './screens/MyScoutingSheetsScreen/myScoutingSheetsScreen';
 import { Provider } from 'react-redux';
 import { Provider as JotaiProvider } from 'jotai';
 import { store } from '@/dataStore';
@@ -58,7 +59,7 @@ function InsideLayout() {
               ),
             }} 
           />
-          
+          <InsideStack.Screen name="MyScoutingSheetsScreen" component={MyScoutingSheetsScreen} />
           <InsideStack.Screen name="EventScoutingScreen" component={EventScoutingScreen} />
           <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} />
           <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen} />

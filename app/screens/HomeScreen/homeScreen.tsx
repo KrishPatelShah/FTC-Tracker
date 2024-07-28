@@ -228,7 +228,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         
       <EventCodeInput navigation = {navigation} modalVisible = {showCodeInput} setModalVisible={setShowCodeInput}></EventCodeInput>
 
-      <TouchableOpacity style = {styles.button}>
+      <TouchableOpacity style = {styles.button} onPress={()=>{navigation.navigate('MyScoutingSheetsScreen');}}>
           <Ionicons name="document-text-outline" size={30} color="#328AFF" style={styles.icon} />
           <Text style={styles.buttonText}>My Scouting Sheets</Text>
       </TouchableOpacity>
