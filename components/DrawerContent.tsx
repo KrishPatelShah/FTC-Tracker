@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userInfoSection: {
-    paddingLeft: 20,
+    paddingLeft: 10,
   },
   userInfo: {
     flexDirection: 'row',
