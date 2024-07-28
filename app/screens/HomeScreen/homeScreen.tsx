@@ -154,6 +154,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   useEffect(() => {
     setSearchDataVisible(false)
     setSearchText("")
+    setTextInputValue("")
   }, [active]);
 
   const toggleShowCodeInput = () => {
@@ -187,7 +188,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             setSearchText(textInputValue);
           }}
         />
-        <TouchableOpacity style = {{right : 10, position : "absolute"}} onPress={()=>{setSearchText(''); setSearchDataVisible(false)}}>
+        <TouchableOpacity style = {{right : 10, position : "absolute"}} onPress={()=>{setSearchText(''); setTextInputValue(""); setSearchDataVisible(false)}}>
           <Ionicons  style={styles.iconStyling}  name= {'close'} size={30} color="grey"/>   
         </TouchableOpacity>
       </View>
