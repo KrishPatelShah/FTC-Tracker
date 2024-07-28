@@ -12,7 +12,6 @@ type MyScoutingSheetsScreenProps = {
 };
 
 const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigation}) => {
- 
   return (
       <View style={styles.container}>
         <Text style={styles.title}>
@@ -30,7 +29,6 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         </TouchableOpacity>
       </View>
   );
-  
 }
 
 const styles = StyleSheet.create({
