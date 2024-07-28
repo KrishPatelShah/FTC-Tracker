@@ -11,6 +11,7 @@ type MyScoutingSheetsScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
 };
 
+
 const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigation}) => {
   return (
       <View style={styles.container}>
