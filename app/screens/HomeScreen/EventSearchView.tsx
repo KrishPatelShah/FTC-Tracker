@@ -8,7 +8,8 @@ import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/app/navigation/types";
 import { useAtom } from "jotai";
 import { eventCodeAtom, scoutingSheetArray } from "@/dataStore";
-
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
 
 interface EventSearchViewProps {
     eventName : string;
@@ -22,20 +23,33 @@ interface EventSearchViewProps {
 const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code, navigation, navigateTo, location}) => {
 
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
-    const [globalSheetArray, setScoutingSheetArray] = useAtom(scoutingSheetArray)
+    const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [isPressed, setIsPressed] = useState(false)
     
-    
+    // FIREBASE VARIABLES:
+    const db = getFirestore();
 
     const check = () => {
         setEventCode(code)
         if(location === "modal"){
-            globalSheetArray.push({code: code, name : eventName, date : date, eventData : []})
-            let stringified: string[] = globalSheetArray.map((item) => JSON.stringify(item))
+            //let stringifiedGlobalScoutingSheetArray: string[] = globalScoutingSheetArray.map((item) => JSON.stringify(item))
+            //globalScoutingSheetArray.pop() 
+            globalScoutingSheetArray.push({code: code, name : eventName, date : date, eventData : []})
+
+            if(FIREBASE_AUTH.currentUser){
+                const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+                try {
+                    updateDoc(userRef, { 
+                        userScoutingSheetArray: globalScoutingSheetArray,
+                    });
+                } 
+                catch (error) {
+                    console.error("Error updating user document:", error);
+                }    
+            }
         }
         navigateTo()
     }
-
 
     return (
         <TouchableOpacity style={styles.container} onPress = {check}>

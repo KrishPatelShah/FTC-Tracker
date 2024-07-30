@@ -1,41 +1,54 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
-import { ASYNC_STORAGE, FIREBASE_AUTH } from '@/FirebaseConfig'; 
+import React, { useEffect, useState } from 'react';
+import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Linking, ActivityIndicator } from 'react-native';
-import { doc, getFirestore, setDoc } from 'firebase/firestore';
+import { doc, getFirestore, setDoc, getDoc, updateDoc, DocumentData } from 'firebase/firestore';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '@/app/navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { eventCodeAtom, persistentEventData, ScoutingSheetArrayType } from '@/dataStore';
+import { eventCodeAtom, persistentEventData, scoutingSheetArray, ScoutingSheetArrayType } from '@/dataStore';
 import { useAtom } from 'jotai';
 
 type MyScoutingSheetsScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
 };
 
-
 const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigation}) => {
-
-  //let fetchedData: ScoutingSheetArrayType[] = firebase.fetch().map((item) => JSON.parse(item))
 
   const [eventData, setEventData] = useAtom(persistentEventData)
   const [eventCodeJotai, setEventCode] = useAtom(eventCodeAtom)
+  const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
+  const db = getFirestore();
 
-  type test1 = {
-    name : string;
-  }
+  const fetchFirebaseData = async ()=>{
+    if(FIREBASE_AUTH.currentUser){
+      const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
 
-  type test2 = {
-    name : string;
+      try {
+        const docSnap = await getDoc(userRef);
+          if (docSnap) {
+            const userData = docSnap.data() as DocumentData 
+
+            setGlobalScoutingSheetArray(userData.userScoutingSheetArray);
+          } 
+      } 
+      catch (error) {
+        console.error("😓 Error retrieving document:", error);
+      }
+
+    }
   }
+  useEffect( () => {
+    fetchFirebaseData()
+  }, [])
+ 
+  // let globalScoutingSheetArray: ScoutingSheetArrayType[] = firebase.fetch().map((item) => JSON.parse(item))
 
   const run: (arg0: ScoutingSheetArrayType) => void = (item) => {
-    navigation.navigate("EventScoutingScreen")
     setEventCode(item.code)
     setEventData(item.eventData)
+    navigation.navigate("EventScoutingScreen")
   }
-
-  
 
   return (
       <View style={styles.container}>
@@ -43,10 +56,9 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
             My Scouting Sheets
         </Text>
 
-
         <View style={{width: '80%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
-        {/* {fetchedData.map((item, index) => (
+        {globalScoutingSheetArray.map((item, index) => (
           <TouchableOpacity style = {styles.button} key = {index} onPress = {() => run(item)}>
             <Ionicons name="calendar-outline" size={35} color="#328AFF" style={styles.icon} />
             <View style={styles.buttonTextContainer}>
@@ -54,15 +66,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
               <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>{item.date}</Text>
             </View>
           </TouchableOpacity>
-        ))} */}
-
-        <TouchableOpacity style = {styles.button}>
-            <Ionicons name="calendar-outline" size={35} color="#328AFF" style={styles.icon} />
-            <View style={styles.buttonTextContainer}>
-              <Text numberOfLines={1} style={styles.buttonText}>SC</Text>
-              <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>123</Text>
-            </View>
-          </TouchableOpacity>
+        ))} 
 
       </View>
   );

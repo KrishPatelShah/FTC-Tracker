@@ -28,7 +28,7 @@ const createAccount = async () => {
 
     if(FIREBASE_AUTH.currentUser){
       const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-      setDoc(userRef, { // basically means "create a document in the collection titled 'user_data' with the fields: 'email:' etc."
+      setDoc(userRef, { // "create a document in the collection titled 'user_data' with the fields: 'email:' etc."
         email: email,
         name: name,
       });
