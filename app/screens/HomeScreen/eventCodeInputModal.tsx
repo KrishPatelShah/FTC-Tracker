@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { TextInput, View, StyleSheet, Modal, Text, FlatList } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity } from "react-native";
 import { useAtom } from "jotai";
 import { NavigationProp } from "@react-navigation/native";
 import { eventCodeAtom } from "@/dataStore";
@@ -116,7 +116,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
           <TextInput
             style={styles.textInput}
             placeholder={"Enter Event"}
-            placeholderTextColor={"white"}
+            placeholderTextColor={"grey"}
             value={textInputValue}
             onChangeText={(text) => {
               setTextInputValue(text);
@@ -136,6 +136,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
                 data={searchData}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.code}
+                showsVerticalScrollIndicator={false}
               />
             </View>
           )}
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     backgroundColor: "#191919",
-    borderWidth: 4,
+    borderWidth: 2,
     borderRadius: 12,
     borderColor: "#328AFF",
     maxWidth: "90%",
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     backgroundColor: "#191919",
-    borderWidth: 4,
+    borderWidth: 2,
     borderRadius: 12,
     borderColor: "#328AFF",
     height: "10%",
@@ -187,9 +188,9 @@ const styles = StyleSheet.create({
 
   textInput: {
     top: 10,
-    borderColor: "gray",
-    backgroundColor: "#328AFF",
-    borderWidth: 1,
+    borderBottomColor: 'grey',
+    borderBottomWidth: 1,
+    textAlign:'center',
     paddingHorizontal: 10,
     color: "white",
     fontSize: 20,
@@ -200,12 +201,11 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   infoScreen: {
-    backgroundColor: "white",
     alignSelf: "center",
     width: "90%",
     height: "70%",
     borderRadius: 12,
-    marginVertical : 20
+    marginVertical : 30
   },
 });
 

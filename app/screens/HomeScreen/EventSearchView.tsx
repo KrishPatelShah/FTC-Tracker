@@ -1,7 +1,7 @@
 
 import { memo, useEffect, useState } from "react";
-import {Text, View, StyleSheet} from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {Text, View, StyleSheet, Pressable, Touchable} from "react-native";
+import { TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setTeamNumber } from "../../../teamNumberReducers";
 import { NavigationProp } from "@react-navigation/native";
