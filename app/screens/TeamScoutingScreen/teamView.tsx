@@ -1,7 +1,7 @@
 import { RootStackParamList } from "@/app/navigation/types";
 import { NavigationProp, useFocusEffect, useIsFocused } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, BackHandler } from "react-native";
 import { GestureHandlerRootView, TextInput } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -80,7 +80,6 @@ type HomeScreenProps = {
   }
 
 
-
 const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const [DropdownMatchView, setDropdownMatch] = useState<dropdownMatches[]>([])
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
@@ -114,6 +113,20 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const [isMatchNumsFinished, setIsMatchNumsFinished] = useState(false)
     const [shouldReRender, setShouldReRender] = useState(false)
 
+    useFocusEffect(
+        useCallback(() => {
+          const onBackPress = () => {
+            // Perform your action here
+            Alert.alert("Back button pressed", "You are leaving the screen");
+    
+            // Returning true prevents the default behavior (exiting the screen)
+            return false;
+          };
+    
+          BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    
+          return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        }, []))
 
     const loadData = () => {
         /* let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))

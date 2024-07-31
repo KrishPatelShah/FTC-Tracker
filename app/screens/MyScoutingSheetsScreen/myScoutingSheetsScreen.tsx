@@ -1,13 +1,15 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Linking, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Linking, ActivityIndicator, Alert, BackHandler } from 'react-native';
 import { doc, getFirestore, setDoc, getDoc, updateDoc, DocumentData } from 'firebase/firestore';
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '@/app/navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import { eventCodeAtom, persistentEventData, scoutingSheetArray, ScoutingSheetArrayType } from '@/dataStore';
 import { useAtom } from 'jotai';
+import DeleteScoutingSheetScreen from '../MyScoutingSheetsScreen/deleteScoutingSheetScreen';
+
 
 type MyScoutingSheetsScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -19,6 +21,14 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const [eventCodeJotai, setEventCode] = useAtom(eventCodeAtom)
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
   const db = getFirestore();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalIndexToDelete, setModalIndexToDelete] = useState(0);
+
+  const handleLongPress = (index : number) => {
+    setModalIndexToDelete(index)
+    setModalVisible(true)
+}
 
   const fetchFirebaseData = async ()=>{
     if(FIREBASE_AUTH.currentUser){
@@ -59,7 +69,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         <View style={{width: '80%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
         {globalScoutingSheetArray.map((item, index) => (
-          <TouchableOpacity style = {styles.button} key = {index} onPress = {() => run(item)}>
+          <TouchableOpacity style = {styles.button} key = {index} onPress = {() => run(item)} onLongPress={() => handleLongPress(index)} delayLongPress={300}>
             <Ionicons name="calendar-outline" size={35} color="#328AFF" style={styles.icon} />
             <View style={styles.buttonTextContainer}>
               <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>
@@ -67,6 +77,8 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
             </View>
           </TouchableOpacity>
         ))} 
+
+        <DeleteScoutingSheetScreen modalVisible={modalVisible} setModalVisible={setModalVisible} modalIndexToDelete={modalIndexToDelete}/>
 
       </View>
   );

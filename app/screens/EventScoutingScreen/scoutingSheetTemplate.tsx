@@ -1,5 +1,5 @@
-import React, { useEffect, useState, } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState, } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, BackHandler } from 'react-native';
 import { global_styles } from '@/styles';
 import { useSelector } from 'react-redux';
 import TeamView from '@/app/screens/EventScoutingScreen/teamScoutingView';
@@ -8,6 +8,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { atom, useAtom } from 'jotai'
 import { eventCodeAtom, persistentEventData, teamDataAtom } from '@/dataStore';
 import { TeamEventData } from '../TeamScoutingScreen/teamView';
+import { useFocusEffect } from 'expo-router';
 
 type ScoutingSheetProps = {
   navigation: any;
@@ -42,6 +43,7 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
       eventData.push(persistentTeamData)
     }
   }, [persistentTeamData])
+
 
 
   useEffect(() => {

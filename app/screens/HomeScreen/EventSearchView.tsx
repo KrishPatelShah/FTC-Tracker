@@ -25,7 +25,7 @@ const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code,
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [isPressed, setIsPressed] = useState(false)
-    
+
     // FIREBASE VARIABLES:
     const db = getFirestore();
 
@@ -33,7 +33,6 @@ const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code,
         setEventCode(code)
         if(location === "modal"){
             //let stringifiedGlobalScoutingSheetArray: string[] = globalScoutingSheetArray.map((item) => JSON.stringify(item))
-            //globalScoutingSheetArray.pop() 
             globalScoutingSheetArray.push({code: code, name : eventName, date : date, eventData : []})
 
             if(FIREBASE_AUTH.currentUser){
@@ -60,7 +59,7 @@ const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code,
                 <Text style={styles.value}>{date}</Text> 
             </View>
         </TouchableOpacity>
-      );
+    );
 }
 
 const styles = StyleSheet.create({
