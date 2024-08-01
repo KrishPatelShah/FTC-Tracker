@@ -69,7 +69,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         <View style={{width: '80%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
         {
-          globalScoutingSheetArray.map((item, index) => (
+          globalScoutingSheetArray?.map((item, index) => (
           <TouchableOpacity style = {styles.button} key = {index} onPress = {() => run(item)} onLongPress={() => handleLongPress(index)} delayLongPress={300}>
             <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
             <View style={styles.buttonTextContainer}>
