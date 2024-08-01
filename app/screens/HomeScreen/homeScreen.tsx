@@ -180,7 +180,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             }}
           />
           <TouchableOpacity style={{ right: 10, position: "absolute" }} onPress={() => { setSearchText(''); setTextInputValue(""); setSearchDataVisible(false) }}>
-            <Ionicons style={styles.iconStyling} name={'close'} size={3} color="grey" />
+            <Ionicons style={styles.iconStyling} name={'close'} size={25} color="grey" />
           </TouchableOpacity>
         </View>
 
