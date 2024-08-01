@@ -1,7 +1,7 @@
 import { RootStackParamList } from "@/app/navigation/types";
 import { NavigationProp, useFocusEffect, useIsFocused } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, BackHandler } from "react-native";
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, BackHandler, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView, TextInput } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -13,7 +13,9 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Slider from "@react-native-community/slider";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAtom, useAtomValue } from "jotai";
-import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData } from "@/dataStore";
+import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData, scoutingSheetArray } from "@/dataStore";
+import { FIREBASE_AUTH } from "@/FirebaseConfig";
+import { doc, getFirestore, updateDoc } from "firebase/firestore";
 
 
 type HomeScreenProps = {
@@ -113,11 +115,24 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const [isMatchNumsFinished, setIsMatchNumsFinished] = useState(false)
     const [shouldReRender, setShouldReRender] = useState(false)
 
+    const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
+    const db = getFirestore();
+    const [loading, setLoading] = useState(false)
+
     useFocusEffect(
         useCallback(() => {
           const onBackPress = () => {
-            // Perform your action here
-            Alert.alert("Back button pressed", "You are leaving the screen");
+            if(FIREBASE_AUTH.currentUser){
+                const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+                try {
+                    updateDoc(userRef, { 
+                        userScoutingSheetArray: globalScoutingSheetArray,
+                    });
+                } 
+                catch (error) {
+                    console.error("Error updating user document:", error);
+                }    
+            }
     
             // Returning true prevents the default behavior (exiting the screen)
             return false;
@@ -262,11 +277,12 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     }, [purplePixelCheck, yellowPixelCheck, parkCheck, driveUnderStageDoorCheck, cyclesText, backDropLineText, mosaicText, climbCheck, droneText, extraNotes, intakeVal, depositVal, drivetrainVal])
 
 
-    
 
     useEffect(() => {
         const fetchTeamData = async () => {
+            setLoading(true);
             if(teamNumber){
+                try{
                 const query = `
                 query getTeamByNumber($season: Int!, $number: Int!, $eventCode: String) {
                     teamByNumber(number: $number) {
@@ -370,7 +386,10 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                                                     rank : eventStats[0].stats.rank, matches : formattedMatchArray}
                     
                 setTeamData(formattedTeamData)
-
+                }
+                finally{
+                    setLoading(false);
+                }
             }
         }
         const unsubscribe = navigation.addListener('focus', () => {
@@ -383,7 +402,12 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
 
     return (
         <GestureHandlerRootView style = {styles.container}>
-            <View style = {styles.view}>
+            <View style = {loading ? styles.loadingStyle : styles.view}>
+            {loading ? <ActivityIndicator size="large" color='#fff'/>
+            : 
+            <>
+            
+           
                 <View style = {styles.headerContainer} /* horizontal = {true} showsHorizontalScrollIndicator={false} */>
                     <Text style={styles.headerTeamNameText}>{teamData.name}</Text>
                     <Text style={styles.headerTeamNumberText}>{teamData.number}</Text>
@@ -438,6 +462,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
                     <View style = {{height : 80, top : 60}}></View>
                     
                 </ScrollView>
+                </>
+            }
+
             </View>
         </GestureHandlerRootView>
     )
@@ -556,6 +583,7 @@ const EventDataFieldCheckBox: React.FC<EventDataFieldCheckBoxProps> = ({name, ch
             <View style = {styles.checkBoxContainer}>
                 <View style = {styles.checkBoxBorder}>
                     <Checkbox
+                        uncheckedColor="#191919"
                         status={checkBoxBoolean === "true" ? 'checked' : 'unchecked'}
                         onPress={() => {
                             setCheckBoxBoolean(checkBoxBoolean === "n/a" ? "true" : checkBoxBoolean === "false" ? "true" : "n/a");
@@ -565,6 +593,7 @@ const EventDataFieldCheckBox: React.FC<EventDataFieldCheckBoxProps> = ({name, ch
                 </View>
                 <View style = {styles.checkBoxBorder}>
                     <Checkbox
+                        uncheckedColor="#191919"
                         status={checkBoxBoolean === "false" ? 'checked' : 'unchecked'}
                         onPress={() => {
                             setCheckBoxBoolean(checkBoxBoolean === "n/a" ? "false" : checkBoxBoolean === "true" ? "false" : "n/a");
@@ -754,7 +783,12 @@ const styles = StyleSheet.create({
         flex : 1
     },
     view : {
-        flex : 1
+        flex : 1,
+    },
+    loadingStyle:{
+        flexDirection:'column',
+        flex: 1,
+        justifyContent:'center'
     },
     headerTeamNameText : {
         fontSize : 26,

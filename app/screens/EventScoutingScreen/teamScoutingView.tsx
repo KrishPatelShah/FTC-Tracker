@@ -27,14 +27,8 @@ const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownV
         setIsPressed(true)
         dispatch(setTeamNumber(teamNumber))
         setTeamNumberJotai(teamNumber)
+        navigation.navigate("TeamScoutingScreen")
     }
-    
-
-    useEffect(() => {
-        if(isPressed){
-            navigation.navigate("TeamScoutingScreen")
-        }
-      }, [storedTeamNumber, teamNumberJotai]);
     
     return (
         
