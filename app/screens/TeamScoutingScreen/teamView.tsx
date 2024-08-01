@@ -1,7 +1,7 @@
 import { RootStackParamList } from "@/app/navigation/types";
 import { NavigationProp, useFocusEffect, useIsFocused } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, BackHandler, ActivityIndicator } from "react-native";
+import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, BackHandler, ActivityIndicator, AppState, AppStateStatus } from "react-native";
 import { GestureHandlerRootView, TextInput } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -142,6 +142,43 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     
           return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
         }, []))
+    
+    // Thought this might work to track when the user closes the app but having issues
+    // const [appState, setAppState] = useState(AppState.currentState);
+    // useEffect(() => {
+    //     // Function to handle app state changes
+    //     const handleAppStateChange = (nextAppState: AppStateStatus) => {
+
+    //        if (nextAppState === 'inactive') {
+    //             if(FIREBASE_AUTH.currentUser){
+    //                 const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+    //                 try {
+    //                     updateDoc(userRef, { 
+    //                         userScoutingSheetArray: globalScoutingSheetArray,
+    //                     });
+    //                 } 
+    //                 catch (error) {
+    //                     console.error("Error updating user document:", error);
+    //                 }    
+    //             }
+    //         }
+    
+    //         // Update the appState
+    //         setAppState(nextAppState);
+    //     };
+    
+    //     // Add event listener
+    //     const subscription = AppState.addEventListener(
+    //         'change',
+    //         handleAppStateChange
+    //     );
+
+    //     // Cleanup the event listener on component unmount
+    //     return () => {
+    //         subscription.remove();
+    //     };
+    // }, [appState]);
+        
 
     const loadData = () => {
         /* let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))

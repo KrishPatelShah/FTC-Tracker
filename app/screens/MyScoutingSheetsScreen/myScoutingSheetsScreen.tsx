@@ -39,7 +39,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
           if (docSnap) {
             const userData = docSnap.data() as DocumentData 
 
-            setGlobalScoutingSheetArray(userData.userScoutingSheetArray);
+              setGlobalScoutingSheetArray(userData.userScoutingSheetArray);
           } 
       } 
       catch (error) {
@@ -68,15 +68,16 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
         <View style={{width: '80%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
-        {globalScoutingSheetArray.map((item, index) => (
+        {
+          globalScoutingSheetArray.map((item, index) => (
           <TouchableOpacity style = {styles.button} key = {index} onPress = {() => run(item)} onLongPress={() => handleLongPress(index)} delayLongPress={300}>
-            <Ionicons name="calendar-outline" size={35} color="#328AFF" style={styles.icon} />
+            <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
             <View style={styles.buttonTextContainer}>
               <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>
               <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>{item.date}</Text>
             </View>
           </TouchableOpacity>
-        ))} 
+        ))}
 
         <DeleteScoutingSheetScreen modalVisible={modalVisible} setModalVisible={setModalVisible} modalIndexToDelete={modalIndexToDelete}/>
 
@@ -94,8 +95,11 @@ const styles = StyleSheet.create({
     flex : 1
   },
   buttonTextContainer:{
-    alignItems:'center',
-    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    justifyContent:'center',
+    flex: 1,
+    paddingRight: 20,
+
   },
   title:{
     color:'white',
@@ -114,8 +118,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    fontSize: 24,
-
+    fontSize: 18,
   },
   icon: {
     padding: 14,
