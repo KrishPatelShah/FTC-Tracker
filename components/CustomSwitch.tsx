@@ -82,7 +82,7 @@ const CustomSwitch: React.FC<SwitchProps> = ({activeColor, inactiveColor, active
 const styles = StyleSheet.create({
     textPositioning:{
         flexDirection: 'row',
-        bottom: 39,
+        bottom: 42,
         justifyContent: 'space-around',
     },
     container:{
