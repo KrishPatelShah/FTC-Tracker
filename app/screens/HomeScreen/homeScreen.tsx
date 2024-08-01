@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: '90%',
-    height: '5%',
+    height: 55,
   },
   buttonText: {
     color: "white",
