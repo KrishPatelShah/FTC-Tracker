@@ -5,7 +5,6 @@ export default function PrivacyPolicyScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.heading}>FTC Tracker Privacy Policy</Text>
-      <Text style={styles.paragraph}>Effective Date: [Insert Date]</Text>
       <Text style={styles.paragraph}>
         1. Introduction
         Welcome to FTC Tracker. We value your privacy and are committed to protecting your personal information.
@@ -41,10 +40,14 @@ export default function PrivacyPolicyScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#101010',
+    container: {
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#101010',
+        paddingTop: 100,
+        flex: 1,
+        paddingLeft: '5%',
+        paddingRight: '5%',
   },
   heading: {
     fontSize: 24,

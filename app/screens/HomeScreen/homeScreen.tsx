@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: "center",
     backgroundColor: '#101010',
-    paddingTop: 110,
+    paddingTop: 100,
     flex: 1
   },
   scrollContainer: {

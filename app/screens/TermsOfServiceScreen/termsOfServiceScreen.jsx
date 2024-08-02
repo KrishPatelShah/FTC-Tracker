@@ -43,10 +43,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: '#101010',
-    paddingTop: 110,
+    paddingTop: 100,
     flex: 1,
-    paddingLeft: '8%',
-    paddingRight: '8%',
+    paddingLeft: '5%',
+    paddingRight: '5%',
   },
   heading: {
     fontSize: 24,
