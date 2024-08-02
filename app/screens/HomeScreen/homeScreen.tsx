@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingBottom: 50,
+    paddingBottom: 40,
   },
   textInputContainer: {
     backgroundColor: '#191919',
