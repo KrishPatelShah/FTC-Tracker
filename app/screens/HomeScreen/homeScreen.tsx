@@ -133,8 +133,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         setSearchData(formattedTeamData);
       }
     }
-
-    setSearchDataVisible(true);
+    if (formattedEventData.length > 0 || (!active && searchData.length > 0)) {
+      setSearchDataVisible(true);
+    } else {
+      setSearchDataVisible(false);
+    }
   }
 
   useEffect(() => {
