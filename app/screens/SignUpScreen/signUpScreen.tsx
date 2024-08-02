@@ -7,14 +7,14 @@ import { ASYNC_STORAGE, FIREBASE_AUTH } from '@/FirebaseConfig';
 import { RootStackParamList } from '@/app/navigation/types';
 
 export default function SignUpScreen() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Initialize navigation
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
 
   const handleTermsOfServicePress = () => {
-    navigation.navigate('TermsOfServiceScreen'); // Navigate to Terms of Service
+    navigation.navigate('TermsOfServiceScreen');
   };
 
   const handlePrivacyPolicyPress = () => {
-    navigation.navigate('PrivacyPolicyScreen'); // Navigate to Privacy Policy
+    navigation.navigate('PrivacyPolicyScreen');
   };
 
   const auth = FIREBASE_AUTH;
