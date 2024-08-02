@@ -36,21 +36,17 @@ function InsideLayout() {
   return (
     <Provider store={store}>
       <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent={true}>
-        
         <InsideStack.Navigator
           screenOptions={{
             headerShown: true,
             headerTitle: '',
             headerTransparent: true,              
-          }} 
-          >
+          }}
+        >
           <InsideStack.Screen 
             name="HomeScreen" 
             component={HomeScreen} 
-            options={{
-              headerShown: true,
-              headerTitle: '',
-              headerTransparent: true,              
+            options={{          
               headerRight: () => (
                 <Icon
                   name="menu"
@@ -66,7 +62,6 @@ function InsideLayout() {
           <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} />
           <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen} />
           <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen} />
-          {/* options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} */}
         </InsideStack.Navigator>
       </NavigationContainer>
     </Provider>
@@ -75,17 +70,50 @@ function InsideLayout() {
 
 const DrawerNav = () => {
   const Drawer = createDrawerNavigator();
-  const Stack = createNativeStackNavigator();
+  const navigation = useNavigation();
   return (
-  
     <Drawer.Navigator
       drawerContent={props => <DrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
         drawerPosition: 'right',
-      }}>
+      }}
+    >
       <Drawer.Screen name="HomeScreen" component={InsideLayout} />
-
+      <Drawer.Screen 
+        name="TermsOfServiceScreen" 
+        component={TermsOfServiceScreen}
+        options={{
+          headerShown: true,
+          headerTitle: '',
+          headerTransparent: true,              
+          headerRight: () => (
+            <Icon
+              name="menu"
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+              size={30}
+              color="#fff"
+            />
+          ),
+        }} 
+      />
+      <Drawer.Screen 
+        name="PrivacyPolicyScreen" 
+        component={PrivacyPolicyScreen}
+        options={{
+          headerShown: true,
+          headerTitle: '',
+          headerTransparent: true,              
+          headerRight: () => (
+            <Icon
+              name="menu"
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+              size={30}
+              color="#fff"
+            />
+          ),
+        }} 
+      />
     </Drawer.Navigator>
   );
 };
@@ -161,5 +189,3 @@ export default function RootLayout() {
     </Provider>
   );
 }
-
-{/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}

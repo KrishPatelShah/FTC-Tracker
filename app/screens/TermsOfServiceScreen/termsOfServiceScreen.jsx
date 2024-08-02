@@ -40,9 +40,13 @@ export default function TermsOfServiceScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: '#101010',
+    paddingTop: 110,
+    flex: 1,
+    paddingLeft: '8%',
+    paddingRight: '8%',
   },
   heading: {
     fontSize: 24,
