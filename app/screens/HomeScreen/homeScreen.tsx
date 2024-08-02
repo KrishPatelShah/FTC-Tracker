@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, ScrollView } from 'react-native';
-// import { GestureHandlerRootView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView, Dimensions } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootStackParamList } from '@/app/navigation/types';
@@ -12,7 +11,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import EventCodeInput from './eventCodeInputModal';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Dimensions } from 'react-native';
 import EventSearchView from './EventSearchView';
 import TeamSearchView from './TeamSearchView';
 import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
@@ -253,7 +251,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     paddingBottom: 50,
-    maxHeight: windowHeight, // Adjust this value as needed
   },
   textInputContainer: {
     backgroundColor: '#191919',
@@ -295,7 +292,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: '90%',
-    // height: 60,
   },
   buttonText: {
     color: "white",
@@ -309,7 +305,7 @@ const styles = StyleSheet.create({
   infoScreen: {
     backgroundColor: "#191919",
     alignSelf: "center",
-    height: "25%",
+    height: 190,
     width: "90%",
     borderRadius: 12
   },
