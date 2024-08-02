@@ -198,7 +198,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
         <CustomDropdown marginTop={10} marginBottom={10} dropdownValue={regionDropdown} setDropDownValue={setRegionDropdown} dropdownData={regionDropdownData} />
 
-        <View style={{ marginTop: '5%', flexDirection: 'row', width: '100%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
+        <View style={{ marginTop: '5%', flexDirection: 'row', width: '98.5%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
           <View style={{ width: '25%', left: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
           <Text style={styles.headings}>Match Schedule</Text>
           <View style={{ width: '25%', right: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
@@ -209,7 +209,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
       </TouchableOpacity>
 
-        <View style={{ marginTop: '5%', flexDirection: 'row', width: '100%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
+        <View style={{ marginTop: '5%', flexDirection: 'row', width: '98.5%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
           <View style={{ width: '35%', left: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
           <Text style={styles.headings}>Scouting</Text>
           <View style={{ width: '35%', right: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
