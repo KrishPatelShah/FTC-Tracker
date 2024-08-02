@@ -12,6 +12,8 @@ export type RootStackParamList = {
     TeamInfoScreen: undefined;
     EventInfoScreen: undefined;
     DrawerNav: undefined;
-    headerRight: undefined
+    headerRight: undefined;
+    TermsOfServiceScreen: undefined;
+    PrivacyPolicyScreen: undefined;
   };
   

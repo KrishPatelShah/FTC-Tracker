@@ -25,6 +25,8 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Entypo';
 import DrawerContent from '../components/DrawerContent';
 import { useNavigation } from '@react-navigation/native';
+import TermsOfServiceScreen from './screens/TermsOfServiceScreen/termsOfServiceScreen';
+import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen/privacyPolicyScreen';
 
 function InsideLayout() {
   const colorScheme = useColorScheme();
@@ -73,7 +75,9 @@ function InsideLayout() {
 
 const DrawerNav = () => {
   const Drawer = createDrawerNavigator();
+  const Stack = createNativeStackNavigator();
   return (
+  
     <Drawer.Navigator
       drawerContent={props => <DrawerContent {...props} />}
       screenOptions={{
@@ -81,6 +85,7 @@ const DrawerNav = () => {
         drawerPosition: 'right',
       }}>
       <Drawer.Screen name="HomeScreen" component={InsideLayout} />
+
     </Drawer.Navigator>
   );
 };
