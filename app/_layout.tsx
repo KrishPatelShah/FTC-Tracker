@@ -86,13 +86,15 @@ const DrawerNav = () => {
         options={{
           headerShown: true,
           headerTitle: '',
-          headerTransparent: true,              
+          headerTransparent: true,
+          headerLeft: () => null,
           headerRight: () => (
             <Icon
               name="menu"
               onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
               size={30}
               color="#fff"
+              style={{ marginRight: 19 }} 
             />
           ),
         }} 
@@ -103,13 +105,15 @@ const DrawerNav = () => {
         options={{
           headerShown: true,
           headerTitle: '',
-          headerTransparent: true,              
+          headerTransparent: true,
+          headerLeft: () => null, 
           headerRight: () => (
             <Icon
               name="menu"
               onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
               size={30}
               color="#fff"
+              style={{ marginRight: 19 }}
             />
           ),
         }} 
