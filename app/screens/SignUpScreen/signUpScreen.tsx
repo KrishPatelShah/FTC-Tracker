@@ -1,112 +1,92 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { ASYNC_STORAGE, FIREBASE_AUTH } from '@/FirebaseConfig'; 
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Linking, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, ActivityIndicator } from 'react-native';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, getFirestore, setDoc } from 'firebase/firestore';
+import { useNavigation, NavigationProp  } from '@react-navigation/native';
+import { ASYNC_STORAGE, FIREBASE_AUTH } from '@/FirebaseConfig';
+import { RootStackParamList } from '@/app/navigation/types';
 
 export default function SignUpScreen() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Initialize navigation
+
   const handleTermsOfServicePress = () => {
-    Linking.openURL('https://example-terms-of-service-url.com');
+    navigation.navigate('TermsOfServiceScreen'); // Navigate to Terms of Service
   };
 
   const handlePrivacyPolicyPress = () => {
-    Linking.openURL('https://example-privacy-policy-url.com');
+    navigation.navigate('PrivacyPolicyScreen'); // Navigate to Privacy Policy
   };
 
-const auth = FIREBASE_AUTH;
-const db = getFirestore();
-const [name, setName] = useState('');
-const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
-const [loading, setLoading] = useState(false);
+  const auth = FIREBASE_AUTH;
+  const db = getFirestore();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-const createAccount = async () => {
-  setLoading(true);
-  try{
-    await createUserWithEmailAndPassword(auth, email, password);
-    await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email, password}));
+  const createAccount = async () => {
+    setLoading(true);
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email, password }));
 
-    if(FIREBASE_AUTH.currentUser){
-      const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-      setDoc(userRef, { // "create a document in the collection titled 'user_data' with the fields: 'email:' etc."
-        email: email,
-        name: name,
-      });
-    }
-
-    /*\     
-    import { getFirestore, doc, getDoc } from 'firebase/firestore';
-    const auth = FIREBASE_AUTH;
-    const db = getFirestore();
-
-    if(FIREBASE_AUTH.currentUser){
-      const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-
-      try {
-        const docSnap = await getDoc(userRef);
-          if (docSnap.exists()) {
-            const scoutingSheets = docSnap.data().scoutingSheets;
-          } 
-      } 
-      catch (error) {
-        console.error("Error retrieving document:", error);
+      if (FIREBASE_AUTH.currentUser) {
+        const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+        await setDoc(userRef, {
+          email: email,
+          name: name,
+        });
       }
 
-      updateDoc(userRef, { 
-        scoutingSheets: scoutingSheets,
-      });
+      alert('Account created!');
+    } catch (error: any) {
+      alert('😓, creation failed:\n' + error.message);
+    } finally {
+      setLoading(false);
     }
-
-    // const scoutingSheets: eventData[] = [. . .];
-    // scoutingSheets.push(eventData);
-    \*/
-
-    alert('Account created!')
-  } catch(error : any){
-    alert('😓, creation failed:\n' + error.message)
-  } finally {
-    setLoading(false);
-  }
-}
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create your account</Text>
 
-      <TextInput style={styles.input}
+      <TextInput
+        style={styles.input}
         placeholder="Name"
         value={name}
         placeholderTextColor="#ccc"
-        autoCapitalize='words'
-        onChangeText={(text)=>{setName(text)}}
+        autoCapitalize="words"
+        onChangeText={(text) => setName(text)}
       />
 
-      <TextInput style={styles.input}
+      <TextInput
+        style={styles.input}
         placeholder="Email"
         value={email}
         placeholderTextColor="#ccc"
-        autoCapitalize='none'
-        onChangeText={(text)=>{setEmail(text)}}
+        autoCapitalize="none"
+        onChangeText={(text) => setEmail(text)}
       />
 
-      <TextInput style={styles.input} 
-         placeholder="Password" 
-         value={password}
-         placeholderTextColor="#ccc" 
-         autoCapitalize='none'
-         onChangeText={(password)=>{setPassword(password)}}
-         secureTextEntry={true}
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        placeholderTextColor="#ccc"
+        autoCapitalize="none"
+        onChangeText={(password) => setPassword(password)}
+        secureTextEntry={true}
       />
 
-      {loading ? <ActivityIndicator size="large" color='#fff' />
-        : 
+      {loading ? (
+        <ActivityIndicator size="large" color="#fff" />
+      ) : (
         <>
           <TouchableOpacity style={styles.createAccountButton} onPress={createAccount}>
             <Text style={styles.createAccountButtonText}>Create your account</Text>
           </TouchableOpacity>
         </>
-      }
-      
+      )}
 
       <View style={styles.termsContainer}>
         <Text style={styles.termsText}>

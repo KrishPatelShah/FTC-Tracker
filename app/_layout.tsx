@@ -183,6 +183,10 @@ export default function RootLayout() {
                   <>
                     <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
                     <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="TermsOfServiceScreen" component={TermsOfServiceScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen} options={{ headerShown: false }} />
+
+
                   </>
                 )}
               </>
