@@ -1,6 +1,6 @@
 import { RootStackParamList } from "@/app/navigation/types";
 import { NavigationProp, useFocusEffect, useIsFocused } from "@react-navigation/native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, BackHandler, ActivityIndicator, AppState, AppStateStatus } from "react-native";
 import { GestureHandlerRootView, TextInput } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
@@ -15,7 +15,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAtom, useAtomValue } from "jotai";
 import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData, scoutingSheetArray } from "@/dataStore";
 import { FIREBASE_AUTH } from "@/FirebaseConfig";
-import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import { doc, getFirestore, updateDoc, getDoc, DocumentData } from "firebase/firestore";
 
 
 type HomeScreenProps = {
@@ -119,6 +119,26 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const db = getFirestore();
     const [loading, setLoading] = useState(false)
 
+    useEffect(() => {
+        const uploadData = async () => {
+            if(FIREBASE_AUTH.currentUser){
+                const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+                console.log("TICK")
+                try {
+                    await updateDoc(userRef, { 
+                        userScoutingSheetArray: globalScoutingSheetArray,
+                    });
+                    console.log("UPDATED")
+                } catch (error) {
+                    console.error('Error uploading data: ', error);
+                }
+            }
+        };
+
+        const intervalId = setInterval(uploadData, 10000); // 10000ms = 10s
+        return () => clearInterval(intervalId); // Cleanup interval on unmount
+    }, []);
+
     useFocusEffect(
         useCallback(() => {
           const onBackPress = () => {
@@ -141,45 +161,10 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
           BackHandler.addEventListener('hardwareBackPress', onBackPress);
     
           return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-        }, []))
+        }, []
+    ))
     
-    // Thought this might work to track when the user closes the app but having issues
-    // const [appState, setAppState] = useState(AppState.currentState);
-    // useEffect(() => {
-    //     // Function to handle app state changes
-    //     const handleAppStateChange = (nextAppState: AppStateStatus) => {
-
-    //        if (nextAppState === 'inactive') {
-    //             if(FIREBASE_AUTH.currentUser){
-    //                 const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-    //                 try {
-    //                     updateDoc(userRef, { 
-    //                         userScoutingSheetArray: globalScoutingSheetArray,
-    //                     });
-    //                 } 
-    //                 catch (error) {
-    //                     console.error("Error updating user document:", error);
-    //                 }    
-    //             }
-    //         }
-    
-    //         // Update the appState
-    //         setAppState(nextAppState);
-    //     };
-    
-    //     // Add event listener
-    //     const subscription = AppState.addEventListener(
-    //         'change',
-    //         handleAppStateChange
-    //     );
-
-    //     // Cleanup the event listener on component unmount
-    //     return () => {
-    //         subscription.remove();
-    //     };
-    // }, [appState]);
-        
-
+   
     const loadData = () => {
         /* let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))
         teamEventData.matchData = loadingTeamArray[0].matchData

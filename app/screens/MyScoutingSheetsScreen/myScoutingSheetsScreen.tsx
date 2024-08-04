@@ -38,8 +38,8 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         const docSnap = await getDoc(userRef);
           if (docSnap) {
             const userData = docSnap.data() as DocumentData 
-
-              setGlobalScoutingSheetArray(userData.userScoutingSheetArray);
+            
+            setGlobalScoutingSheetArray(userData.userScoutingSheetArray);
           } 
       } 
       catch (error) {
