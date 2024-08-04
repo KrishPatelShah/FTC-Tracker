@@ -11,7 +11,7 @@ type EventDisplayType = {
     data : EventData
 }
 
-const EventDisplay: React.FC<EventDisplayType> = ({data}) => {
+const DivisionEventDisplay: React.FC<EventDisplayType> = ({data}) => {
     const [teamNumber, setTeamNumber] = useAtom(teamNumberAtom)
     return (
         <View style = {{ display : "flex", flexDirection : "column", marginVertical : 10, width : "100%" }}>
@@ -19,10 +19,6 @@ const EventDisplay: React.FC<EventDisplayType> = ({data}) => {
             <View style = {{display : "flex", flexDirection : "row"}}> 
                 <Text style = {{fontSize : 18, color : "#328AFF"}}>{data.eventCode} - </Text>
                 <Text style = {{fontSize : 18, color : "#328AFF"}}>{data.date}</Text>
-            </View>
-            <View style = {{display : "flex", flexDirection : "row"}}>
-                <Text style = {{color : "white", fontSize : 20}}>W-L-T {data.wins}-{data.losses}-{data.ties} </Text>
-                <Text style = {{color : "white", fontSize : 20}}>Total OPR {Number(data.eventStats?.total).toFixed(2) ?? 0}</Text>
             </View>
             <View style = {{display : "flex", flexDirection : "row"}}>
                 {data.awards.map((item, index) => (
@@ -84,4 +80,4 @@ const MatchView: React.FC<matchViewProps> = ({match, viewingTeamNum}) => {
     )
 }
 
-export default EventDisplay
+export default DivisionEventDisplay
