@@ -25,6 +25,8 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Entypo';
 import DrawerContent from '../components/DrawerContent';
 import { useNavigation } from '@react-navigation/native';
+import TermsOfServiceScreen from './screens/TermsOfServiceScreen/termsOfServiceScreen';
+import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen/privacyPolicyScreen';
 
 function InsideLayout() {
   const colorScheme = useColorScheme();
@@ -34,21 +36,17 @@ function InsideLayout() {
   return (
     <Provider store={store}>
       <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} independent={true}>
-        
         <InsideStack.Navigator
           screenOptions={{
             headerShown: true,
             headerTitle: '',
             headerTransparent: true,              
-          }} 
-          >
+          }}
+        >
           <InsideStack.Screen 
             name="HomeScreen" 
             component={HomeScreen} 
-            options={{
-              headerShown: true,
-              headerTitle: '',
-              headerTransparent: true,              
+            options={{          
               headerRight: () => (
                 <Icon
                   name="menu"
@@ -64,7 +62,6 @@ function InsideLayout() {
           <InsideStack.Screen name="TeamScoutingScreen" component={TeamScoutingScreen} />
           <InsideStack.Screen name="TeamInfoScreen" component={TeamInfoScreen} />
           <InsideStack.Screen name="EventInfoScreen" component={EventInfoScreen} />
-          {/* options={{ headerShown: true, headerTitle: '', headerTransparent: true, }} */}
         </InsideStack.Navigator>
       </NavigationContainer>
     </Provider>
@@ -73,14 +70,54 @@ function InsideLayout() {
 
 const DrawerNav = () => {
   const Drawer = createDrawerNavigator();
+  const navigation = useNavigation();
   return (
     <Drawer.Navigator
       drawerContent={props => <DrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
         drawerPosition: 'right',
-      }}>
+      }}
+    >
       <Drawer.Screen name="HomeScreen" component={InsideLayout} />
+      <Drawer.Screen 
+        name="TermsOfServiceScreen" 
+        component={TermsOfServiceScreen}
+        options={{
+          headerShown: true,
+          headerTitle: '',
+          headerTransparent: true,
+          headerLeft: () => null,
+          headerRight: () => (
+            <Icon
+              name="menu"
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+              size={30}
+              color="#fff"
+              style={{ marginRight: 19 }} 
+            />
+          ),
+        }} 
+      />
+      <Drawer.Screen 
+        name="PrivacyPolicyScreen" 
+        component={PrivacyPolicyScreen}
+        options={{
+          headerShown: true,
+          headerTitle: '',
+          headerTransparent: true,
+          headerLeft: () => null, 
+          headerRight: () => (
+            <Icon
+              name="menu"
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+              size={30}
+              color="#fff"
+              style={{ marginRight: 19 }}
+            />
+          ),
+        }} 
+      />
     </Drawer.Navigator>
   );
 };
@@ -146,6 +183,10 @@ export default function RootLayout() {
                   <>
                     <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
                     <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="TermsOfServiceScreen" component={TermsOfServiceScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen} options={{ headerShown: false }} />
+
+
                   </>
                 )}
               </>
@@ -156,5 +197,3 @@ export default function RootLayout() {
     </Provider>
   );
 }
-
-{/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}

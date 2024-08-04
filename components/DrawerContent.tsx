@@ -23,11 +23,11 @@ const handleSignOut = async () => {
 };
 
 const DrawerList: DrawerListType[] = [
-  // { icon: 'home-outline', label: 'Home', navigateTo: 'HomeScreen' },
+  { icon: 'home-outline', label: 'Home', navigateTo: 'HomeScreen' },
   { icon: 'account', label: 'Profile', navigateTo: 'Profile' },
   // { icon: 'account-group', label: 'User', navigateTo: 'User' },
-  { icon: 'shield-check-outline', label: 'Privacy Policy', navigateTo: '' },
-  { icon: 'file-document-outline', label: 'Terms of Service', navigateTo: '' },
+  { icon: 'shield-check-outline', label: 'Privacy Policy', navigateTo: 'PrivacyPolicyScreen' },
+  { icon: 'file-document-outline', label: 'Terms of Service', navigateTo: 'TermsOfServiceScreen' },
   { icon: 'cog-outline', label: 'Settings', navigateTo: '' },
 ];
 

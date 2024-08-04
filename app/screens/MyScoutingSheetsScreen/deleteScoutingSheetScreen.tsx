@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Pressable } from 'react-native'; 
 import { Ionicons } from '@expo/vector-icons';
 import { useAtom } from 'jotai';
-import { scoutingSheetArray } from '@/dataStore';
+import { persistentEventData, scoutingSheetArray, teamDataAtom } from '@/dataStore';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 
@@ -14,12 +14,15 @@ type deleteScoutingSheetScreenProps = {
 
 const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ modalVisible, modalIndexToDelete, setModalVisible }) => {
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
+  const [loadedEventData, setLoadedEventData] = useAtom(persistentEventData)
+  const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
   const db = getFirestore();
 
   const handleScoutingSheetDelete = () => {
     try{
       setModalVisible(!modalVisible)
-      
+      setLoadedEventData([])
+      setPersistentTeamData({teamNumber : 0, extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : []})
       globalScoutingSheetArray.splice(modalIndexToDelete, 1); // 1 means you only remove one item
 
       if(FIREBASE_AUTH.currentUser){

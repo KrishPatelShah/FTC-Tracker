@@ -3,7 +3,8 @@ export type RootStackParamList = {
     LoginScreen: undefined;
     createAccount: undefined;
     SignUpScreen: undefined;
-    // Add other screens paramaters here  
+    TermsOfServiceScreen: undefined;
+    PrivacyPolicyScreen: undefined;
     EventScoutingScreen: undefined;
     TeamScoutingScreen: undefined;
     HomeScreen: undefined;
@@ -12,6 +13,7 @@ export type RootStackParamList = {
     TeamInfoScreen: undefined;
     EventInfoScreen: undefined;
     DrawerNav: undefined;
-    headerRight: undefined
+    headerRight: undefined;
+
   };
   
