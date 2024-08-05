@@ -198,21 +198,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
         <CustomDropdown marginTop={10} marginBottom={10} dropdownValue={regionDropdown} setDropDownValue={setRegionDropdown} dropdownData={regionDropdownData} />
 
-        <View style={{ marginTop: '5%', flexDirection: 'row', width: '98.5%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
-          <View style={{ width: '25%', left: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
-          <Text style={styles.headings}>Match Schedule</Text>
-          <View style={{ width: '25%', right: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
-        </View>
 
-        <TouchableOpacity style = {styles.button}>
-          <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
-          <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
-      </TouchableOpacity>
-
-        <View style={{ marginTop: '5%', flexDirection: 'row', width: '98.5%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
-          <View style={{ width: '35%', left: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
+        <View style={{ marginTop: '3%', flexDirection: 'row', width: '100%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
+          <View style={{ width: '27%', left: 0, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
           <Text style={styles.headings}>Scouting</Text>
-          <View style={{ width: '35%', right: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
+          <View style={{ width: '27%', right: 0, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
         </View>
 
         <TouchableOpacity onPress={toggleShowCodeInput} style={styles.button}>
@@ -231,6 +221,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <MaterialCommunityIcons name="import" size={30} color="#328AFF" style={styles.icon} />
           <Text style={styles.buttonText}>Import Scouting Sheet</Text>
         </TouchableOpacity>
+
+
+        <View style={{ marginTop: '5%', flexDirection: 'row', width: '100%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
+          <View style={{ width: '22.5%', left: 0, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
+          <Text style={styles.headings}>Bookmarks</Text>
+          <View style={{ width: '22.5%', right: 0, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
+        </View>
+
+        <TouchableOpacity style = {styles.button}>
+          <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
+          <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style = {styles.button}>
+          <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
+          <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style = {styles.button}>
+          <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
+          <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
+      </TouchableOpacity>
+
       </ScrollView>
     </GestureHandlerRootView>
   );
