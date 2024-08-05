@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { View, Text } from "react-native"
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler"
 import EventDisplay from "./EventDisplay"
+import DivisionEventDisplay from "./DivisionEventDisplay"
 
 type OPR = {
     total : string,
@@ -16,12 +17,14 @@ export type EventData = {
     eventCode : string,
     eventName : string,
     rank : string,
-    eventStats : OPR,
+    eventStats? : OPR,
     matches : Match[],
-    wins : string,
-    losses : string,
-    ties : string,
-    date : string
+    wins? : string,
+    losses? : string,
+    ties? : string,
+    date : string,
+    awards : Award[],
+    trueEvent : boolean
 }
 
 export type Match = {
@@ -39,6 +42,11 @@ type Team = {
     teamName : string,
     alliance : string,
     onField : boolean
+}
+
+type Award = {
+    type : string,
+    placement : number
 }
 
 
@@ -67,6 +75,11 @@ const TeamInfoScreen : React.FC = () => {
                     eg{
                         value
                     }
+                }
+                awards(season: $season){
+                    eventCode
+                    type
+                    placement
                 }
                 events(season: $season){
                     eventCode
@@ -124,6 +137,7 @@ const TeamInfoScreen : React.FC = () => {
             body: JSON.stringify({ query, variables: {number: teamNumber, season: 2023} })
         });
         const data = await response.json();
+        //console.log(data.data.teamByNumber.awards)
         setTeamName(data.data.teamByNumber.name)
         if(data.data.teamByNumber.quickStats != null){
             setOverallOPR({
@@ -153,16 +167,30 @@ const TeamInfoScreen : React.FC = () => {
             }
         }
 
+        const pushAwardData = (award: any, array : Award[]) => {
+            let newAward: Award = {type : award.type, placement : award.placement}
+            array.push(newAward)
+        }
+
         const pushEventData = (item :any) => {
             let matchArray: any[] = item.matches
             //console.log(matchArray)
             let formattedMatchArray: Match[] = []
             matchArray.map((item) => (pushMatchData(item.match, formattedMatchArray)))
+            let formattedAwardArray: Award[] = []
+            let awardArray: any[] = data.data.teamByNumber.awards
+            awardArray = awardArray.filter((award) => award.eventCode == item.eventCode)
+            awardArray.map((award) => pushAwardData(award, formattedAwardArray))
+            //console.log("all events" + item.event.name)
             if(item.stats != null){
+                //console.log("true events" + item.event.name)
                 formattedEventData.push({eventCode: item.eventCode, 
                     eventName: item.event.name, rank : item.stats.rank, 
                     eventStats : {total : item.stats.opr.totalPointsNp, auto: item.stats.opr.autoPoints, tele : item.stats.opr.dcPoints, endgame : item.stats.opr.egPoints}, 
-                    matches : formattedMatchArray, wins : item.stats.wins, losses : item.stats.losses, ties : item.stats.ties, date : item.event.start})
+                    matches : formattedMatchArray, wins : item.stats.wins, losses : item.stats.losses, ties : item.stats.ties, date : item.event.start, awards : formattedAwardArray, trueEvent : true})
+            } else {
+                console.log(item)
+                formattedEventData.push({eventCode : item.eventCode, eventName: item.event.name, rank : "0", matches : formattedMatchArray, date : item.event.start, awards : formattedAwardArray, trueEvent : false})
             }
         }
         //console.log(data.data.teamByNumber.events)
@@ -171,6 +199,8 @@ const TeamInfoScreen : React.FC = () => {
         eventArray.map((item) => (
             pushEventData(item)
         ))
+        
+        //console.log(formattedEventData)
         setEventDisplay(formattedEventData)
         
         
@@ -199,9 +229,9 @@ const TeamInfoScreen : React.FC = () => {
                 </View>
                 <Header text = {"Events"}></Header>
                 <View style = {{display : "flex", width : "100%", alignSelf : "center", flexDirection : "column", borderRadius : 12, justifyContent : "space-between", paddingHorizontal : 10}}>
-                    {eventDisplay.sort((a, b) => {const dateA = new Date(a.date).getTime(); const dateB = new Date(b.date).getTime(); return dateA - dateB;}).map((item, index) => (
-                        <EventDisplay data={item} key={index}></EventDisplay>
-                    ))}
+                {eventDisplay.sort((a, b) => {const dateA = new Date(a.date).getTime();const dateB = new Date(b.date).getTime();return dateA - dateB;}).map((item, index) => (
+                    item.trueEvent ? <EventDisplay data={item} key={index} /> : <DivisionEventDisplay data = {item} key={index}/>
+                ))}
                 </View>
                 <View style = {{height : "1%"}}></View>
             </ScrollView>
