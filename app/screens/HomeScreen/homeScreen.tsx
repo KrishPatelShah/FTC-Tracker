@@ -223,9 +223,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={{ marginTop: '5%', flexDirection: 'row', width: '98.5%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
-          <View style={{ width: '35%', left: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
+          <View style={{ width: '30%', left: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
           <Text style={styles.headings}>Saved Events</Text>
-          <View style={{ width: '35%', right: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
+          <View style={{ width: '30%', right: -15, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
         </View>
 
         <TouchableOpacity style = {styles.button}>
