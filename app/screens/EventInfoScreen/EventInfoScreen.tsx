@@ -1,6 +1,6 @@
-import { eventCodeAtom } from "@/dataStore"
+import { bookmarkCodeArray, eventCodeAtom } from "@/dataStore"
 import { AntDesign } from "@expo/vector-icons"
-import { useAtom } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { useEffect, useState } from "react"
 import { TouchableOpacity } from "react-native"
 import { View, Text } from "react-native"
@@ -8,6 +8,9 @@ import TeamDisplay from "./TeamDisplay"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import AwardDisplay from "./AwardDisplay"
 import MatchDisplay from "./MatchDisplay"
+import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore"
+import { FIREBASE_AUTH } from "@/FirebaseConfig"
+
 
 type EventData = {
     name : string,
@@ -58,10 +61,16 @@ enum ViewingData {
 }
 
 const EventInfoScreen: React.FC = () => {
+
+    const db = getFirestore();
+    const [bookmarkCodes, setBookmarkCodes] = useState<string[]>([]);
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
     const [eventData, setEventData] = useState<EventData>({name : "", code : "", teams: [], awards : [], matches : []})
     const [viewingData, setViewingData] = useState<ViewingData>(ViewingData.Matches)
     const [eventNameLines, setEventNameLines] = useState(0);
+    const [isBookMarked, setIsBookMarked] = useState(false);
+    const bookmarks = useAtomValue(bookmarkCodeArray)
+
     const fetchData = async () => {
         const query = `
             query getEventByCode($season : Int!, $code : String!){
@@ -175,16 +184,55 @@ const EventInfoScreen: React.FC = () => {
 
     useEffect(() => {
         fetchData()
+        if (bookmarks.includes(eventCode)){
+            setIsBookMarked(true)
+        }
     }, [eventCode])
 
-    
+    const bookmarkEvent = (eventCode: string, eventName: string) => {
+            try{
+              if(FIREBASE_AUTH.currentUser){
+                const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+                try {
+                    if(isBookMarked){
+                        updateDoc(userRef, {
+                            bookmarks: arrayRemove({name: eventName, code : eventCode})
+                        })
+                        setIsBookMarked(false)
+                    }else {
+                        updateDoc(userRef, { 
+                            bookmarks: arrayUnion({name : eventName, code : eventCode})
+                        });
+                        setIsBookMarked(true)
+                    }
+                } 
+                catch (error) {
+                    console.error("Error updating user document:", error);
+                }    
+              }
+            } catch(error : any){
+              alert('😓 Error:\n' + error.message)
+            } 
+    }
+
+    const getIconImage = ():"staro" | "star" => {
+        if (isBookMarked){
+            return "star"
+        }
+        return "staro"
+    } 
 
     return (
         <GestureHandlerRootView>
         <View style={{ display: "flex", flex: 1, backgroundColor: "black", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", height : "100%" }}>
             <View style={{ marginTop: 32, top: 12, width: "95%", display: "flex", flexDirection: "column", marginBottom: 12, flexWrap: "wrap"}}>
                 <Text style={{ color: "white", fontSize: 36,width: "100%" }} onTextLayout={(e) => setEventNameLines(e.nativeEvent.lines.length)}>{eventData.name}</Text>
-                <Text style={{ color: "#328AFF", fontSize: 28 }}>{eventData.code}</Text>
+                <View style = {{display : "flex", flexDirection : "row", alignItems : "center"}}>
+                    <Text style={{ color: "#328AFF", fontSize: 28 }}>{eventData.code}</Text>
+                    <TouchableOpacity>
+                        <AntDesign name={getIconImage()} size={24} color="#328AFF" style = {{left : 10}} onPress={() => {bookmarkEvent(eventCode, eventData.name)}}/>
+                    </TouchableOpacity>
+                </View>
                 <TabBar viewingData={viewingData} setViewingData={setViewingData}></TabBar>
                 <View style = {{backgroundColor : "#191919", height : eventNameLines == 2 ? "73.4%" : "68%"}}>
                 {viewingData == ViewingData.Teams && 

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView, Dimensions } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootStackParamList } from '@/app/navigation/types';
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect } from '@react-navigation/native';
 import CustomDropdown from '@/components/CustomDropdown';
 import { setEventCode } from '@/eventCodeReducers';
 import CustomSwitch from "@/components/CustomSwitch";
@@ -15,7 +15,10 @@ import EventSearchView from './EventSearchView';
 import TeamSearchView from './TeamSearchView';
 import { FIREBASE_AUTH, ASYNC_STORAGE } from '@/FirebaseConfig';
 import { RegionOption } from './RegionOptions';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firestore';
+import Bookmark from './Bookmark';
+import { useSetAtom } from 'jotai';
+import { bookmarkCodeArray } from '@/dataStore';
 
 type HomeScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -34,6 +37,17 @@ type EventSearchData = {
 
 const windowHeight = Dimensions.get('window').height;
 
+export type BookmarkType = {
+  name: string,
+  code: string,
+}
+
+export type BookmarkView = {
+  name: string,
+  code: string,
+  navigation : NavigationProp<RootStackParamList>;
+}
+
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const eventCode = useSelector((state: any) => state.event.eventCode);
@@ -44,6 +58,56 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [textInputValue, setTextInputValue] = useState("");
   const [searchDataVisible, setSearchDataVisible] = useState(false);
   const [regionDropdown, setRegionDropdown] = useState("All");
+  
+  const [bookmarks, setBookmarks] = useState<BookmarkType[]>([]);
+  const setBookmarkCodes = useSetAtom(bookmarkCodeArray)
+  const db = getFirestore();
+
+  const fetchFirebaseData = async ()=>{
+    if(FIREBASE_AUTH.currentUser){
+      const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+
+      try {
+        const docSnap = await getDoc(userRef);
+          if (docSnap) {
+            const userData = docSnap.data() as DocumentData 
+            console.log("set");
+            setBookmarks(userData.bookmarks)
+          } 
+      } 
+      catch (error) {
+        console.error("😓 Error retrieving document:", error);
+      }
+
+    }
+  }
+
+
+  const collectCodes = () => {
+    setBookmarkCodes(bookmarks.map((item) => (item.code)))
+  }
+
+
+  useEffect( () => {
+    fetchFirebaseData()
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchFirebaseData();
+    }, [])
+  );
+
+
+  useEffect(() => {
+    console.log("bookmarks")
+    console.log(bookmarks)
+    collectCodes()
+  }, [bookmarks])
+
+  
+  
+
 
   const regionDropdownData = Object.keys(RegionOption)
     .filter(key => isNaN(Number(key)))
@@ -256,18 +320,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <View style={{ width: '22.5%', right: 0, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
         </View>
 
-        <TouchableOpacity style = {styles.button}>
-          <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
-          <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style = {styles.button}>
-          <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
-          <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style = {styles.button}>
-          <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
-          <Text numberOfLines={1} style={styles.buttonText}>California - San Diego SD Championship</Text>
-      </TouchableOpacity>
+        {bookmarks.map((item, index) => (
+          <Bookmark name={item.name} code={item.code} key = {index} navigation={navigation}></Bookmark>
+        ))}
+
 
       </ScrollView>
     </GestureHandlerRootView>
