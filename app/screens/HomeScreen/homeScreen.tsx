@@ -76,6 +76,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   }`;
 
   const fetchData = async () => {
+    console.log("fetching for " + searchText + " and " + regionDropdown)
     setSearchData([]);
     let formattedEventData: EventSearchData[] = [];
     let foundByCode: boolean = false;
@@ -88,13 +89,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         body: JSON.stringify({ query: eventCodeQuery, variables: { season: 2023, code: searchText } })
       });
       let data = await response.json();
-      console.log(data);
+      //console.log("Code")
+      //console.log(data);
       if (data.data.eventByCode != null) {
         let newEvent: EventSearchData = { name: data.data.eventByCode.name, data: data.data.eventByCode.start, code: data.data.eventByCode.code };
         formattedEventData.push(newEvent);
         foundByCode = true;
       }
-      setSearchData(formattedEventData);
+      setSearchData([...formattedEventData]);
     }
 
     if (!foundByCode) {
@@ -109,6 +111,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       if (active) {
         let dataArray: any[] = data.data.eventsSearch;
         let limit = 0;
+        //console.log("Name")
+        //console.log(data);
         dataArray.map((item) => {
           if (limit < 20) {
             let newData: EventSearchData = { name: item.name, data: item.start, code: item.code };
@@ -116,7 +120,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             limit++;
           }
         });
-        setSearchData(formattedEventData);
+        console.log("search data")
+        console.log(searchData)
+        setSearchData([...formattedEventData]);
+        console.log("set")
+        console.log(formattedEventData);
       } else {
         let dataArray: any[] = data.data.teamsSearch;
         let formattedTeamData: TeamSearchData[] = [];
@@ -128,18 +136,37 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             limit++;
           }
         });
-        setSearchData(formattedTeamData);
+        setSearchData([...formattedTeamData]);
       }
     }
-    if (formattedEventData.length > 0 || (!active && searchData.length > 0)) {
+   
+    /* if (formattedEventData.length > 0 || (!active && searchData.length > 0)) {
       setSearchDataVisible(true);
+      console.log("should render")
+      //console.log(searchData)
     } else {
       setSearchDataVisible(false);
-    }
+    } */
   }
 
   useEffect(() => {
-    fetchData();
+    console.log(active)
+    console.log(searchData.length)
+    if (searchData.length > 0) {
+      setSearchDataVisible(true);
+      console.log("should render")
+      //console.log(searchData)
+    } else {
+      setSearchDataVisible(false);
+    }
+  }, [searchData])
+
+  useEffect(() => {
+    setSearchText("");
+    setTextInputValue("");
+    setSearchData([])
+    setSearchDataVisible(false);
+    //fetchData();
   }, [regionDropdown]);
 
   useEffect(() => {

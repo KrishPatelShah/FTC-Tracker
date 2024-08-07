@@ -18,6 +18,7 @@ export type ScoutingSheetArrayType = {
   code : string;
   name : string;
   date : string;
+  
   eventData : TeamEventData[]
 }
 
