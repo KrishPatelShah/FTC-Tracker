@@ -1,10 +1,13 @@
-import { teamNumberAtom } from "@/dataStore"
+import { bookmarkCodeArray, teamNumberAtom } from "@/dataStore"
 import { useAtomValue } from "jotai"
 import { useEffect, useState } from "react"
-import { View, Text } from "react-native"
+import { View, Text, TouchableOpacity } from "react-native"
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler"
 import EventDisplay from "./EventDisplay"
 import DivisionEventDisplay from "./DivisionEventDisplay"
+import { AntDesign } from "@expo/vector-icons"
+import { FIREBASE_AUTH } from "@/FirebaseConfig"
+import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore"
 
 type OPR = {
     total : string,
@@ -53,10 +56,12 @@ type Award = {
 
 
 const TeamInfoScreen : React.FC = () => {
+    const db = getFirestore();
     const teamNumber = useAtomValue(teamNumberAtom)
     const [teamName, setTeamName] = useState("")
     const [overallOPR, setOverallOPR] = useState<OPR>({total : "0", auto : "0", tele : "0", endgame : "0"})
     const [eventDisplay, setEventDisplay] = useState<EventData[]>([])
+    const bookmarks = useAtomValue(bookmarkCodeArray)
     const fetchData = async () => {
         const query = `
         query getTeamByNumber($number : Int!, $season : Int!){
@@ -210,14 +215,57 @@ const TeamInfoScreen : React.FC = () => {
     useEffect(() => {
         //console.log(teamNumber)
         fetchData();
+        if (bookmarks.includes(teamNumber)){
+            setIsBookMarked(true)
+        }
     }, [teamNumber])
+
+    const [isBookMarked, setIsBookMarked] = useState(false);
+
+    const getIconImage = ():"staro" | "star" => {
+        if (isBookMarked){
+            return "star"
+        }
+        return "staro"
+    } 
+
+    const bookmarkTeam = (teamNum: string, teamName: string) => {
+        try{
+          if(FIREBASE_AUTH.currentUser){
+            const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+            try {
+                if(isBookMarked){
+                    updateDoc(userRef, {
+                        bookmarks: arrayRemove({name: teamName, code : teamNum})
+                    })
+                    setIsBookMarked(false)
+                }else {
+                    updateDoc(userRef, { 
+                        bookmarks: arrayUnion({name : teamName, code : teamNum})
+                    });
+                    setIsBookMarked(true)
+                }
+            } 
+            catch (error) {
+                console.error("Error updating user document:", error);
+            }    
+          }
+        } catch(error : any){
+          alert('😓 Error:\n' + error.message)
+        } 
+}
 
     return (
         <GestureHandlerRootView>
         <View style = {{display : "flex", flex : 1, backgroundColor : "black", flexDirection : "column", justifyContent : "flex-start", alignItems : "center"}}>
             <View style = {{height : "10%", marginTop : 32, top : 12 , width : "95%", display : "flex", flexDirection : "column", marginBottom : 12}}>
                 <Text style = {{color : "white", fontSize : 36}}>{teamName}</Text>
-                <Text style = {{color : "#328AFF", fontSize : 28}}>{teamNumber}</Text>
+                <View style = {{display : "flex", flexDirection : "row", alignItems : "center"}}>
+                    <Text style = {{color : "#328AFF", fontSize : 28}}>{teamNumber}</Text>
+                    <TouchableOpacity>
+                        <AntDesign name={getIconImage()} size={24} color="#328AFF" style = {{left : 10}} onPress={() => {bookmarkTeam(teamNumber, teamName)}}/>
+                    </TouchableOpacity>
+                </View>
             </View>
             <ScrollView style = {{width : "95%", display : "flex", flexDirection : "column"}} contentContainerStyle = {{alignItems : "center"}} >
                 <Header text = {"Stats"}></Header>
