@@ -6,16 +6,12 @@ import { eventCodeAtom, teamNumberAtom } from "@/dataStore";
 import { useEffect, useState } from "react";
 
 
-const Bookmark: React.FC<BookmarkView> = ({name, code, navigation}) => {
+const Bookmark: React.FC<BookmarkView> = ({name, code, navigation, setToDelete}) => {
 
     const setEventCode = useSetAtom(eventCodeAtom)
     const setTeamCode = useSetAtom(teamNumberAtom)
     
 
-
-    useEffect(() => {
-
-    }, [])
 
     const navigateTo = () => {
         if(isNaN(parseInt(code))) {
@@ -28,7 +24,7 @@ const Bookmark: React.FC<BookmarkView> = ({name, code, navigation}) => {
     }
 
     return (
-        <TouchableOpacity style = {{backgroundColor: '#191919', borderRadius: 10, marginTop: '5%', flexDirection: "row", alignItems: "center",width: '90%'}} onPress={() => {navigateTo()}}>
+        <TouchableOpacity style = {{backgroundColor: '#191919', borderRadius: 10, marginTop: '5%', flexDirection: "row", alignItems: "center",width: '90%'}} onPress={() => {navigateTo()}} onLongPress={() => {setToDelete({name : name, code : code}); console.log("ran long press")}}>
             <Ionicons name= {isNaN(parseInt(code)) ? "calendar-outline" : "accessibility"} size={30} color="#328AFF" style={{padding: '3.5%'}} />
             <Text numberOfLines={1} style={{color: "white",flex: 1,fontSize: 20, paddingRight: '3.5%'}}>{isNaN(parseInt(code)) ? name : code + " - " + name}</Text>
         </TouchableOpacity>
