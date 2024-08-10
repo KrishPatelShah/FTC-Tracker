@@ -44,7 +44,7 @@ export default function LoginScreen (){
     <View style={styles.container}>
       <View style={styles.logoContainer}>
         <Image
-          source={require("@/assets/images/logo.png")}
+          source={require("@/assets/images/gradient_applied_logo.png")}
           style={styles.logo}
         />
         <Text style={styles.title}>FTC Tracker</Text>
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 100,
     height: 100,
-    marginRight: 10,
+    marginRight: 30,
   },
   title: {
     color: '#fff',

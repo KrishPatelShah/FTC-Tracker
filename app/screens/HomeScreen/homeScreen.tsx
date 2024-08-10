@@ -19,6 +19,7 @@ import { getFirestore, doc, setDoc, getDoc, DocumentData } from 'firebase/firest
 import Bookmark from './Bookmark';
 import { useSetAtom } from 'jotai';
 import { bookmarkCodeArray } from '@/dataStore';
+import DeleteBookmark from './DeleteBookmarkModal';
 
 type HomeScreenProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -46,6 +47,7 @@ export type BookmarkView = {
   name: string,
   code: string,
   navigation : NavigationProp<RootStackParamList>;
+  setToDelete : (payload: BookmarkType) => void
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
@@ -61,6 +63,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   
   const [bookmarks, setBookmarks] = useState<BookmarkType[]>([]);
   const setBookmarkCodes = useSetAtom(bookmarkCodeArray)
+  const [bookmarkModalVisible, setBookmarkModalVisible] = useState(false)
+  const [bookmarkToDelete, setBookmarkToDelete] = useState<BookmarkType>({name : "", code : ""})
+
+
+  useEffect(() => {
+      setBookmarkModalVisible(true)
+      console.log("ran useEffect")
+  }, [bookmarkToDelete])
+
   const db = getFirestore();
 
   const fetchFirebaseData = async ()=>{
@@ -321,10 +332,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </View>
 
         {bookmarks.map((item, index) => (
-          <Bookmark name={item.name} code={item.code} key = {index} navigation={navigation}></Bookmark>
+          <Bookmark name={item.name} code={item.code} key = {index} navigation={navigation} setToDelete={setBookmarkToDelete}></Bookmark>
         ))}
 
-
+        <DeleteBookmark modalVisible = {bookmarkModalVisible} setModalVisible={setBookmarkModalVisible} bookmarkToDelete= {bookmarkToDelete} updateBookmarks={setBookmarks}></DeleteBookmark>
       </ScrollView>
     </GestureHandlerRootView>
   );
