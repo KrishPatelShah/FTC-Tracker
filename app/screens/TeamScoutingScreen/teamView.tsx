@@ -119,50 +119,50 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const db = getFirestore();
     const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
-        const uploadData = async () => {
-            if(FIREBASE_AUTH.currentUser){
-                const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-                console.log("TICK")
-                try {
-                    await updateDoc(userRef, { 
-                        userScoutingSheetArray: globalScoutingSheetArray,
-                    });
-                    console.log("UPDATED")
-                } catch (error) {
-                    console.error('Error uploading data: ', error);
-                }
-            }
-        };
+    // useEffect(() => {
+    //     const uploadData = async () => {
+    //         if(FIREBASE_AUTH.currentUser){
+    //             const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+    //             console.log("TICK")
+    //             try {
+    //                 await updateDoc(userRef, { 
+    //                     userScoutingSheetArray: globalScoutingSheetArray,
+    //                 });
+    //                 console.log("UPDATED")
+    //             } catch (error) {
+    //                 console.error('Error uploading data: ', error);
+    //             }
+    //         }
+    //     };
 
-        const intervalId = setInterval(uploadData, 10000); // 10000ms = 10s
-        return () => clearInterval(intervalId); // Cleanup interval on unmount
-    }, []);
+    //     const intervalId = setInterval(uploadData, 10000); // 10000ms = 10s
+    //     return () => clearInterval(intervalId); // Cleanup interval on unmount
+    // }, []);
 
-    useFocusEffect(
-        useCallback(() => {
-          const onBackPress = () => {
-            if(FIREBASE_AUTH.currentUser){
-                const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-                try {
-                    updateDoc(userRef, { 
-                        userScoutingSheetArray: globalScoutingSheetArray,
-                    });
-                } 
-                catch (error) {
-                    console.error("Error updating user document:", error);
-                }    
-            }
+    // useFocusEffect(
+    //     useCallback(() => {
+    //       const onBackPress = () => {
+    //         if(FIREBASE_AUTH.currentUser){
+    //             const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+    //             try {
+    //                 updateDoc(userRef, { 
+    //                     userScoutingSheetArray: globalScoutingSheetArray,
+    //                 });
+    //             } 
+    //             catch (error) {
+    //                 console.error("Error updating user document:", error);
+    //             }    
+    //         }
     
-            // Returning true prevents the default behavior (exiting the screen)
-            return false;
-          };
+    //         // Returning true prevents the default behavior (exiting the screen)
+    //         return false;
+    //       };
     
-          BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    //       BackHandler.addEventListener('hardwareBackPress', onBackPress);
     
-          return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-        }, []
-    ))
+    //       return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    //     }, []
+    // ))
     
    
     const loadData = () => {
@@ -428,8 +428,6 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
             {loading ? <ActivityIndicator size="large" color='#fff'/>
             : 
             <>
-            
-           
                 <View style = {styles.headerContainer} /* horizontal = {true} showsHorizontalScrollIndicator={false} */>
                     <Text style={styles.headerTeamNameText}>{teamData.name}</Text>
                     <Text style={styles.headerTeamNumberText}>{teamData.number}</Text>

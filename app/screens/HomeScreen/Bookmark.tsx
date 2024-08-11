@@ -24,7 +24,7 @@ const Bookmark: React.FC<BookmarkView> = ({name, code, navigation, setToDelete})
     }
 
     return (
-        <TouchableOpacity style = {{backgroundColor: '#191919', borderRadius: 10, marginTop: '5%', flexDirection: "row", alignItems: "center",width: '90%'}} onPress={() => {navigateTo()}} onLongPress={() => {setToDelete({name : name, code : code}); console.log("ran long press")}}>
+        <TouchableOpacity style = {{backgroundColor: '#191919', borderRadius: 10, marginTop: '5%', flexDirection: "row", alignItems: "center",width: '90%'}} onPress={() => {navigateTo()}} onLongPress={() => {setToDelete({name : name, code : code}); console.log("ran long press")}}  delayLongPress={300}>
             <Ionicons name= {isNaN(parseInt(code)) ? "calendar-outline" : "accessibility"} size={30} color="#328AFF" style={{padding: '3.5%'}} />
             <Text numberOfLines={1} style={{color: "white",flex: 1,fontSize: 20, paddingRight: '3.5%'}}>{isNaN(parseInt(code)) ? name : code + " - " + name}</Text>
         </TouchableOpacity>

@@ -25,8 +25,8 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const [modalVisible, setModalVisible] = useState(false);
   const [modalIndexToDelete, setModalIndexToDelete] = useState(0);
 
-  const handleLongPress = (index : number) => {
-    setModalIndexToDelete(index)
+  const handleLongPress = (scoutingSheetArrayIndex : number) => {
+    setModalIndexToDelete(scoutingSheetArrayIndex)
     setModalVisible(true)
 }
 
@@ -54,10 +54,10 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
  
   // let globalScoutingSheetArray: ScoutingSheetArrayType[] = firebase.fetch().map((item) => JSON.parse(item))
 
-  const run: (arg0: ScoutingSheetArrayType) => void = (item) => {
+  const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number) => void = (item, scoutingSheetArrayIndex) => {
     setEventCode(item.code)
     setEventData(item.eventData)
-    navigation.navigate("EventScoutingScreen")
+    navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex})
   }
 
   return (
@@ -69,8 +69,8 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         <View style={{width: '80%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
         {
-          globalScoutingSheetArray?.map((item, index) => (
-          <TouchableOpacity style = {styles.button} key = {index} onPress = {() => run(item)} onLongPress={() => handleLongPress(index)} delayLongPress={300}>
+          globalScoutingSheetArray?.map((item, scoutingSheetArrayIndex) => (
+          <TouchableOpacity style = {styles.button} key = {scoutingSheetArrayIndex} onPress = {() => run(item, scoutingSheetArrayIndex)} onLongPress={() => handleLongPress(scoutingSheetArrayIndex)} delayLongPress={300}>
             <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
             <View style={styles.buttonTextContainer}>
               <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>

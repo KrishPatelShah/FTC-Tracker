@@ -6,23 +6,34 @@ import TeamView from '@/app/screens/EventScoutingScreen/teamScoutingView';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-element-dropdown';
 import { atom, useAtom } from 'jotai'
-import { eventCodeAtom, persistentEventData, teamDataAtom } from '@/dataStore';
+import { eventCodeAtom, persistentEventData, teamDataAtom, scoutingSheetArray } from '@/dataStore';
 import { TeamEventData } from '../TeamScoutingScreen/teamView';
 import { useFocusEffect } from 'expo-router';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
+import ShareScoutingSheetModal from '../EventScoutingScreen/ShareScoutingSheetModal';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '@/app/navigation/types';
+
 
 type ScoutingSheetProps = {
   navigation: any;
+  route: RouteProp<RootStackParamList, 'EventScoutingScreen'>;
 };
 
 type Team = {
-    id: string,
-    name: string,
-    tot_opr: string,
-    auto_opr: string,
-    rank: string,
-  };
+  id: string,
+  name: string,
+  tot_opr: string,
+  auto_opr: string,
+  rank: string,
+};
 
-const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
+const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) => {
+  const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray) 
+  const scoutingSheetArrayIndex = route.params?.scoutingSheetArrayIndex !== undefined ? route.params.scoutingSheetArrayIndex : globalScoutingSheetArray.length - 1;
+  //console.log('scouting sheet array index: ', scoutingSheetArrayIndex)
+
+  const [shareModalVisible, setShareModalVisible] = useState(false)
   const [eventName, setEventName] = useState("");
   const [teamArray, setTeamArray] = useState<Team[]>([]);
   const [eventData, setEventData] = useAtom(persistentEventData)
@@ -141,6 +152,12 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({ navigation }) => {
             <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.rank} key={team.id} navigation={navigation}/>
           ))}
         </ScrollView>
+
+        <TouchableOpacity onPress={()=>{setShareModalVisible(true)}}>
+          <Ionicons name="share-social-outline" size={30} color="#328AFF" style={{marginTop: '10%'}} />
+        </TouchableOpacity>
+        <ShareScoutingSheetModal shareModalVisible={shareModalVisible} setShareModalVisible={setShareModalVisible} sheetArrayIndex={scoutingSheetArrayIndex}/>
+        
       </View>
     </GestureHandlerRootView>
   );

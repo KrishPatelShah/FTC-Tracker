@@ -11,6 +11,7 @@ import { eventCodeAtom, scoutingSheetArray } from "@/dataStore";
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
 
+
 interface EventSearchViewProps {
     eventName : string;
     date : string;
@@ -29,11 +30,21 @@ const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code,
     // FIREBASE VARIABLES:
     const db = getFirestore();
 
+    const generateScoutingSheetID = (): string => {
+        const timestamp = new Date().getTime(); // Current timestamp in milliseconds
+        const randomPart = Math.random().toString(36).substring(2, 15); // Converts the number to a base-36 string representation
+        return `${timestamp}-${randomPart}`;
+    };
+
     const check = () => {
+        // generates a random id for the scouting sheet upon creation
+        const scoutingSheetID = generateScoutingSheetID();
+
         setEventCode(code)
         if(location === "modal"){
-            //let stringifiedGlobalScoutingSheetArray: string[] = globalScoutingSheetArray.map((item) => JSON.stringify(item))
-            globalScoutingSheetArray.push({code: code, name : eventName, date : date, eventData : []})
+            
+            globalScoutingSheetArray.push({code: code, name : eventName, date : date, eventData : [], sheetID: scoutingSheetID})
+            console.log("scouting sheet id: ", scoutingSheetID)
 
             if(FIREBASE_AUTH.currentUser){
                 const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
