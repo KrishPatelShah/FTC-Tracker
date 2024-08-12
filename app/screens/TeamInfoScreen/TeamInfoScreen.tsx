@@ -257,7 +257,7 @@ const TeamInfoScreen : React.FC = () => {
 
     return (
         <GestureHandlerRootView>
-        <View style = {{display : "flex", flex : 1, backgroundColor : "black", flexDirection : "column", justifyContent : "flex-start", alignItems : "center"}}>
+        <View style = {{display : "flex", flex : 1, backgroundColor : "black", flexDirection : "column", justifyContent : "flex-start", alignItems : "center",marginTop:'15%' }}>
             <View style = {{height : "10%", marginTop : 32, top : 12 , width : "95%", display : "flex", flexDirection : "column", marginBottom : 12}}>
                 <Text style = {{color : "white", fontSize : 36}}>{teamName}</Text>
                 <View style = {{display : "flex", flexDirection : "row", alignItems : "center"}}>

@@ -85,7 +85,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   }, [mySharedSheets])
 
   useEffect(()=>{
-     console.log("sharedSheetsArraySet: ", sharedSheetsArray)
+    //  console.log("sharedSheetsArraySet: ", sharedSheetsArray)
   }, [sharedSheetsArray])
 
   const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number) => void = (item, scoutingSheetArrayIndex) => {

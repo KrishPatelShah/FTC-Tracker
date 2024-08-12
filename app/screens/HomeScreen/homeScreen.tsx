@@ -319,12 +319,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Text style={styles.buttonText}>My Scouting Sheets</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <MaterialCommunityIcons name="import" size={30} color="#328AFF" style={styles.icon} />
-          <Text style={styles.buttonText}>Import Scouting Sheet</Text>
-        </TouchableOpacity>
-
-
         <View style={{ marginTop: '5%', flexDirection: 'row', width: '100%', justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: '#101010' }}>
           <View style={{ width: '22.5%', left: 0, height: 2.5, marginBottom: -5, backgroundColor: '#328AFF', borderRadius: 10 }} />
           <Text style={styles.headings}>Favorites</Text>
