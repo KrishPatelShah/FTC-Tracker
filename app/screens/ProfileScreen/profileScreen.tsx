@@ -83,7 +83,7 @@ const ProfileScreen = () => {
 
     if (user) {
       try {
-        const userDocRef = doc(FIRESTORE_DB, 'users', user.uid);
+        const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
         await deleteDoc(userDocRef);
         await user.delete();
         FIREBASE_AUTH.signOut();
