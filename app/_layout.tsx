@@ -27,6 +27,7 @@ import DrawerContent from '../components/DrawerContent';
 import { useNavigation } from '@react-navigation/native';
 import TermsOfServiceScreen from './screens/TermsOfServiceScreen/termsOfServiceScreen';
 import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen/privacyPolicyScreen';
+import ProfileScreen from './screens/ProfileScreen/profileScreen';
 
 function InsideLayout() {
   const colorScheme = useColorScheme();
@@ -118,6 +119,27 @@ const DrawerNav = () => {
           ),
         }} 
       />
+
+      <Drawer.Screen 
+        name="Profile" 
+        component={ProfileScreen}
+        options={{
+          headerShown: true,
+          headerTitle: '',
+          headerTransparent: true,
+          headerLeft: () => null, 
+          headerRight: () => (
+            <Icon
+              name="menu"
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+              size={30}
+              color="#fff"
+              style={{ marginRight: 19 }}
+            />
+          ),
+        }} 
+      />
+
     </Drawer.Navigator>
   );
 };
