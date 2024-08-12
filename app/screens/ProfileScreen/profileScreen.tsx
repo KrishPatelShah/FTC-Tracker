@@ -178,7 +178,6 @@ const styles = StyleSheet.create({
       fontSize: 24,
       marginBottom: 20,
       color: '#fff',
-      fontWeight: 'bold',
     },
     label: {
       fontSize: 16,
