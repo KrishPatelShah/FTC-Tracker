@@ -1,13 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../../FirebaseConfig';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { updatePassword } from 'firebase/auth';
 
 const ProfileScreen = () => {
-  const [name, setName] = useState('John Smith'); 
-  const [email, setEmail] = useState('john.smith@gmail.com'); 
+  const [userName, setUserName] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user = FIREBASE_AUTH.currentUser;
+        if (user) {
+          const userRef = doc(collection(FIRESTORE_DB, 'user_data'), user.uid);
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUserName(userData.name);
+            setUserEmail(userData.email);
+          } else {
+            console.warn("No User Info");
+            setUserName("No Data");
+            setUserEmail("No Data");
+          }
+        } else {
+          console.warn("No user logged in!");
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const [password, setPassword] = useState(''); 
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,8 +51,8 @@ const ProfileScreen = () => {
       try {
         const userDocRef = doc(FIRESTORE_DB, 'users', user.uid);
         await updateDoc(userDocRef, {
-          name,
-          email,
+          userName,
+          userEmail,
         });
 
         if (password) {
@@ -65,15 +93,15 @@ const ProfileScreen = () => {
       <Text style={styles.label}>Name</Text>
       <TextInput
         style={styles.input}
-        value={name}
-        onChangeText={setName}
+        value={userName}
+        onChangeText={setUserName}
       />
       
       <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
-        value={email}
-        onChangeText={setEmail}
+        value={userEmail}
+        onChangeText={setUserEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
