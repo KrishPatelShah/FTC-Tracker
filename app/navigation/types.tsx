@@ -5,7 +5,7 @@ export type RootStackParamList = {
     SignUpScreen: undefined;
     TermsOfServiceScreen: undefined;
     PrivacyPolicyScreen: undefined;
-    EventScoutingScreen: { scoutingSheetArrayIndex: number };
+    EventScoutingScreen: {scoutingSheetArrayIndex: number};
     TeamScoutingScreen: undefined;
     HomeScreen: undefined;
     MyScoutingSheetsScreen: undefined;

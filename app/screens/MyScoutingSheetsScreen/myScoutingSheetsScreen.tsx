@@ -24,10 +24,12 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const db = getFirestore();
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [isSharedWithMe, setIsSharedWithMe] = useState(false);
   const [modalIndexToDelete, setModalIndexToDelete] = useState(0);
 
-  const handleLongPress = (scoutingSheetArrayIndex : number) => {
+  const handleLongPress = (scoutingSheetArrayIndex : number, isSharedWithMe : boolean) => {
     setModalIndexToDelete(scoutingSheetArrayIndex)
+    setIsSharedWithMe(isSharedWithMe);
     setModalVisible(true)
   }
 
@@ -100,12 +102,12 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
             My Scouting Sheets
         </Text>
 
-        <View style={{width: '80%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
+        <View style={{width: '85%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
         {
           globalScoutingSheetArray?.map((item, scoutingSheetArrayIndex) => (
-          <TouchableOpacity style = {styles.button} key = {scoutingSheetArrayIndex} onPress = {() => run(item, scoutingSheetArrayIndex)} onLongPress={() => handleLongPress(scoutingSheetArrayIndex)} delayLongPress={300}>
-            <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
+          <TouchableOpacity style = {styles.button} key = {scoutingSheetArrayIndex} onPress = {() => run(item, scoutingSheetArrayIndex)} onLongPress={() => handleLongPress(scoutingSheetArrayIndex, false)} delayLongPress={300}>
+            <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon}/>
             <View style={styles.buttonTextContainer}>
               <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>
               <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>{item.date}</Text>
@@ -113,10 +115,16 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
           </TouchableOpacity>
         ))}
 
+        <Text style={[styles.title, {fontSize: 30, marginTop:'5%',}]}>
+            Shared with Me
+        </Text>
+
+        <View style={{width: '55%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
+
         {
           sharedSheetsArray?.map((item, sharedSheetArrayIndex) => (
-            <TouchableOpacity style = {styles.button} key = {sharedSheetArrayIndex} onPress = {() => run(item, sharedSheetArrayIndex)} onLongPress={() => handleLongPress(sharedSheetArrayIndex)} delayLongPress={300}>
-              <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
+            <TouchableOpacity style = {styles.button} key = {sharedSheetArrayIndex} onPress = {() => run(item, sharedSheetArrayIndex)} onLongPress={() => handleLongPress(sharedSheetArrayIndex, true)} delayLongPress={300}>
+              <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon}/>
               <View style={styles.buttonTextContainer}>
                 <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>
                 <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>{item.date}</Text>
@@ -125,7 +133,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
           ))
         }
 
-        <DeleteScoutingSheetScreen modalVisible={modalVisible} setModalVisible={setModalVisible} modalIndexToDelete={modalIndexToDelete}/>
+        <DeleteScoutingSheetScreen modalVisible={modalVisible} setModalVisible={setModalVisible} isSharedWithMe={isSharedWithMe} modalIndexToDelete={modalIndexToDelete}/>
 
       </View>
   );
@@ -150,7 +158,7 @@ const styles = StyleSheet.create({
   title:{
     color:'white',
     fontSize: 40,
-    marginBottom:'4%',
+    marginBottom:'2%',
     marginTop: '2%',
   },
   button:{
