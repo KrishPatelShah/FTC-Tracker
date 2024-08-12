@@ -153,7 +153,6 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     flex: 1,
     paddingRight: 20,
-
   },
   title:{
     color:'white',
