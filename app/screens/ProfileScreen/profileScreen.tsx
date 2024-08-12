@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal } fro
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../../FirebaseConfig';
 import { collection, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { updatePassword } from 'firebase/auth';
+import { updatePassword, updateEmail } from 'firebase/auth';
 
 const ProfileScreen = () => {
   const [userName, setUserName] = useState<string>('');
@@ -36,28 +36,29 @@ const ProfileScreen = () => {
     fetchUserData();
   }, []);
 
-  const [password, setPassword] = useState(''); 
-  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+//   const [password, setPassword] = useState(''); 
+//   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const togglePasswordVisibility = () => {
-    setIsPasswordHidden(!isPasswordHidden);
-  };
+//   const togglePasswordVisibility = () => {
+//     setIsPasswordHidden(!isPasswordHidden);
+//   };
 
   const handleSaveChanges = async () => {
     const user = FIREBASE_AUTH.currentUser;
 
     if (user) {
       try {
-        const userDocRef = doc(FIRESTORE_DB, 'users', user.uid);
+        await updateEmail(user, userEmail);
+        const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
         await updateDoc(userDocRef, {
-          userName,
-          userEmail,
+          email: userEmail,
+          name: userName,
         });
 
-        if (password) {
-          await updatePassword(user, password); 
-        }
+        // if (password) {
+        //   await updatePassword(user, password); 
+        // }
 
         Alert.alert('Success', 'Your profile has been updated.');
       } catch (error) {
@@ -106,7 +107,7 @@ const ProfileScreen = () => {
         autoCapitalize="none"
       />
       
-      <Text style={styles.label}>Password</Text>
+      {/* <Text style={styles.label}>Password</Text>
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.input}
@@ -117,7 +118,7 @@ const ProfileScreen = () => {
         <TouchableOpacity onPress={togglePasswordVisibility}>
           <Icon name={isPasswordHidden ? "eye-off-outline" : "eye-outline"} size={24} color="gray" />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
         <Text style={styles.saveButtonText}>Save Changes</Text>

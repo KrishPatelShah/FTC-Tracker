@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { FIREBASE_AUTH, ASYNC_STORAGE, FIRESTORE_DB } from '@/FirebaseConfig';
 import { Octicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { collection, doc, getDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot } from 'firebase/firestore';
 
 type DrawerListType = {
   icon: string;
@@ -25,7 +25,6 @@ const handleSignOut = async () => {
 const DrawerList: DrawerListType[] = [
   { icon: 'home-outline', label: 'Home', navigateTo: 'HomeScreen' },
   { icon: 'account', label: 'Profile', navigateTo: 'Profile' },
-  // { icon: 'account-group', label: 'User', navigateTo: 'User' },
   { icon: 'shield-check-outline', label: 'Privacy Policy', navigateTo: 'PrivacyPolicyScreen' },
   { icon: 'file-document-outline', label: 'Terms of Service', navigateTo: 'TermsOfServiceScreen' },
   { icon: 'cog-outline', label: 'Settings', navigateTo: '' },
@@ -59,30 +58,30 @@ const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
   const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const user = FIREBASE_AUTH.currentUser;
-        if (user) {
-          const userRef = doc(collection(FIRESTORE_DB, 'user_data'), user.uid);
-          const userDoc = await getDoc(userRef);
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setUserName(userData.name);
-            setUserEmail(userData.email);
-          } else {
-            console.warn("No User Info");
-            setUserName("No Data");
-            setUserEmail("No Data");
-          }
-        } else {
-          console.warn("No user logged in!");
-        }
-      } catch (error) {
-        console.error("Error fetching user data: ", error);
-      }
-    };
+    const user = FIREBASE_AUTH.currentUser;
 
-    fetchUserData();
+    if (user) {
+      const userRef = doc(FIRESTORE_DB, 'user_data', user.uid);
+
+      // Set up a real-time listener
+      const unsubscribe = onSnapshot(userRef, (doc) => {
+        if (doc.exists()) {
+          const userData = doc.data();
+          setUserName(userData.name || 'No Data');
+          setUserEmail(userData.email || 'No Data');
+        } else {
+          setUserName('No Data');
+          setUserEmail('No Data');
+        }
+      }, (error) => {
+        console.error('Error listening to user data:', error);
+      });
+
+      // Clean up the listener when the component unmounts
+      return () => unsubscribe();
+    } else {
+      console.warn('No user logged in!');
+    }
   }, []);
 
   return (
@@ -97,9 +96,9 @@ const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
               <View style={styles.userInfoSection}>
                 <View style={styles.userInfo}>
                   <View style={styles.userInfoText}>
-                    <Title style={styles.title}>{userName || "Loading..."}</Title>
+                    <Title style={styles.title}>{userName || 'Loading...'}</Title>
                     <Text style={styles.caption} numberOfLines={1}>
-                      {userEmail || "Loading..."}
+                      {userEmail || 'Loading...'}
                     </Text>
                   </View>
                 </View>
