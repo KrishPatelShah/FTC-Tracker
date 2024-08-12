@@ -1,9 +1,10 @@
 import { scoutingSheetArray } from "@/dataStore";
 import { FIREBASE_APP, FIREBASE_AUTH, FIRESTORE_DB } from "@/FirebaseConfig";
-import { arrayRemove, arrayUnion, collection, doc, DocumentData, getDoc, getFirestore, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { User } from "firebase/auth";
+import { arrayRemove, arrayUnion, collection, doc, DocumentData, getDoc, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { useAtom } from "jotai";
-import { useState } from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { Modal, View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 type ShareScoutingSheetProps = {
@@ -30,6 +31,31 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
         // should be queried and displayed in dropdown like event search 
         // call setRecicpientUserID right after the user clicks on whoever they want to share with 
 
+    const [users, setUsers] = useState<User[]>([]);
+
+    useEffect(() => {
+        if (textInputValue.length > 0) {
+            const q = query(
+                collection(FIRESTORE_DB, 'user_data'),
+                where('email', '>=', textInputValue),
+                where('email', '<=', textInputValue + '\uf8ff')
+            );
+    
+            const unsubscribe = onSnapshot(q, (snapshot: { docs: any[] }) => {
+                const usersData = snapshot.docs.map(doc => ({
+                  id: doc.id,
+                  ...doc.data(),
+                }));
+                setUsers(usersData);
+              });
+    
+            return () => unsubscribe();
+
+        } else {
+          setUsers([]);
+        }
+    }, [textInputValue]);
+
     return (
         <Modal
         animationType="fade"
@@ -49,11 +75,22 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                         value={textInputValue}
                         onChangeText={(text) => {setTextInputValue(text)}}
                         cursorColor={'#328aff'}
+                        autoCapitalize="none"
                         style = {styles.textInput}
-                    >
-                         
-                    </TextInput>
+                    />
 
+                    <FlatList
+                        style = {styles.searchResults}
+                        data={users}
+                        showsVerticalScrollIndicator={false}
+                        keyExtractor={item => item.uid}
+                        renderItem={({ item }) => (
+                        <TouchableOpacity style={styles.userSearchResult}onPress={() => console.log(`Selected: ${item.email}`)}>
+                            <Text style = {{fontSize: 18, color:'white', padding: 10,}}>{item.email}</Text>
+                        </TouchableOpacity>
+                        )}
+                    />
+                         
                     <View style={{justifyContent:'center', flexDirection:'row', paddingTop: 20, paddingBottom: 15}}>
                         <TouchableOpacity style={[styles.cancelButton, {}]} onPress={() => setShareModalVisible(!shareModalVisible)}>
                             <Text style={styles.buttonText}>Cancel</Text>
@@ -96,7 +133,7 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
     }
 };
 
-const listenForUpdates = async (sheetID:string, updateCallback: (arg0: any) => void) => {
+const listenForUpdates = async (sheetID: string, updateCallback: (arg0: any) => void) => {
     // I'm p sure that when you share a scouting sheet, your userRef would have to change to sharedSheetRef to trigger this listener
     // when you update your scouting sheet 
 
@@ -162,6 +199,22 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color:'white',
         borderBottomWidth: 2, 
+    },
+    searchResults:{
+        flexDirection: 'column',
+        marginTop: 20,
+        width: '90%',
+        height: '20%',
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: 'white',
+    },
+    userSearchResult:{
+        width: '80%', 
+        backgroundColor:'#1E90FF', 
+        alignSelf:'center',
+        borderRadius: 6,
+        marginTop: 10
     }
   });
   

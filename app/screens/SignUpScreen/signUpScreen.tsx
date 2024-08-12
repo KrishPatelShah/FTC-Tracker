@@ -26,7 +26,10 @@ export default function SignUpScreen() {
 
   const createAccount = async () => {
     setLoading(true);
+    setEmail(email.toLowerCase())
+    
     try {
+      //await ASYNC_STORAGE.clear()
       await createUserWithEmailAndPassword(auth, email, password);
       await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email, password }));
 

@@ -30,8 +30,8 @@ type Team = {
 
 const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) => {
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray) 
-  const scoutingSheetArrayIndex = route.params?.scoutingSheetArrayIndex !== undefined ? route.params.scoutingSheetArrayIndex : globalScoutingSheetArray.length - 1;
-  //console.log('scouting sheet array index: ', scoutingSheetArrayIndex)
+  const scoutingSheetArrayIndex = route.params?.scoutingSheetArrayIndex
+  // console.log('scouting sheet array index: ', scoutingSheetArrayIndex)
 
   const [shareModalVisible, setShareModalVisible] = useState(false)
   const [eventName, setEventName] = useState("");

@@ -3,7 +3,7 @@ import { TextInput, View, StyleSheet, Modal, Text, FlatList } from "react-native
 import { TouchableOpacity } from "react-native";
 import { useAtom } from "jotai";
 import { NavigationProp } from "@react-navigation/native";
-import { eventCodeAtom } from "@/dataStore";
+import { eventCodeAtom, scoutingSheetArray } from "@/dataStore";
 import EventSearchView from "./EventSearchView";
 import { RootStackParamList } from "@/app/navigation/types";
 
@@ -25,6 +25,8 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
   const [searchText, setSearchText] = useState("");
   const [searchDataVisible, setSearchDataVisible] = useState(false);
   const [textInputValue, setTextInputValue] = useState("");
+  const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
+  const scoutingSheetArrayIndex = globalScoutingSheetArray.length // don't have to -1 because scouting sheet array has not appended sheet yet
 
   const eventQuery = `query eventsSearch($season: Int!, $searchText: String!, $limit: Int!, $region: RegionOption!) {
     eventsSearch(season: $season, searchText: $searchText, limit: $limit, region: $region) {
@@ -97,7 +99,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
 
   const renderItem = ({ item }: { item: EventSearchData }) => (
     <EventSearchView eventName={item.name} date={item.data} navigation={navigation} code={item.code} navigateTo={() => {
-      navigation.navigate("EventScoutingScreen")
+      navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex}) // previous error here, had to define scoutingSheetArrayIndex
       setModalVisible(false);
     }} location="modal"/>
   );
