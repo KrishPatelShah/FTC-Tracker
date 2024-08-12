@@ -63,7 +63,7 @@ const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
     if (user) {
       const userRef = doc(FIRESTORE_DB, 'user_data', user.uid);
 
-      // Set up a real-time listener
+      //real-time listener
       const unsubscribe = onSnapshot(userRef, (doc) => {
         if (doc.exists()) {
           const userData = doc.data();
@@ -77,7 +77,7 @@ const DrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
         console.error('Error listening to user data:', error);
       });
 
-      // Clean up the listener when the component unmounts
+      // Cleans up the listener when the component unmounts
       return () => unsubscribe();
     } else {
       console.warn('No user logged in!');

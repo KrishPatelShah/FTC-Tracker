@@ -63,6 +63,17 @@ const ProfileScreen = () => {
         Alert.alert('Success', 'Your profile has been updated.');
       } catch (error) {
         Alert.alert('Error', 'Failed to update profile.');
+        try {
+            const user = FIREBASE_AUTH.currentUser;
+            if (user) {
+              const userRef = doc(collection(FIRESTORE_DB, 'user_data'), user.uid);
+              const userDoc = await getDoc(userRef);
+              if (userDoc.exists()) {
+                const userData = userDoc.data();
+                setUserName(userData.name);
+                setUserEmail(userData.email);}}}
+        catch (error) {
+            console.error("Error fetching user data: ", error); }
       }
     }
   };
