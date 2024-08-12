@@ -159,6 +159,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     marginBottom:'2%',
     marginTop: '2%',
+    
   },
   button:{
     backgroundColor: '#191919',
