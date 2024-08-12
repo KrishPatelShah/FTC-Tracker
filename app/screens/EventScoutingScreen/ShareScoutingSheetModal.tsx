@@ -27,11 +27,17 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)        
     const [sheetID, setSheetID] = useState(globalScoutingSheetArray[sheetArrayIndex].sheetID)
 
-    const [recipientUserID, setRecipientUserID] = useState("dX3icSA3Ytey4ac0QZ9HVjhRL5q2") // Abhilash's userID
+    //const [recipientUserID, setRecipientUserID] = useState("dX3icSA3Ytey4ac0QZ9HVjhRL5q2") // Abhilash's userID
         // should be queried and displayed in dropdown like event search 
         // call setRecicpientUserID right after the user clicks on whoever they want to share with 
 
-    const [users, setUsers] = useState<User[]>([]);
+    type firestoreUser = {
+        name: string,
+        email: string,
+        id: string
+    } 
+    const [users, setUsers] = useState<firestoreUser[]>([]);
+
 
     useEffect(() => {
         if (textInputValue.length > 0) {
@@ -83,9 +89,9 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                         style = {styles.searchResults}
                         data={users}
                         showsVerticalScrollIndicator={false}
-                        keyExtractor={item => item.uid}
+                        keyExtractor={(item, index) => index.toLocaleString()}
                         renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.userSearchResult}onPress={() => console.log(`Selected: ${item.email}`)}>
+                        <TouchableOpacity style={styles.userSearchResult}onPress={() => {console.log(item.id), shareScoutingSheet(sheetID, sheetIndex, item.id)}}>
                             <Text style = {{fontSize: 18, color:'white', padding: 10,}}>{item.email}</Text>
                         </TouchableOpacity>
                         )}
@@ -95,9 +101,6 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                         <TouchableOpacity style={[styles.cancelButton, {}]} onPress={() => setShareModalVisible(!shareModalVisible)}>
                             <Text style={styles.buttonText}>Cancel</Text>
                         </TouchableOpacity>    
-                        <TouchableOpacity style={[styles.cancelButton, {}]} onPress={() => {shareScoutingSheet(sheetID, sheetIndex, recipientUserID); listenForUpdates(sheetID, updateCallback)}}>
-                            <Text style={styles.buttonText}>Test</Text>
-                        </TouchableOpacity>  
                     </View>       
                 </View>
             </View>
@@ -114,13 +117,23 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
 
         try {
           const userDoc = await getDoc(userRef);
+          const sharedDoc = await getDoc(sharedSheetRef);
+
           const userSheetData = await userDoc?.data()?.userScoutingSheetArray[sheetIndex]; 
 
-          const sharedSheetDoc = await setDoc(
-            sharedSheetRef, {
-            sharedSheetData: userSheetData,
-            userIds: [FIREBASE_AUTH.currentUser.uid, recipientUserId]
-          });
+          const sharedSheetDoc = sharedDoc.exists()? 
+            await updateDoc(
+                sharedSheetRef,{
+                sharedSheetData: userSheetData,
+                userIds: arrayUnion(FIREBASE_AUTH.currentUser.uid, recipientUserId)
+                }
+            )
+          :
+            await setDoc(
+                sharedSheetRef, {
+                sharedSheetData: userSheetData,
+                userIds: [FIREBASE_AUTH.currentUser.uid, recipientUserId]
+            });
 
           // updates the recipient's personal sharedSheets array 
           await updateDoc(recipientRef, {

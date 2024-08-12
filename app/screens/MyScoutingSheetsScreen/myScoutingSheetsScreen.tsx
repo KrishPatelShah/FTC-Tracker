@@ -20,6 +20,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const [eventData, setEventData] = useAtom(persistentEventData)
   const [eventCodeJotai, setEventCode] = useAtom(eventCodeAtom)
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
+  const [mySharedSheets, setMySharedSheets] = useState<String[]>()
   const db = getFirestore();
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -36,9 +37,10 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
       try {
         const docSnap = await getDoc(userRef);
-          if (docSnap) {
+          if (docSnap.exists()) {
             const userData = docSnap.data() as DocumentData 
             
+            setMySharedSheets(userData.sharedSheets)
             setGlobalScoutingSheetArray(userData.userScoutingSheetArray);
           } 
       } 
@@ -51,6 +53,11 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   useEffect( () => {
     fetchFirebaseData()
   }, [])
+
+  useEffect( () => {
+    console.log("my shared sheets: ", mySharedSheets)    
+  }, [mySharedSheets])
+ 
  
   // let globalScoutingSheetArray: ScoutingSheetArrayType[] = firebase.fetch().map((item) => JSON.parse(item))
 
