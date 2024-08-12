@@ -91,7 +91,7 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                         showsVerticalScrollIndicator={false}
                         keyExtractor={(item, index) => index.toLocaleString()}
                         renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.userSearchResult}onPress={() => {console.log(item.id), shareScoutingSheet(sheetID, sheetIndex, item.id)}}>
+                        <TouchableOpacity style={styles.userSearchResult}onPress={() => {shareScoutingSheet(sheetID, sheetIndex, item.id)}}>    
                             <Text style = {{fontSize: 18, color:'white', padding: 10,}}>{item.email}</Text>
                         </TouchableOpacity>
                         )}
@@ -137,7 +137,7 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
 
           // updates the recipient's personal sharedSheets array 
           await updateDoc(recipientRef, {
-            sharedSheets: arrayUnion(sheetID)
+            sharedSheets: arrayUnion(sheetID),
           });
         } 
         catch (error) {

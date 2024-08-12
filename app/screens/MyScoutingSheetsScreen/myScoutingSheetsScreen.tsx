@@ -20,7 +20,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const [eventData, setEventData] = useAtom(persistentEventData)
   const [eventCodeJotai, setEventCode] = useAtom(eventCodeAtom)
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
-  const [mySharedSheets, setMySharedSheets] = useState<String[]>()
+  const [mySharedSheets, setMySharedSheets] = useState<string[]>()
   const db = getFirestore();
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -29,9 +29,12 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const handleLongPress = (scoutingSheetArrayIndex : number) => {
     setModalIndexToDelete(scoutingSheetArrayIndex)
     setModalVisible(true)
-}
+  }
 
-  const fetchFirebaseData = async ()=>{
+  const [sharedSheetsArray, setSharedSheetsArray] = useState<ScoutingSheetArrayType[]>([])
+  const tempSharedSheetArray: ScoutingSheetArrayType[] = []
+
+  const fetchUserFirebaseData = async ()=>{
     if(FIREBASE_AUTH.currentUser){
       const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
 
@@ -39,7 +42,6 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         const docSnap = await getDoc(userRef);
           if (docSnap.exists()) {
             const userData = docSnap.data() as DocumentData 
-            
             setMySharedSheets(userData.sharedSheets)
             setGlobalScoutingSheetArray(userData.userScoutingSheetArray);
           } 
@@ -50,16 +52,41 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
     }
   }
-  useEffect( () => {
-    fetchFirebaseData()
-  }, [])
+
+  const fetchSharedData = async () => {
+    if (FIREBASE_AUTH.currentUser && mySharedSheets) {
+      try {
+        const sharedDataPromises = mySharedSheets.map(async (item) => {
+          const sharedRef = doc(db, 'shared_scouting_sheets', item);
+          const docSnap = await getDoc(sharedRef);
+          if (docSnap.exists()) {
+            return docSnap.data().sharedSheetData as ScoutingSheetArrayType;
+          }
+          return null;
+        });
+  
+        const sharedDataArray = await Promise.all(sharedDataPromises);
+  
+        // Filter out any null values (in case some docs didn't exist)
+        const validSharedData = sharedDataArray.filter(data => data !== null) as ScoutingSheetArrayType[];
+        setSharedSheetsArray(validSharedData);
+      } catch (error) {
+        console.error("😓 Error retrieving shared data:", error);
+      }
+    }
+  };
 
   useEffect( () => {
-    console.log("my shared sheets: ", mySharedSheets)    
+    fetchUserFirebaseData()
+  }, [])
+
+  useEffect(()=>{
+    fetchSharedData()
   }, [mySharedSheets])
- 
- 
-  // let globalScoutingSheetArray: ScoutingSheetArrayType[] = firebase.fetch().map((item) => JSON.parse(item))
+
+  useEffect(()=>{
+     console.log("sharedSheetsArraySet: ", sharedSheetsArray)
+  }, [sharedSheetsArray])
 
   const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number) => void = (item, scoutingSheetArrayIndex) => {
     setEventCode(item.code)
@@ -85,6 +112,18 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
             </View>
           </TouchableOpacity>
         ))}
+
+        {
+          sharedSheetsArray?.map((item, sharedSheetArrayIndex) => (
+            <TouchableOpacity style = {styles.button} key = {sharedSheetArrayIndex} onPress = {() => run(item, sharedSheetArrayIndex)} onLongPress={() => handleLongPress(sharedSheetArrayIndex)} delayLongPress={300}>
+              <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon} />
+              <View style={styles.buttonTextContainer}>
+                <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>
+                <Text numberOfLines={1} style={{fontSize: 15, color:'grey', alignSelf: 'flex-start'}}>{item.date}</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        }
 
         <DeleteScoutingSheetScreen modalVisible={modalVisible} setModalVisible={setModalVisible} modalIndexToDelete={modalIndexToDelete}/>
 
