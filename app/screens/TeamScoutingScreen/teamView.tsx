@@ -143,12 +143,12 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     //     return () => clearInterval(intervalId); // Cleanup interval on unmount
     // }, []);
 
-    useFocusEffect(
-        useCallback(() => {
-          const onBackPress = () => {
 
-            // turn off listener subscription or something 
+    useEffect(() => {
+        console.log("Start")
 
+        return () => {
+            console.log("Back2")
             if(FIREBASE_AUTH.currentUser){
                 if(isSharedWithMe){ // instead of isSharedWithMe, should be isShared
                     // if( globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
@@ -176,16 +176,13 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                     }  
                 } 
             }
-    
-            // Returning true prevents the default behavior (exiting the screen)
-            return false;
           };
+    }, [])
+
     
-          BackHandler.addEventListener('hardwareBackPress', onBackPress);
     
-          return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-        }, []
-    ))
+
+    
 
 
     useEffect(() => {
