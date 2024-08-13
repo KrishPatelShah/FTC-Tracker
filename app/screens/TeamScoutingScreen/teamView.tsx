@@ -150,7 +150,8 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             // turn off listener subscription or something 
 
             if(FIREBASE_AUTH.currentUser){
-                if(isSharedWithMe){
+                if(isSharedWithMe){ // instead of isSharedWithMe, should be isShared
+                    // if( globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
                     const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
                     try {
                         console.log("updating in shared collection!")
