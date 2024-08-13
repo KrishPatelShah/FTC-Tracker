@@ -146,38 +146,6 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
     }
 };
 
-const listenForUpdates = async (sheetID: string, updateCallback: (arg0: any) => void) => {
-    // I'm p sure that when you share a scouting sheet, your userRef would have to change to sharedSheetRef to trigger this listener
-    // when you update your scouting sheet 
-
-    // I think we might also need a collection variable. This way, if you "unshare" a scouting sheet, we just switch these variables
-    // and it should change which collection in the db you write to depending on if the sheet is shared 
-
-    // onSnapshot returns a function (unsubscribe) that, when called, detaches the listener and stops receiving updates.
-    // listenForUpdates(sheetID, updateCallback): This returns the unsubscribe function.
-        // so we have to declare something like const unsubscribe = listenForUpdates(sheetID, updateCallback); and then unsubscribe();
-        // The unsubscribe function does not run automatically; it must be invoked manually.
-
-    const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
-
-    // Listen for changes in the document
-    const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
-        if (doc.exists()) {
-            updateCallback(doc.data());
-        } else {
-            console.error('Document does not exist!');
-        }
-    }, (error) => {
-        console.error('Error listening to document: ', error);
-    });
-
-  return unsubscribe;
-};
-
-const updateCallback = () =>{
-    // funny merge time 
-}
-
 export default ShareScoutingSheetModal
 
 const styles = StyleSheet.create({

@@ -12,10 +12,10 @@ interface teamScoutingViewProps {
     teamName : string;
     shownValue : string;
     navigation : any;
+    selectedScoutingSheetIndex : number;
 }
 
-const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownValue, navigation}) => {
-
+const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownValue, navigation, selectedScoutingSheetIndex}) => {
     const [teamNumberJotai, setTeamNumberJotai] = useAtom(teamNumberAtom)
     
     const [isPressed, setIsPressed] = useState(false)
@@ -27,7 +27,7 @@ const TeamView: React.FC<teamScoutingViewProps> = ({teamNumber, teamName, shownV
         setIsPressed(true)
         dispatch(setTeamNumber(teamNumber))
         setTeamNumberJotai(teamNumber)
-        navigation.navigate("TeamScoutingScreen")
+        navigation.navigate("TeamScoutingScreen", {selectedScoutingSheetIndex})
     }
     
     return (

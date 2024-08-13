@@ -6,7 +6,7 @@ import { doc, getFirestore, setDoc, getDoc, updateDoc, DocumentData } from 'fire
 import { NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '@/app/navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { eventCodeAtom, persistentEventData, scoutingSheetArray, ScoutingSheetArrayType } from '@/dataStore';
+import { eventCodeAtom, persistentEventData, scoutingSheetArray, ScoutingSheetArrayType, isSharedWithMeAtom, sharedSheetsArrayAtom } from '@/dataStore';
 import { useAtom } from 'jotai';
 import DeleteScoutingSheetScreen from '../MyScoutingSheetsScreen/deleteScoutingSheetScreen';
 
@@ -19,12 +19,15 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
   const [eventData, setEventData] = useAtom(persistentEventData)
   const [eventCodeJotai, setEventCode] = useAtom(eventCodeAtom)
+  const [globalSharedSheetsArray, setGlobalSharedSheetsArray] = useAtom(sharedSheetsArrayAtom)
+
+  const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
-  const [mySharedSheets, setMySharedSheets] = useState<string[]>()
+  const [mySharedSheetIDs, setMySharedSheetIDs] = useState<string[]>()
   const db = getFirestore();
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [isSharedWithMe, setIsSharedWithMe] = useState(false);
+  // const [isSharedWithMe, setIsSharedWithMe] = useState(false);
   const [modalIndexToDelete, setModalIndexToDelete] = useState(0);
 
   const handleLongPress = (scoutingSheetArrayIndex : number, isSharedWithMe : boolean) => {
@@ -33,7 +36,6 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
     setModalVisible(true)
   }
 
-  const [sharedSheetsArray, setSharedSheetsArray] = useState<ScoutingSheetArrayType[]>([])
   const tempSharedSheetArray: ScoutingSheetArrayType[] = []
 
   const fetchUserFirebaseData = async ()=>{
@@ -44,7 +46,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         const docSnap = await getDoc(userRef);
           if (docSnap.exists()) {
             const userData = docSnap.data() as DocumentData 
-            setMySharedSheets(userData.sharedSheets)
+            setMySharedSheetIDs(userData.sharedSheets)
             setGlobalScoutingSheetArray(userData.userScoutingSheetArray);
           } 
       } 
@@ -56,9 +58,9 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   }
 
   const fetchSharedData = async () => {
-    if (FIREBASE_AUTH.currentUser && mySharedSheets) {
+    if (FIREBASE_AUTH.currentUser && mySharedSheetIDs) {
       try {
-        const sharedDataPromises = mySharedSheets.map(async (item) => {
+        const sharedDataPromises = mySharedSheetIDs.map(async (item) => {
           const sharedRef = doc(db, 'shared_scouting_sheets', item);
           const docSnap = await getDoc(sharedRef);
           if (docSnap.exists()) {
@@ -71,7 +73,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   
         // Filter out any null values (in case some docs didn't exist)
         const validSharedData = sharedDataArray.filter(data => data !== null) as ScoutingSheetArrayType[];
-        setSharedSheetsArray(validSharedData);
+        setGlobalSharedSheetsArray(validSharedData);
       } catch (error) {
         console.error("😓 Error retrieving shared data:", error);
       }
@@ -84,15 +86,13 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
   useEffect(()=>{
     fetchSharedData()
-  }, [mySharedSheets])
+  }, [mySharedSheetIDs])
 
-  useEffect(()=>{
-    //  console.log("sharedSheetsArraySet: ", sharedSheetsArray)
-  }, [sharedSheetsArray])
-
-  const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number) => void = (item, scoutingSheetArrayIndex) => {
+  const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number, isSharedWithMe : boolean) => void = (item, scoutingSheetArrayIndex, isSharedWithMe) => {
     setEventCode(item.code)
     setEventData(item.eventData)
+    setIsSharedWithMe(isSharedWithMe)
+    //console.log("scoutingSheetArrayIndex: ", scoutingSheetArrayIndex)
     navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex})
   }
 
@@ -106,7 +106,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
         {
           globalScoutingSheetArray?.map((item, scoutingSheetArrayIndex) => (
-          <TouchableOpacity style = {styles.button} key = {scoutingSheetArrayIndex} onPress = {() => run(item, scoutingSheetArrayIndex)} onLongPress={() => handleLongPress(scoutingSheetArrayIndex, false)} delayLongPress={300}>
+          <TouchableOpacity style = {styles.button} key = {scoutingSheetArrayIndex} onPress = {() => run(item, scoutingSheetArrayIndex, false)} onLongPress={() => handleLongPress(scoutingSheetArrayIndex, false)} delayLongPress={300}>
             <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon}/>
             <View style={styles.buttonTextContainer}>
               <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>
@@ -122,8 +122,8 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         <View style={{width: '55%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
         {
-          sharedSheetsArray?.map((item, sharedSheetArrayIndex) => (
-            <TouchableOpacity style = {styles.button} key = {sharedSheetArrayIndex} onPress = {() => run(item, sharedSheetArrayIndex)} onLongPress={() => handleLongPress(sharedSheetArrayIndex, true)} delayLongPress={300}>
+          globalSharedSheetsArray?.map((item, sharedSheetArrayIndex) => (
+            <TouchableOpacity style = {styles.button} key = {sharedSheetArrayIndex} onPress = {() => run(item, sharedSheetArrayIndex, true)} onLongPress={() => handleLongPress(sharedSheetArrayIndex, true)} delayLongPress={300}>
               <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon}/>
               <View style={styles.buttonTextContainer}>
                 <Text numberOfLines={1} style={styles.buttonText}>{item.name}</Text>
@@ -133,7 +133,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
           ))
         }
 
-        <DeleteScoutingSheetScreen modalVisible={modalVisible} setModalVisible={setModalVisible} isSharedWithMe={isSharedWithMe} modalIndexToDelete={modalIndexToDelete}/>
+        <DeleteScoutingSheetScreen modalVisible={modalVisible} setModalVisible={setModalVisible} modalIndexToDelete={modalIndexToDelete}/>
 
       </View>
   );

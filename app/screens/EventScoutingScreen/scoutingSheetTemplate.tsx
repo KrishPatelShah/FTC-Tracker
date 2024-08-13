@@ -6,7 +6,7 @@ import TeamView from '@/app/screens/EventScoutingScreen/teamScoutingView';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-element-dropdown';
 import { atom, useAtom } from 'jotai'
-import { eventCodeAtom, persistentEventData, teamDataAtom, scoutingSheetArray } from '@/dataStore';
+import { eventCodeAtom, persistentEventData, teamDataAtom, scoutingSheetArray, isSharedWithMeAtom } from '@/dataStore';
 import { TeamEventData } from '../TeamScoutingScreen/teamView';
 import { useFocusEffect } from 'expo-router';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
@@ -29,9 +29,9 @@ type Team = {
 };
 
 const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) => {
+  const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray) 
   const scoutingSheetArrayIndex = route.params?.scoutingSheetArrayIndex
-  // console.log('scouting sheet array index: ', scoutingSheetArrayIndex)
 
   const [shareModalVisible, setShareModalVisible] = useState(false)
   const [eventName, setEventName] = useState("");
@@ -46,7 +46,6 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
     { label: "TOTAL", value: "TOTAL" },
     {label : "RANK", value: "RANK"}
   ];
-
   useEffect(() => {
     let storedTeamArray: number[] = []
     eventData.map((item) => {storedTeamArray.push(item.teamNumber)})
@@ -143,13 +142,13 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
         </View>
         <ScrollView style={styles.teamScroller} contentContainerStyle={styles.teamScrollerContainer}>
           {stats == "AUTO" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(b.auto_opr) - Number(a.auto_opr)).map((team) => (
-            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.auto_opr} key={team.id} navigation={navigation}/>
+            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.auto_opr} key={team.id} navigation={navigation} selectedScoutingSheetIndex={scoutingSheetArrayIndex}/>
           ))}
           {stats == "TOTAL" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(b.tot_opr) - Number(a.tot_opr)).map((team) => (
-            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.tot_opr} key={team.id} navigation={navigation}/>
+            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.tot_opr} key={team.id} navigation={navigation} selectedScoutingSheetIndex={scoutingSheetArrayIndex}/>
           ))}
           {stats == "RANK" && teamArray.filter(team => Number(team.rank) != 999).sort((a, b) => Number(a.rank) - Number(b.rank)).map((team) => (
-            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.rank} key={team.id} navigation={navigation}/>
+            <TeamView teamName={team.name} teamNumber={team.id} shownValue={team.rank} key={team.id} navigation={navigation} selectedScoutingSheetIndex={scoutingSheetArrayIndex}/>
           ))}
         </ScrollView>
 

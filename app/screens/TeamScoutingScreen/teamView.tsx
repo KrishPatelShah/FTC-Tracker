@@ -1,5 +1,5 @@
 import { RootStackParamList } from "@/app/navigation/types";
-import { NavigationProp, useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { NavigationProp, RouteProp, useFocusEffect, useIsFocused } from "@react-navigation/native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, BackHandler, ActivityIndicator, AppState, AppStateStatus } from "react-native";
 import { GestureHandlerRootView, TextInput } from "react-native-gesture-handler";
@@ -13,14 +13,15 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Slider from "@react-native-community/slider";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAtom, useAtomValue } from "jotai";
-import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData, scoutingSheetArray } from "@/dataStore";
-import { FIREBASE_AUTH } from "@/FirebaseConfig";
-import { doc, getFirestore, updateDoc, getDoc, DocumentData } from "firebase/firestore";
+import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData, scoutingSheetArray, isSharedWithMeAtom, sharedSheetsArrayAtom } from "@/dataStore";
+import { FIREBASE_AUTH, FIRESTORE_DB } from "@/FirebaseConfig";
+import { doc, getFirestore, updateDoc, getDoc, DocumentData, onSnapshot } from "firebase/firestore";
 
 
 type HomeScreenProps = {
     navigation: NavigationProp<RootStackParamList>;
-  };
+    route: RouteProp<RootStackParamList, 'TeamScoutingScreen'>;
+};
 
   type TeamData = {
     number : string,
@@ -82,7 +83,7 @@ type HomeScreenProps = {
   }
 
 
-const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
+const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const [DropdownMatchView, setDropdownMatch] = useState<dropdownMatches[]>([])
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
     const [teamNumber, setTeamNumber] = useAtom(teamNumberAtom)
@@ -118,6 +119,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const db = getFirestore();
     const [loading, setLoading] = useState(false)
+    const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
+    const [globalSharedSheetsArray, setGlobalSharedSheetsArray] = useAtom(sharedSheetsArrayAtom)
+    const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex;
 
     // useEffect(() => {
     //     const uploadData = async () => {
@@ -139,31 +143,88 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     //     return () => clearInterval(intervalId); // Cleanup interval on unmount
     // }, []);
 
-    // useFocusEffect(
-    //     useCallback(() => {
-    //       const onBackPress = () => {
-    //         if(FIREBASE_AUTH.currentUser){
-    //             const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-    //             try {
-    //                 updateDoc(userRef, { 
-    //                     userScoutingSheetArray: globalScoutingSheetArray,
-    //                 });
-    //             } 
-    //             catch (error) {
-    //                 console.error("Error updating user document:", error);
-    //             }    
-    //         }
+    useFocusEffect(
+        useCallback(() => {
+          const onBackPress = () => {
+
+            // turn off listener subscription or something 
+
+            if(FIREBASE_AUTH.currentUser){
+                if(isSharedWithMe){
+                    const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
+                    try {
+                        console.log("updating in shared collection!")
+                        console.log("sharedSheet ID: ", globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
+                        updateDoc(userRef, { 
+                            sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
+                        });
+                    } 
+                    catch (error) {
+                        console.error("Error updating user document:", error);
+                    }  
+                }else{
+                    const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+                    try {
+                        console.log("updating in local user_data collection!")
+                        updateDoc(userRef, { 
+                            userScoutingSheetArray: globalScoutingSheetArray,
+                        });
+                    } 
+                    catch (error) {
+                        console.error("Error updating user document:", error);
+                    }  
+                } 
+            }
     
-    //         // Returning true prevents the default behavior (exiting the screen)
-    //         return false;
-    //       };
+            // Returning true prevents the default behavior (exiting the screen)
+            return false;
+          };
     
-    //       BackHandler.addEventListener('hardwareBackPress', onBackPress);
+          BackHandler.addEventListener('hardwareBackPress', onBackPress);
     
-    //       return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    //     }, []
-    // ))
+          return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        }, []
+    ))
+
+
+    useEffect(() => {
+        if(isSharedWithMe){
+            listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID, updateCallback)
+        }
+    }, [])
     
+
+    const listenForUpdates = async (sheetID: string, updateCallback: (arg0: any) => void) => {
+        // I'm p sure that when you share a scouting sheet, your userRef would have to change to sharedSheetRef to trigger this listener
+        // when you update your scouting sheet 
+    
+        // I think we might also need a collection variable. This way, if you "unshare" a scouting sheet, we just switch these variables
+        // and it should change which collection in the db you write to depending on if the sheet is shared 
+    
+        // onSnapshot returns a function (unsubscribe) that, when called, detaches the listener and stops receiving updates.
+        // listenForUpdates(sheetID, updateCallback): This returns the unsubscribe function.
+            // so we have to declare something like const unsubscribe = listenForUpdates(sheetID, updateCallback); and then unsubscribe();
+            // The unsubscribe function does not run automatically; it must be invoked manually.
+    
+        const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
+    
+        // Listen for changes in the document
+        const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
+            if (doc.exists()) {
+                updateCallback(doc.data());
+            } else {
+                console.error('Document does not exist!');
+            }
+        }, (error) => {
+            console.error('Error listening to document: ', error);
+        });
+    
+      return unsubscribe;
+    };
+    const updateCallback = (docData : any) =>{
+        // funny merge time 
+        console.log("docData: ", docData)
+    }
    
     const loadData = () => {
         /* let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))
