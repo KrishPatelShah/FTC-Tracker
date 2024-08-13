@@ -144,7 +144,8 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     // }, []);
 
 
-    useEffect(() => {
+    useFocusEffect(
+        React.useCallback(() => {
         console.log("Start")
 
         return () => {
@@ -177,7 +178,8 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                 } 
             }
           };
-    }, [])
+        }, [])
+    )
 
     
     
