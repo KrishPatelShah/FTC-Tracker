@@ -10,6 +10,7 @@ type deleteScoutingSheetScreenProps = {
   modalVisible: boolean;
   modalIndexToDelete: number;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  
 };
 
 const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ modalVisible, modalIndexToDelete, setModalVisible }) => {

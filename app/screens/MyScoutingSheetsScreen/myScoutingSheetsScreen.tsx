@@ -92,7 +92,9 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
     setEventCode(item.code)
     setEventData(item.eventData)
     setIsSharedWithMe(isSharedWithMe)
-    //console.log("scoutingSheetArrayIndex: ", scoutingSheetArrayIndex)
+    console.log("Clicked")
+    //console.log("")
+    console.log("scoutingSheetArrayIndex: ", scoutingSheetArrayIndex)
     navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex})
   }
 

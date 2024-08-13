@@ -1,4 +1,4 @@
-import { scoutingSheetArray } from "@/dataStore";
+import { isSharedWithMeAtom, scoutingSheetArray, sharedSheetsArrayAtom } from "@/dataStore";
 import { FIREBASE_APP, FIREBASE_AUTH, FIRESTORE_DB } from "@/FirebaseConfig";
 import { User } from "firebase/auth";
 import { arrayRemove, arrayUnion, collection, doc, DocumentData, getDoc, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
@@ -10,7 +10,7 @@ import { TextInput } from "react-native-gesture-handler";
 type ShareScoutingSheetProps = {
     shareModalVisible : boolean,
     setShareModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    sheetArrayIndex : number
+    sheetArrayIndex : number,
 }
 
 const userData = collection(FIRESTORE_DB, 'user_data'); // newer way of accessing a collection 
@@ -19,13 +19,17 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
 
     // just to keep track of the textInput value
     const [textInputValue, setTextInputValue] = useState("")
+    const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
 
     // the index of the scouting sheet the user is currently on (passed from scoutingSheetTemplate.tsx, which got the index from myScoutingSheetsScreen.tsx)
     const [sheetIndex, setSheetIndex] = useState(sheetArrayIndex)
 
     // accesses globalScoutingSheetArray to use sheetIndex to retrive the ID of the scouting sheet the user is currently on
-    const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)        
-    const [sheetID, setSheetID] = useState(globalScoutingSheetArray[sheetArrayIndex].sheetID)
+    const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
+    const [sharedScoutingSheetArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
+    console.log("Index " + sheetArrayIndex)   
+    console.log("Array " + globalScoutingSheetArray)        
+    const [sheetID, setSheetID] = isSharedWithMe ? useState(sharedScoutingSheetArray[sheetArrayIndex].sheetID) : useState(globalScoutingSheetArray[sheetArrayIndex].sheetID)
 
     //const [recipientUserID, setRecipientUserID] = useState("dX3icSA3Ytey4ac0QZ9HVjhRL5q2") // Abhilash's userID
         // should be queried and displayed in dropdown like event search 
