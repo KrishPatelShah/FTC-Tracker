@@ -13,7 +13,7 @@ type ShareScoutingSheetProps = {
     sheetArrayIndex : number,
 }
 
-const userData = collection(FIRESTORE_DB, 'user_data'); // newer way of accessing a collection 
+// const userData = collection(FIRESTORE_DB, 'user_data'); // newer way of accessing a collection 
 
 const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalVisible, setShareModalVisible, sheetArrayIndex}) => {
 
@@ -28,46 +28,43 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [sharedScoutingSheetArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
     console.log("Index " + sheetArrayIndex)   
-    console.log("Array " + globalScoutingSheetArray)        
+    console.log("Array " + globalScoutingSheetArray)      
+    // If the scouting sheet the user is currently on is shared with someone else, fetch the sheetID from the sharedScoutingSheetArray  
     const [sheetID, setSheetID] = isSharedWithMe ? useState(sharedScoutingSheetArray[sheetArrayIndex].sheetID) : useState(globalScoutingSheetArray[sheetArrayIndex].sheetID)
 
-    //const [recipientUserID, setRecipientUserID] = useState("dX3icSA3Ytey4ac0QZ9HVjhRL5q2") // Abhilash's userID
-        // should be queried and displayed in dropdown like event search 
-        // call setRecicpientUserID right after the user clicks on whoever they want to share with 
-
     type firestoreUser = {
-        name: string,
-        email: string,
-        id: string
+      name: string,
+      email: string,
+      id: string
     } 
     const [users, setUsers] = useState<firestoreUser[]>([]);
 
 
     useEffect(() => {
-        if (textInputValue.length > 0) {
-            const q = query(
-                collection(FIRESTORE_DB, 'user_data'),
-                where('email', '>=', textInputValue),
-                where('email', '<=', textInputValue + '\uf8ff')
-            );
-    
-            const unsubscribe = onSnapshot(q, (snapshot: { docs: any[] }) => {
-                const usersData = snapshot.docs.map(doc => ({
-                  id: doc.id,
-                  ...doc.data(),
-                }));
-                setUsers(usersData);
-              });
-    
-            return () => unsubscribe();
+      if (textInputValue.length > 0) {
+          const q = query(
+              collection(FIRESTORE_DB, 'user_data'),
+              where('email', '>=', textInputValue),
+              where('email', '<=', textInputValue + '\uf8ff')
+          );
+  
+          const unsubscribe = onSnapshot(q, (snapshot: { docs: any[] }) => {
+              const usersData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              setUsers(usersData); // doesn't this need to append usersData, not serUsers?
+            });
+  
+          return () => unsubscribe();
 
-        } else {
-          setUsers([]);
-        }
+      } else {
+        setUsers([]);
+      }
     }, [textInputValue]);
 
     return (
-        <Modal
+      <Modal
         animationType="fade"
         transparent={true}
         visible={shareModalVisible}
@@ -75,40 +72,40 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
             setShareModalVisible(!shareModalVisible);
         }}
         >
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <Text style={{color: 'white', fontSize: 25, marginBottom: 20}}>Share Scouting Sheet</Text>
+          <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                  <Text style={{color: 'white', fontSize: 25, marginBottom: 20}}>Share Scouting Sheet</Text>
 
-                    <TextInput
-                        placeholder="Recipient's email"
-                        placeholderTextColor={'grey'}
-                        value={textInputValue}
-                        onChangeText={(text) => {setTextInputValue(text)}}
-                        cursorColor={'#328aff'}
-                        autoCapitalize="none"
-                        style = {styles.textInput}
-                    />
+                  <TextInput
+                      placeholder="Recipient's email"
+                      placeholderTextColor={'grey'}
+                      value={textInputValue}
+                      onChangeText={(text) => {setTextInputValue(text)}}
+                      cursorColor={'#328aff'}
+                      autoCapitalize="none"
+                      style = {styles.textInput}
+                  />
 
-                    <FlatList
-                        style = {styles.searchResults}
-                        data={users}
-                        showsVerticalScrollIndicator={false}
-                        keyExtractor={(item, index) => index.toLocaleString()}
-                        renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.userSearchResult}onPress={() => {shareScoutingSheet(sheetID, sheetIndex, item.id)}}>    
-                            <Text style = {{fontSize: 18, color:'white', padding: 10,}}>{item.email}</Text>
-                        </TouchableOpacity>
-                        )}
-                    />
-                         
-                    <View style={{justifyContent:'center', flexDirection:'row', paddingTop: 20, paddingBottom: 15}}>
-                        <TouchableOpacity style={[styles.cancelButton, {}]} onPress={() => setShareModalVisible(!shareModalVisible)}>
-                            <Text style={styles.buttonText}>Cancel</Text>
-                        </TouchableOpacity>    
-                    </View>       
-                </View>
-            </View>
-        </Modal>
+                  <FlatList
+                      style = {styles.searchResults}
+                      data={users}
+                      showsVerticalScrollIndicator={false}
+                      keyExtractor={(item, index) => index.toLocaleString()}
+                      renderItem={({ item }) => (
+                      <TouchableOpacity style={styles.userSearchResult}onPress={() => {shareScoutingSheet(sheetID, sheetIndex, item.id)}}>   
+                          <Text style = {{fontSize: 18, color:'white', padding: 10,}}>{item.email}</Text>
+                      </TouchableOpacity>
+                      )}
+                  />
+                        
+                  <View style={{justifyContent:'center', flexDirection:'row', paddingTop: 20, paddingBottom: 15}}>
+                      <TouchableOpacity style={[styles.cancelButton, {}]} onPress={() => setShareModalVisible(!shareModalVisible)}>
+                          <Text style={styles.buttonText}>Cancel</Text>
+                      </TouchableOpacity>    
+                  </View>       
+              </View>
+          </View>
+      </Modal>
     )
 }
 
@@ -117,19 +114,21 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
     if(FIREBASE_AUTH.currentUser){
         const userRef = doc(FIRESTORE_DB, 'user_data', FIREBASE_AUTH.currentUser.uid);
         const recipientRef = doc(FIRESTORE_DB, 'user_data', recipientUserId);
-        const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
+        const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID); // if isSharedWithMe = false, sharedSheetRef won't exist
 
         try {
           const userDoc = await getDoc(userRef);
           const sharedDoc = await getDoc(sharedSheetRef);
 
+          // this line would need to change. If a user tries to share a scouting sheet that's already shared with them, 
+          // userSheetData would have to be set to the data stored in the shared_scouting_sheets collection, NOT the local data
           const userSheetData = await userDoc?.data()?.userScoutingSheetArray[sheetIndex]; 
 
           const sharedSheetDoc = sharedDoc.exists()? 
             await updateDoc(
                 sharedSheetRef,{
                 sharedSheetData: userSheetData,
-                userIds: arrayUnion(FIREBASE_AUTH.currentUser.uid, recipientUserId)
+                userIds: arrayUnion(FIREBASE_AUTH.currentUser.uid, recipientUserId) // merges array elements (no duplication)
                 }
             )
           :

@@ -26,7 +26,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
       setPersistentTeamData({teamNumber : 0, extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : []})
       globalScoutingSheetArray.splice(modalIndexToDelete, 1); // 1 means you only remove one item
 
-      // Here check conditions of sharing/ownership so we know where to delete the sheet 
+      // Here check conditions of sharing/ownership so we know WHERE to delete the sheet 
 
       // CASE 1:
       // if isSharedWithMe = true
