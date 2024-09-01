@@ -117,13 +117,14 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
         ))}
 
         <Text style={[styles.title, {fontSize: 30, marginTop:'5%',}]}>
-            Shared with Me
+            Shared Sheets
         </Text>
 
         <View style={{width: '55%', height: '0.25%', marginBottom: '-1%', backgroundColor:'#328AFF', borderRadius: 10}}/>
 
         {
           globalSharedSheetsArray?.map((item, sharedSheetArrayIndex) => (
+            // owner ID stuff here
             <TouchableOpacity style = {styles.button} key = {sharedSheetArrayIndex} onPress = {() => run(item, sharedSheetArrayIndex, true)} onLongPress={() => handleLongPress(sharedSheetArrayIndex, true)} delayLongPress={300}>
               <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon}/>
               <View style={styles.buttonTextContainer}>

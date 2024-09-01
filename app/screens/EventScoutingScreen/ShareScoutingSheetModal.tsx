@@ -142,6 +142,9 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
           await updateDoc(recipientRef, {
             sharedSheets: arrayUnion(sheetID),
           });
+
+          // would also have to update the current user's shared sheet IDs (look in myScoutingSheetsScreen class)
+          // would have to remove the scouting sheet from the user's personal userScoutingSheetArray
         } 
         catch (error) {
           console.error("😓 Error:", error);
