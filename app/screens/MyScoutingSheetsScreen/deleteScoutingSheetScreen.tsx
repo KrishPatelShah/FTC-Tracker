@@ -29,24 +29,25 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
       // Here check conditions of sharing/ownership so we know WHERE to delete the sheet 
 
       // CASE 1:
-      // if isSharedWithMe = true
-      // if globalScoutingSheetArray[modalIndexToDelete].isShared = true 
-      // remove yourself from userIds and delete scouting sheet 
-
-      // CASE 2:
-      // if isSharedWithMe = false
+      // if globalScoutingSheetArray[modalIndexToDelete].ownerId = FIREBASE_AUTH.currentUser.uid
       // if globalScoutingSheetArray[modalIndexToDelete].isShared = true 
       // -> map through userIds and remove the scouting sheet for each user, then delete scouting sheet 
 
+      // CASE 2:
+      // if ownerId = FIREBASE_AUTH.currentUser.uid
+      // if isShared = false 
+      // ->  delete scouting sheet from user_data collection
+
       // CASE 3:
-      // if isSharedWithMe = false
-      // if globalScoutingSheetArray[modalIndexToDelete].isShared = false 
-      // ->  delete scouting sheet like normal
+      // if ownerId != FIREBASE_AUTH.currentUser.uid
+      // isShared = true 
+      // -> remove yourself from userIds under a document in shared_scouting_sheets collection 
+
       
       // CASE 4:
-      // if isSharedWithMe = true
-      // if globalScoutingSheetArray[modalIndexToDelete].isShared = false 
-      // ->  CAN NEVER OCCUR
+      // if ownerId != FIREBASE_AUTH.currentUser.uid
+      // if isShared = false
+      // -> scouting sheet doesn't exist!
 
       if(FIREBASE_AUTH.currentUser){
         const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
