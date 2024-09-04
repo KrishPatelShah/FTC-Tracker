@@ -54,7 +54,6 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
   // add useEffect to initialize listener for shared scouting sheet
   // we currently only check for changes while in teamview
 
-
   useEffect(() => {
     const fetchEventData = async () => {
       if (eventCodeJotai) {

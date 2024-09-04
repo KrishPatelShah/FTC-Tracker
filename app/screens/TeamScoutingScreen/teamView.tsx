@@ -121,29 +121,10 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const [loading, setLoading] = useState(false)
     const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
     const [globalSharedSheetsArray, setGlobalSharedSheetsArray] = useAtom(sharedSheetsArrayAtom)
-    const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex;
-
-    // useEffect(() => {
-    //     const uploadData = async () => {
-    //         if(FIREBASE_AUTH.currentUser){
-    //             const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-    //             console.log("TICK")
-    //             try {
-    //                 await updateDoc(userRef, { 
-    //                     userScoutingSheetArray: globalScoutingSheetArray,
-    //                 });
-    //                 console.log("UPDATED")
-    //             } catch (error) {
-    //                 console.error('Error uploading data: ', error);
-    //             }
-    //         }
-    //     };
-
-    //     const intervalId = setInterval(uploadData, 10000); // 10000ms = 10s
-    //     return () => clearInterval(intervalId); // Cleanup interval on unmount
-    // }, []);
+    const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex; // is this in the right place?
 
 
+    // Triggers when the user backs out of team view screen
     useFocusEffect(
         React.useCallback(() => {
         console.log("Start")
@@ -153,6 +134,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             if(FIREBASE_AUTH.currentUser){
                 if(isSharedWithMe){ // instead of isSharedWithMe, should be isShared
                     // if( globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
+
+                    // I'm p sure that if isShared=true, userRef would have to change to sharedSheetRef so that when you back out from teamView,
+                    //  it updates in the right place 
                     const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
                     try {
                         console.log("updating in shared collection!")
@@ -181,29 +165,17 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         }, [])
     )
 
-    
-    
-
-    
-
-
     useEffect(() => {
-        if(isSharedWithMe){
+        if(isSharedWithMe){ // should be isShared
             listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID, updateCallback)
         }
     }, [])
     
 
     const listenForUpdates = async (sheetID: string, updateCallback: (arg0: any) => void) => {
-        // I'm p sure that when you share a scouting sheet, your userRef would have to change to sharedSheetRef to trigger this listener
-        // when you update your scouting sheet 
-    
-        // I think we might also need a collection variable. This way, if you "unshare" a scouting sheet, we just switch these variables
-        // and it should change which collection in the db you write to depending on if the sheet is shared 
-    
         // onSnapshot returns a function (unsubscribe) that, when called, detaches the listener and stops receiving updates.
-        // listenForUpdates(sheetID, updateCallback): This returns the unsubscribe function.
-            // so we have to declare something like const unsubscribe = listenForUpdates(sheetID, updateCallback); and then unsubscribe();
+        // listenForUpdates(sheetID, updateCallback) returns the unsubscribe function.
+            // I believe we have to declare something like const unsubscribe = listenForUpdates(sheetID, updateCallback); and then unsubscribe();
             // The unsubscribe function does not run automatically; it must be invoked manually.
     
         const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);

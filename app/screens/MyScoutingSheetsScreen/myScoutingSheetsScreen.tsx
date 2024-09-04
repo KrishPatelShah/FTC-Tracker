@@ -27,7 +27,6 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const db = getFirestore();
 
   const [modalVisible, setModalVisible] = useState(false);
-  // const [isSharedWithMe, setIsSharedWithMe] = useState(false);
   const [modalIndexToDelete, setModalIndexToDelete] = useState(0);
 
   const handleLongPress = (scoutingSheetArrayIndex : number, isSharedWithMe : boolean) => {

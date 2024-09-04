@@ -27,8 +27,8 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     // accesses globalScoutingSheetArray to use sheetIndex to retrive the ID of the scouting sheet the user is currently on
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [sharedScoutingSheetArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
-    console.log("Index " + sheetArrayIndex)   
-    console.log("Array " + globalScoutingSheetArray)      
+    console.log("Index of Scouting Sheet Selected:" + sheetArrayIndex)   
+    console.log("globalScoutingSheetArray: " + globalScoutingSheetArray)      
     // If the scouting sheet the user is currently on is shared with someone else, fetch the sheetID from the sharedScoutingSheetArray  
     const [sheetID, setSheetID] = isSharedWithMe ? useState(sharedScoutingSheetArray[sheetArrayIndex].sheetID) : useState(globalScoutingSheetArray[sheetArrayIndex].sheetID)
 
@@ -53,7 +53,7 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                 id: doc.id,
                 ...doc.data(),
               }));
-              setUsers(usersData); // doesn't this need to append usersData, not serUsers?
+              setUsers(usersData); // doesn't this need to append usersData, not SET usersData? I think this is why the sharing modal is only displaying one email
             });
   
           return () => unsubscribe();
@@ -109,12 +109,11 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     )
 }
 
-// Function to share a scouting sheet
 const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipientUserId: string) => {
     if(FIREBASE_AUTH.currentUser){
         const userRef = doc(FIRESTORE_DB, 'user_data', FIREBASE_AUTH.currentUser.uid);
         const recipientRef = doc(FIRESTORE_DB, 'user_data', recipientUserId);
-        const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID); // if isSharedWithMe = false, sharedSheetRef won't exist
+        const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID); // if isShared = false, sharedSheetRef won't exist
 
         try {
           const userDoc = await getDoc(userRef);
@@ -143,8 +142,8 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
             sharedSheets: arrayUnion(sheetID),
           });
 
-          // would also have to update the current user's shared sheet IDs (look in myScoutingSheetsScreen class)
-          // would have to remove the scouting sheet from the user's personal userScoutingSheetArray
+          // would also have to update the current user's shared sheet IDs (this way they render in myScoutingSheetsScreen screen)
+          // would have to remove the scouting sheet from the user's personal userScoutingSheetArray; this effectively "moves" the scouting sheet
         } 
         catch (error) {
           console.error("😓 Error:", error);
