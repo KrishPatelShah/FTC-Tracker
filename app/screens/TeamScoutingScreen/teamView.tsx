@@ -13,7 +13,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Slider from "@react-native-community/slider";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAtom, useAtomValue } from "jotai";
-import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData, scoutingSheetArray, isSharedWithMeAtom, sharedSheetsArrayAtom } from "@/dataStore";
+import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData, scoutingSheetArray, isSharedAtom, sharedSheetsArrayAtom } from "@/dataStore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "@/FirebaseConfig";
 import { doc, getFirestore, updateDoc, getDoc, DocumentData, onSnapshot } from "firebase/firestore";
 
@@ -119,7 +119,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const db = getFirestore();
     const [loading, setLoading] = useState(false)
-    const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
+    const [isShared, setIsShared] = useAtom(isSharedAtom)
     const [globalSharedSheetsArray, setGlobalSharedSheetsArray] = useAtom(sharedSheetsArrayAtom)
     const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex; // is this in the right place?
 
@@ -132,11 +132,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         return () => {
             console.log("Back2")
             if(FIREBASE_AUTH.currentUser){
-                if(isSharedWithMe){ // instead of isSharedWithMe, should be isShared
+                if(isShared){ 
                     // if( globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
 
                     // I'm p sure that if isShared=true, userRef would have to change to sharedSheetRef so that when you back out from teamView,
-                    //  it updates in the right place 
+                    // it updates in the right place 
                     const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
                     try {
                         console.log("updating in shared collection!")
@@ -166,7 +166,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     )
 
     useEffect(() => {
-        if(isSharedWithMe){ // should be isShared
+        if(isShared){ 
             listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID, updateCallback)
         }
     }, [])

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Pressable } from 'react-native'; 
 import { Ionicons } from '@expo/vector-icons';
 import { useAtom } from 'jotai';
-import { persistentEventData, scoutingSheetArray, teamDataAtom, isSharedWithMeAtom } from '@/dataStore';
+import { persistentEventData, scoutingSheetArray, teamDataAtom, isSharedAtom } from '@/dataStore';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 
@@ -17,7 +17,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
   const [loadedEventData, setLoadedEventData] = useAtom(persistentEventData)
   const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
-  const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
+  const [isShared, setIsShared] = useAtom(isSharedAtom)
   const db = getFirestore();
   const handleScoutingSheetDelete = () => {
     try{
@@ -30,7 +30,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
 
       // CASE 1:
       // if globalScoutingSheetArray[modalIndexToDelete].ownerId = FIREBASE_AUTH.currentUser.uid
-      // if globalScoutingSheetArray[modalIndexToDelete].isShared = true 
+      // if isShared = true 
       // -> map through userIds and remove the scouting sheet for each user, then delete scouting sheet 
 
       // CASE 2:

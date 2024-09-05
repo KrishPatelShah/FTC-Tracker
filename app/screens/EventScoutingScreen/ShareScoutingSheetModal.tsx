@@ -1,4 +1,4 @@
-import { isSharedWithMeAtom, scoutingSheetArray, sharedSheetsArrayAtom } from "@/dataStore";
+import { isSharedAtom, scoutingSheetArray, sharedSheetsArrayAtom } from "@/dataStore";
 import { FIREBASE_APP, FIREBASE_AUTH, FIRESTORE_DB } from "@/FirebaseConfig";
 import { User } from "firebase/auth";
 import { arrayRemove, arrayUnion, collection, doc, DocumentData, getDoc, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
@@ -19,7 +19,7 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
 
     // just to keep track of the textInput value
     const [textInputValue, setTextInputValue] = useState("")
-    const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
+    const [isShared, setIsShared] = useAtom(isSharedAtom)
 
     // the index of the scouting sheet the user is currently on (passed from scoutingSheetTemplate.tsx, which got the index from myScoutingSheetsScreen.tsx)
     const [sheetIndex, setSheetIndex] = useState(sheetArrayIndex)
@@ -28,9 +28,11 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [sharedScoutingSheetArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
     console.log("Index of Scouting Sheet Selected:" + sheetArrayIndex)   
-    console.log("globalScoutingSheetArray: " + globalScoutingSheetArray)      
-    // If the scouting sheet the user is currently on is shared with someone else, fetch the sheetID from the sharedScoutingSheetArray  
-    const [sheetID, setSheetID] = isSharedWithMe ? useState(sharedScoutingSheetArray[sheetArrayIndex].sheetID) : useState(globalScoutingSheetArray[sheetArrayIndex].sheetID)
+    console.log("globalScoutingSheetArray: " + globalScoutingSheetArray)    
+      
+    // If the scouting sheet the user is currently on is shared with someone else, fetch the sheetID from the sharedScoutingSheetArray 
+    // Switched from isSharedWithMe -> isShared because the the owner's sheet still needs to update in the shared scouting sheets collection 
+    const [sheetID, setSheetID] = isShared ? useState(sharedScoutingSheetArray[sheetArrayIndex].sheetID) : useState(globalScoutingSheetArray[sheetArrayIndex].sheetID)
 
     type firestoreUser = {
       name: string,
@@ -119,7 +121,7 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
           const userDoc = await getDoc(userRef);
           const sharedDoc = await getDoc(sharedSheetRef);
 
-          // this line would need to change. If a user tries to share a scouting sheet that's already shared with them, 
+          // this line would need to change. If a user tries to share a scouting sheet that's already shared with them (isShare = true and owner id doesn't match), 
           // userSheetData would have to be set to the data stored in the shared_scouting_sheets collection, NOT the local data
           const userSheetData = await userDoc?.data()?.userScoutingSheetArray[sheetIndex]; 
 

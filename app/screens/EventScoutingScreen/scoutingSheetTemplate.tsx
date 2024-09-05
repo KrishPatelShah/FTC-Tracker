@@ -6,7 +6,7 @@ import TeamView from '@/app/screens/EventScoutingScreen/teamScoutingView';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-element-dropdown';
 import { atom, useAtom } from 'jotai'
-import { eventCodeAtom, persistentEventData, teamDataAtom, scoutingSheetArray, isSharedWithMeAtom } from '@/dataStore';
+import { eventCodeAtom, persistentEventData, teamDataAtom, scoutingSheetArray, isSharedAtom } from '@/dataStore';
 import { TeamEventData } from '../TeamScoutingScreen/teamView';
 import { useFocusEffect } from 'expo-router';
 import { AntDesign, Ionicons } from '@expo/vector-icons';

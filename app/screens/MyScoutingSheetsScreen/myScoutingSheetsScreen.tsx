@@ -6,7 +6,7 @@ import { doc, getFirestore, setDoc, getDoc, updateDoc, DocumentData } from 'fire
 import { NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '@/app/navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { eventCodeAtom, persistentEventData, scoutingSheetArray, ScoutingSheetArrayType, isSharedWithMeAtom, sharedSheetsArrayAtom } from '@/dataStore';
+import { eventCodeAtom, persistentEventData, scoutingSheetArray, ScoutingSheetArrayType, isSharedAtom, sharedSheetsArrayAtom } from '@/dataStore';
 import { useAtom } from 'jotai';
 import DeleteScoutingSheetScreen from '../MyScoutingSheetsScreen/deleteScoutingSheetScreen';
 
@@ -21,7 +21,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const [eventCodeJotai, setEventCode] = useAtom(eventCodeAtom)
   const [globalSharedSheetsArray, setGlobalSharedSheetsArray] = useAtom(sharedSheetsArrayAtom)
 
-  const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
+  const [isShared, setIsShared] = useAtom(isSharedAtom)
   const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
   const [mySharedSheetIDs, setMySharedSheetIDs] = useState<string[]>()
   const db = getFirestore();
@@ -29,9 +29,9 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   const [modalVisible, setModalVisible] = useState(false);
   const [modalIndexToDelete, setModalIndexToDelete] = useState(0);
 
-  const handleLongPress = (scoutingSheetArrayIndex : number, isSharedWithMe : boolean) => {
+  const handleLongPress = (scoutingSheetArrayIndex : number, isShared : boolean) => {
     setModalIndexToDelete(scoutingSheetArrayIndex)
-    setIsSharedWithMe(isSharedWithMe);
+    setIsShared(isShared);
     setModalVisible(true)
   }
 
@@ -87,10 +87,10 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
     fetchSharedData()
   }, [mySharedSheetIDs])
 
-  const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number, isSharedWithMe : boolean) => void = (item, scoutingSheetArrayIndex, isSharedWithMe) => {
+  const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number, isShared : boolean) => void = (item, scoutingSheetArrayIndex, isShared) => {
     setEventCode(item.code)
     setEventData(item.eventData)
-    setIsSharedWithMe(isSharedWithMe)
+    setIsShared(isShared)
     console.log("Clicked")
     console.log("scoutingSheetArrayIndex: ", scoutingSheetArrayIndex)
     navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex})
