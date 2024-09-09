@@ -134,7 +134,11 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
           ))
         }
 
-        <DeleteScoutingSheetScreen modalVisible={modalVisible} setModalVisible={setModalVisible} modalIndexToDelete={modalIndexToDelete}/>
+        <DeleteScoutingSheetScreen 
+          modalVisible={modalVisible} 
+          setModalVisible={setModalVisible} 
+          modalIndexToDelete={modalIndexToDelete} 
+        />
 
       </View>
   );

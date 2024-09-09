@@ -7,7 +7,7 @@ import { setTeamNumber } from "../../../teamNumberReducers";
 import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/app/navigation/types";
 import { useAtom } from "jotai";
-import { eventCodeAtom, scoutingSheetArray} from "@/dataStore";
+import { eventCodeAtom, isSharedAtom, scoutingSheetArray} from "@/dataStore";
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { FIREBASE_AUTH } from '@/FirebaseConfig'; 
 
@@ -25,6 +25,8 @@ const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code,
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [isPressed, setIsPressed] = useState(false)
+    const [isShared, setIsShared] = useAtom(isSharedAtom)
+
 
     // FIREBASE VARIABLES:
     const db = getFirestore();
@@ -36,6 +38,7 @@ const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code,
     };
 
     const check = () => {
+        setIsShared(false);
         const scoutingSheetID = generateScoutingSheetID();
 
         setEventCode(code)

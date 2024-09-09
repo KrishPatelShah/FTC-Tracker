@@ -24,31 +24,26 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     // the index of the scouting sheet the user is currently on (passed from scoutingSheetTemplate.tsx, which got the index from myScoutingSheetsScreen.tsx)
     const [sheetIndex, setSheetIndex] = useState(sheetArrayIndex)
 
-    // accesses globalScoutingSheetArray to use sheetIndex to retrive the ID of the scouting sheet the user is currently on
+    // accesses globalSharedSheetsArray to use sheetIndex to retrive the ID of the scouting sheet the user is currently on
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
-    const [sharedScoutingSheetArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
+    const [globalSharedSheetsArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
     console.log("Index of Scouting Sheet Selected:" + sheetArrayIndex) 
     console.log("isShared?: " + isShared)   
-
-    // If the scouting sheet the user is currently on is shared with someone else, fetch the sheetID from the sharedScoutingSheetArray 
-    // Switched from isSharedWithMe -> isShared because the the owner's sheet still needs to update in the shared scouting sheets collection 
-    // const [sheetID, setSheetID] = useState('')
-    // const [ownerId, setOwnerId] = useState('')
 
     // Initialize state based on the value of isShared, before the first render
     const [sheetID, setSheetID] = useState(() => {
         return isShared
-            ? sharedScoutingSheetArray[sheetArrayIndex].sheetID || ''
+            ? globalSharedSheetsArray[sheetArrayIndex].sheetID || ''
             : globalScoutingSheetArray[sheetArrayIndex]?.sheetID || '';
     });
 
     const [ownerId, setOwnerId] = useState(() => {
         return isShared
-            ? sharedScoutingSheetArray[sheetArrayIndex].ownerID || ''
+            ? globalSharedSheetsArray[sheetArrayIndex].ownerID || ''
             : globalScoutingSheetArray[sheetArrayIndex]?.ownerID || '';
     });
     
-    console.log("sheetId: " + sheetID)
+    console.log("sheetID: " + sheetID)
     console.log("ownerId: " + ownerId)
 
     type firestoreUser = {
