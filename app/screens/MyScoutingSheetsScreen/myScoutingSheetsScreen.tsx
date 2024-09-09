@@ -85,7 +85,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
   useEffect(()=>{
     fetchSharedData()
-  }, [mySharedSheetIDs])
+  }, [mySharedSheetIDs]) 
 
   const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number, isShared : boolean) => void = (item, scoutingSheetArrayIndex, isShared) => {
     setEventCode(item.code)
