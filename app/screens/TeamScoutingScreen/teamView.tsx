@@ -13,7 +13,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Slider from "@react-native-community/slider";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAtom, useAtomValue } from "jotai";
-import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData, scoutingSheetArray, isSharedWithMeAtom, sharedSheetsArrayAtom } from "@/dataStore";
+import { eventCodeAtom, teamDataAtom, teamNumberAtom, persistentEventData, scoutingSheetArray, isSharedWithMeAtom, sharedSheetsArrayAtom, ScoutingSheetArrayType } from "@/dataStore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "@/FirebaseConfig";
 import { doc, getFirestore, updateDoc, getDoc, DocumentData, onSnapshot } from "firebase/firestore";
 
@@ -142,6 +142,76 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     //     const intervalId = setInterval(uploadData, 10000); // 10000ms = 10s
     //     return () => clearInterval(intervalId); // Cleanup interval on unmount
     // }, []);
+
+
+    const mergeScoutingSheets: (userScoutingSheet : ScoutingSheetArrayType, storedScoutingSheet : ScoutingSheetArrayType) => ScoutingSheetArrayType = (userScoutingSheet, storedScoutingSheet) => {
+        type MergePair = {
+            userSide : TeamEventData,
+            serverSide : TeamEventData
+        }
+
+        let needToMerge: MergePair[] = []
+        let mergedEventData: TeamEventData[] = []
+        let allUserNumbers: number[] = userScoutingSheet.eventData.map((item) => item.teamNumber)
+        let allStoredNumbers: number[] = storedScoutingSheet.eventData.map((item) => item.teamNumber)
+
+        userScoutingSheet.eventData.map((item) => {
+            if(allStoredNumbers.includes(item.teamNumber)){
+                let serverData = storedScoutingSheet.eventData.filter((server) => server.teamNumber = item.teamNumber)[0]
+                needToMerge.push({userSide : item, serverSide : serverData})
+            } else {
+                mergedEventData.push(item)
+            }
+        })
+        storedScoutingSheet.eventData.map((item) => {
+            if(!allUserNumbers.includes(item.teamNumber)){
+                mergedEventData.push(item)
+            }
+        })
+
+        needToMerge.map((item) => {
+            let mergedMatchData = item.userSide.matchData.map((userMatch, index) => {
+                let serverMatch = item.serverSide.matchData[index];
+                let mergedMatch: TeamMatchData = { ...serverMatch };
+    
+                for (const key in userMatch) {
+                    if (userMatch.hasOwnProperty(key)) {
+                        const userValue = userMatch[key as keyof TeamMatchData];
+                        const serverValue = serverMatch[key as keyof TeamMatchData];
+    
+                        if (userValue !== "" && userValue !== "n/a") {
+                            mergedMatch[key as keyof TeamMatchData] = userValue;
+                        } else if (serverValue) {
+                            mergedMatch[key as keyof TeamMatchData] = serverValue;
+                        }
+                    }
+                }
+    
+                return mergedMatch;
+            });
+    
+            let mergedTeamData: TeamEventData = {
+                teamNumber: item.userSide.teamNumber,
+                matchData: mergedMatchData,
+                extraNotes: item.userSide.extraNotes || item.serverSide.extraNotes,
+                intake: item.userSide.intake || item.serverSide.intake,
+                deposit: item.userSide.deposit || item.serverSide.deposit,
+                drivetrain: item.userSide.drivetrain || item.serverSide.drivetrain,
+            };
+    
+            mergedEventData.push(mergedTeamData);
+        });
+    
+        let mergedScoutingSheet: ScoutingSheetArrayType = {
+            code: userScoutingSheet.code,
+            date: userScoutingSheet.date,
+            name: userScoutingSheet.name,
+            sheetID: userScoutingSheet.sheetID,
+            eventData: mergedEventData,
+        };
+    
+        return mergedScoutingSheet;
+    }
 
 
     useFocusEffect(
