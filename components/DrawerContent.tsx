@@ -23,7 +23,7 @@ const handleSignOut = async () => {
 };
 
 const DrawerList: DrawerListType[] = [
-  { icon: 'home-outline', label: 'Home', navigateTo: 'HomeScreen' },
+  { icon: 'home-outline', label: 'Home', navigateTo: 'Home' },
   { icon: 'account', label: 'Profile', navigateTo: 'Profile' },
   { icon: 'shield-check-outline', label: 'Privacy Policy', navigateTo: 'PrivacyPolicyScreen' },
   { icon: 'file-document-outline', label: 'Terms of Service', navigateTo: 'TermsOfServiceScreen' },
@@ -32,16 +32,27 @@ const DrawerList: DrawerListType[] = [
 
 const DrawerLayout: React.FC<DrawerListType> = ({ icon, label, navigateTo }) => {
   const navigation = useNavigation<NavigationProp<any>>();
+
+  const handlePress = () => {
+    if (navigateTo === 'Home') {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Inside', params: { screen: 'HomeScreen' } }],
+      });
+    } else {
+      navigation.navigate(navigateTo);
+    }
+  };
+
   return (
     <DrawerItem
       icon={({ color, size }) => <MaterialCommunityIcons name={icon as any} color={color} size={size} />}
       label={label}
-      onPress={() => {
-        navigation.navigate(navigateTo);
-      }}
+      onPress={handlePress}
     />
   );
 };
+
 
 const DrawerItems: React.FC = () => {
   return (

@@ -68,9 +68,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
 
   useEffect(() => {
-      setBookmarkModalVisible(true)
-      console.log("ran useEffect")
-  }, [bookmarkToDelete])
+    if (bookmarkToDelete.name !== "" && bookmarkToDelete.code !== "") {
+      setBookmarkModalVisible(true);
+      console.log("ran useEffect");
+    }
+  }, [bookmarkToDelete]);
 
   const db = getFirestore();
 

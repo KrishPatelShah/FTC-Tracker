@@ -18,12 +18,11 @@ export type ScoutingSheetArrayType = {
   code : string;
   name : string;
   date : string;
+  isShared : boolean;
+  ownerID :  string;
   sheetID : string;
   eventData : TeamEventData[]
 }
-
-// going to have to add the owner user's ID as a field in the userScoutingSheetArray
-// also have to add isShared condition
  
 export const eventCodeAtom = atom<string>("")
 export const teamNumberAtom = atom<string>("")
@@ -32,4 +31,4 @@ export const persistentEventData = atom<TeamEventData[]>([])
 export const scoutingSheetArray = atom<ScoutingSheetArrayType[]>([])
 export const sharedSheetsArrayAtom = atom<ScoutingSheetArrayType[]>([])
 export const bookmarkCodeArray = atom<string[]>([])
-export const isSharedWithMeAtom = atom<boolean>(false)
+export const isSharedAtom = atom<boolean>(false)

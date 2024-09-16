@@ -1,4 +1,4 @@
-import { isSharedWithMeAtom, scoutingSheetArray, sharedSheetsArrayAtom } from "@/dataStore";
+import { isSharedAtom, scoutingSheetArray, ScoutingSheetArrayType, sharedSheetsArrayAtom } from "@/dataStore";
 import { FIREBASE_APP, FIREBASE_AUTH, FIRESTORE_DB } from "@/FirebaseConfig";
 import { User } from "firebase/auth";
 import { arrayRemove, arrayUnion, collection, doc, DocumentData, getDoc, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
@@ -19,18 +19,32 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
 
     // just to keep track of the textInput value
     const [textInputValue, setTextInputValue] = useState("")
-    const [isSharedWithMe, setIsSharedWithMe] = useAtom(isSharedWithMeAtom)
+    const [isShared, setIsShared] = useAtom(isSharedAtom)
 
     // the index of the scouting sheet the user is currently on (passed from scoutingSheetTemplate.tsx, which got the index from myScoutingSheetsScreen.tsx)
     const [sheetIndex, setSheetIndex] = useState(sheetArrayIndex)
 
-    // accesses globalScoutingSheetArray to use sheetIndex to retrive the ID of the scouting sheet the user is currently on
+    // accesses globalSharedSheetsArray to use sheetIndex to retrive the ID of the scouting sheet the user is currently on
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
-    const [sharedScoutingSheetArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
-    console.log("Index " + sheetArrayIndex)   
-    console.log("Array " + globalScoutingSheetArray)      
-    // If the scouting sheet the user is currently on is shared with someone else, fetch the sheetID from the sharedScoutingSheetArray  
-    const [sheetID, setSheetID] = isSharedWithMe ? useState(sharedScoutingSheetArray[sheetArrayIndex].sheetID) : useState(globalScoutingSheetArray[sheetArrayIndex].sheetID)
+    const [globalSharedSheetsArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
+    console.log("Index of Scouting Sheet Selected:" + sheetArrayIndex) 
+    console.log("isShared?: " + isShared)   
+
+    // Initialize state based on the value of isShared, before the first render
+    const [sheetID, setSheetID] = useState(() => {
+        return isShared
+            ? globalSharedSheetsArray[sheetArrayIndex].sheetID || ''
+            : globalScoutingSheetArray[sheetArrayIndex]?.sheetID || '';
+    });
+
+    const [ownerId, setOwnerId] = useState(() => {
+        return isShared
+            ? globalSharedSheetsArray[sheetArrayIndex].ownerID || ''
+            : globalScoutingSheetArray[sheetArrayIndex]?.ownerID || '';
+    });
+    
+    console.log("sheetID: " + sheetID)
+    console.log("ownerId: " + ownerId)
 
     type firestoreUser = {
       name: string,
@@ -53,7 +67,7 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                 id: doc.id,
                 ...doc.data(),
               }));
-              setUsers(usersData); // doesn't this need to append usersData, not serUsers?
+              setUsers(usersData); // doesn't this need to append usersData, not SET usersData? I think this is why the sharing modal is only displaying one email
             });
   
           return () => unsubscribe();
@@ -92,7 +106,12 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                       showsVerticalScrollIndicator={false}
                       keyExtractor={(item, index) => index.toLocaleString()}
                       renderItem={({ item }) => (
-                      <TouchableOpacity style={styles.userSearchResult}onPress={() => {shareScoutingSheet(sheetID, sheetIndex, item.id)}}>   
+                      <TouchableOpacity style={styles.userSearchResult} onPress={() => 
+                        {
+                          shareScoutingSheet(sheetID, sheetIndex, item.id, ownerId, isShared, globalScoutingSheetArray);
+                          setShareModalVisible(!shareModalVisible); // Close modal after sharing
+                          alert('Scouting Sheet Shared!');
+                        }}>   
                           <Text style = {{fontSize: 18, color:'white', padding: 10,}}>{item.email}</Text>
                       </TouchableOpacity>
                       )}
@@ -109,47 +128,69 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     )
 }
 
-// Function to share a scouting sheet
-const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipientUserId: string) => {
-    if(FIREBASE_AUTH.currentUser){
-        const userRef = doc(FIRESTORE_DB, 'user_data', FIREBASE_AUTH.currentUser.uid);
-        const recipientRef = doc(FIRESTORE_DB, 'user_data', recipientUserId);
-        const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID); // if isSharedWithMe = false, sharedSheetRef won't exist
+const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipientUserId: string, ownerId: string, isShared: boolean, globalScoutingSheetArray : ScoutingSheetArrayType[]) => {
 
-        try {
-          const userDoc = await getDoc(userRef);
-          const sharedDoc = await getDoc(sharedSheetRef);
+  if(FIREBASE_AUTH.currentUser){
+    const userRef = doc(FIRESTORE_DB, 'user_data', FIREBASE_AUTH.currentUser.uid);
+    const recipientRef = doc(FIRESTORE_DB, 'user_data', recipientUserId);
+    const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID); 
 
-          // this line would need to change. If a user tries to share a scouting sheet that's already shared with them, 
-          // userSheetData would have to be set to the data stored in the shared_scouting_sheets collection, NOT the local data
-          const userSheetData = await userDoc?.data()?.userScoutingSheetArray[sheetIndex]; 
+      try {
+        const sharedDoc = await getDoc(sharedSheetRef); // if isShared = false, this shouldn't exist
+        const userDoc = await getDoc(userRef);
 
-          const sharedSheetDoc = sharedDoc.exists()? 
-            await updateDoc(
-                sharedSheetRef,{
-                sharedSheetData: userSheetData,
-                userIds: arrayUnion(FIREBASE_AUTH.currentUser.uid, recipientUserId) // merges array elements (no duplication)
-                }
-            )
-          :
-            await setDoc(
-                sharedSheetRef, {
-                sharedSheetData: userSheetData,
-                userIds: [FIREBASE_AUTH.currentUser.uid, recipientUserId]
-            });
-
-          // updates the recipient's personal sharedSheets array 
-          await updateDoc(recipientRef, {
-            sharedSheets: arrayUnion(sheetID),
-          });
-
-          // would also have to update the current user's shared sheet IDs (look in myScoutingSheetsScreen class)
-          // would have to remove the scouting sheet from the user's personal userScoutingSheetArray
-        } 
-        catch (error) {
-          console.error("😓 Error:", error);
+        if (!sharedDoc.exists() && !userDoc.exists()) {
+          console.error('Shared or User Document not found');
+          return;
         }
-    }
+
+        // If a user tries to share a scouting sheet that's already shared with them (isShared = true), 
+        // userSheetData would have to be set to the data stored in the shared_scouting_sheets collection, NOT the local data (user_data)
+        const userSheetData = isShared ? await sharedDoc?.data()?.sharedSheetData : await userDoc?.data()?.userScoutingSheetArray[sheetIndex];
+
+        if (!userSheetData) {
+          console.error('User sheet data is undefined or null.');
+          return;
+        }
+
+        if (sharedDoc.exists()) { 
+          await updateDoc(
+            sharedSheetRef,{
+            sharedSheetData: userSheetData,
+            userIds: arrayUnion(FIREBASE_AUTH.currentUser.uid, recipientUserId) // merges array elements (no duplication)
+            }
+          )
+        }
+        else{
+          // creates new document (aka scouting sheet) in shared_scouting_sheets collection 
+          await setDoc(
+              sharedSheetRef, {
+              sharedSheetData: userSheetData,
+              userIds: [FIREBASE_AUTH.currentUser.uid, recipientUserId]
+            }
+          )
+
+          // removes scouting sheet from current user's scouting sheet array 
+          globalScoutingSheetArray.splice(sheetIndex, 1);
+
+          // updates the current user's shared sheets array and scouting sheet array (this way it'll render under shared sheets)
+          await updateDoc(
+            userRef,{
+            sharedSheets: arrayUnion(sheetID),
+            userScoutingSheetArray: globalScoutingSheetArray
+            }
+          )
+        }
+
+        // updates the recipient's personal sharedSheets array 
+        await updateDoc(recipientRef, {
+          sharedSheets: arrayUnion(sheetID),
+        });
+      } 
+      catch (error) {
+        console.error("😓 Error:", error);
+      }
+  }
 };
 
 export default ShareScoutingSheetModal

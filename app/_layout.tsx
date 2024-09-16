@@ -41,7 +41,15 @@ function InsideLayout() {
           screenOptions={{
             headerShown: true,
             headerTitle: '',
-            headerTransparent: true,              
+            headerTransparent: true,     
+            headerRight: () => (
+              <Icon
+                name="menu"
+                onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                size={30}
+                color="#fff"
+              />
+            ),         
           }}
         >
           <InsideStack.Screen 
@@ -80,7 +88,7 @@ const DrawerNav = () => {
         drawerPosition: 'right',
       }}
     >
-      <Drawer.Screen name="HomeScreen" component={InsideLayout} />
+      <Drawer.Screen name="Home" component={InsideLayout} />
       <Drawer.Screen 
         name="TermsOfServiceScreen" 
         component={TermsOfServiceScreen}
