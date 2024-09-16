@@ -44,7 +44,7 @@ export default function LoginScreen (){
     <View style={styles.container}>
       <View style={styles.logoContainer}>
         <Image
-          source={require("@/assets/images/gradient_applied_logo.png")}
+          source={require("@/assets/images/UpdatedFTCTrackerLogo.png")}
           style={styles.logo}
         />
         <Text style={styles.title}>FTC Tracker</Text>
