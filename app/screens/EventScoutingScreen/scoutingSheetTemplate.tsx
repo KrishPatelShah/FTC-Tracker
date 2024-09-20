@@ -30,6 +30,7 @@ type Team = {
 
 const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) => {
   const scoutingSheetArrayIndex = route.params?.scoutingSheetArrayIndex
+  console.log("scoutingSheetArrayIndex: " + scoutingSheetArrayIndex)
   const [shareModalVisible, setShareModalVisible] = useState(false)
   const [eventName, setEventName] = useState("");
   const [teamArray, setTeamArray] = useState<Team[]>([]);

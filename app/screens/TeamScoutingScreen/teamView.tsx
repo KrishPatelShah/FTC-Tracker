@@ -247,7 +247,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const listenForUpdates = async (sheetID: string, updateCallback: (arg0: any) => void) => {
         // onSnapshot returns a function (unsubscribe) that, when called, detaches the listener and stops receiving updates.
         // listenForUpdates(sheetID, updateCallback) returns the unsubscribe function.
-            // I believe we have to declare something like const unsubscribe = listenForUpdates(sheetID, updateCallback); and then unsubscribe();
+            // I believe we have to declare something like const unsubscribe = listenForUpdates(sheetID, updateCallback); and then call unsubscribe();
             // The unsubscribe function does not run automatically; it must be invoked manually.
     
         const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
@@ -257,7 +257,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             if (doc.exists()) {
                 updateCallback(doc.data());
             } else {
-                console.error('Document does not exist!');
+                //console.error('Document does not exist or has been deleted!');
             }
         }, (error) => {
             console.error('Error listening to document: ', error);

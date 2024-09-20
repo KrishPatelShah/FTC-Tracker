@@ -123,7 +123,6 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
         {
           globalSharedSheetsArray?.map((item, sharedSheetArrayIndex) => (
-            // owner ID stuff here
             <TouchableOpacity style = {styles.button} key = {sharedSheetArrayIndex} onPress = {() => run(item, sharedSheetArrayIndex, true)} onLongPress={() => handleLongPress(sharedSheetArrayIndex, true)} delayLongPress={300}>
               <Ionicons name="calendar-outline" size={30} color="#328AFF" style={styles.icon}/>
               <View style={styles.buttonTextContainer}>
@@ -134,11 +133,14 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
           ))
         }
 
-        <DeleteScoutingSheetScreen 
-          modalVisible={modalVisible} 
-          setModalVisible={setModalVisible} 
-          modalIndexToDelete={modalIndexToDelete} 
-        />
+        {modalVisible && 
+          <DeleteScoutingSheetScreen 
+            modalVisible={modalVisible} 
+            setModalVisible={setModalVisible} 
+            modalIndexToDelete={modalIndexToDelete} 
+          />
+        }
+
 
       </View>
   );

@@ -27,19 +27,21 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     // accesses globalSharedSheetsArray to use sheetIndex to retrive the ID of the scouting sheet the user is currently on
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [globalSharedSheetsArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
+    console.log("user's scouting sheet array: ", globalScoutingSheetArray)
     console.log("Index of Scouting Sheet Selected:" + sheetArrayIndex) 
     console.log("isShared?: " + isShared)   
+
 
     // Initialize state based on the value of isShared, before the first render
     const [sheetID, setSheetID] = useState(() => {
         return isShared
-            ? globalSharedSheetsArray[sheetArrayIndex].sheetID || ''
+            ? globalSharedSheetsArray[sheetArrayIndex]?.sheetID || ''
             : globalScoutingSheetArray[sheetArrayIndex]?.sheetID || '';
     });
 
     const [ownerId, setOwnerId] = useState(() => {
         return isShared
-            ? globalSharedSheetsArray[sheetArrayIndex].ownerID || ''
+            ? globalSharedSheetsArray[sheetArrayIndex]?.ownerID || ''
             : globalScoutingSheetArray[sheetArrayIndex]?.ownerID || '';
     });
     
@@ -110,6 +112,7 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                         {
                           shareScoutingSheet(sheetID, sheetIndex, item.id, ownerId, isShared, globalScoutingSheetArray);
                           setShareModalVisible(!shareModalVisible); // Close modal after sharing
+                          setIsShared(true)
                           alert('Scouting Sheet Shared!');
                         }}>   
                           <Text style = {{fontSize: 18, color:'white', padding: 10,}}>{item.email}</Text>
@@ -129,7 +132,6 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
 }
 
 const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipientUserId: string, ownerId: string, isShared: boolean, globalScoutingSheetArray : ScoutingSheetArrayType[]) => {
-
   if(FIREBASE_AUTH.currentUser){
     const userRef = doc(FIRESTORE_DB, 'user_data', FIREBASE_AUTH.currentUser.uid);
     const recipientRef = doc(FIRESTORE_DB, 'user_data', recipientUserId);
@@ -186,6 +188,8 @@ const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipient
         await updateDoc(recipientRef, {
           sharedSheets: arrayUnion(sheetID),
         });
+
+        
       } 
       catch (error) {
         console.error("😓 Error:", error);

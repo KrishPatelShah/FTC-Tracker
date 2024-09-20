@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native'; 
 import { useAtom } from 'jotai';
 import { persistentEventData, scoutingSheetArray, teamDataAtom, isSharedAtom, sharedSheetsArrayAtom, ScoutingSheetArrayType } from '@/dataStore';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
-import { doc, getFirestore, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
 
 type deleteScoutingSheetScreenProps = {
   modalVisible: boolean;
@@ -17,70 +17,176 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
   const [loadedEventData, setLoadedEventData] = useAtom(persistentEventData)
   const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
   const [isShared, setIsShared] = useAtom(isSharedAtom)
+  const [userIDs, setUserIDs] = useState<string[]>([]);
   const db = getFirestore();
   const currentUserID = FIREBASE_AUTH.currentUser?.uid
-  const sheetOwnerID = isShared
-  ? globalSharedSheetsArray[modalIndexToDelete]?.ownerID 
-  : globalScoutingSheetArray[modalIndexToDelete]?.ownerID;
 
-  // console.log("\n\nmodal index to delete: " + modalIndexToDelete + "\nisShared?: " + isShared)
+  // Same two methods as in ShareScoutingSheetModal.tsx:
+  const [sheetID, setSheetID] = useState(() => {
+    return isShared
+        ? globalSharedSheetsArray[modalIndexToDelete]?.sheetID || ''
+        : globalScoutingSheetArray[modalIndexToDelete]?.sheetID || ''
+  });
+
+  const [sheetOwnerID, setSheetOwnerID] = useState(() => {
+    return isShared
+        ? globalSharedSheetsArray[modalIndexToDelete]?.ownerID || ''
+        : globalScoutingSheetArray[modalIndexToDelete]?.ownerID || ''
+  });
+
+  // Have to fetch userIDs from firestore directly since it doesn't exist in globalSharedSheetsArray
+  useEffect(() => {
+    const fetchUserIDs = async () => {
+      if (isShared) {
+        try {
+          const docRef = doc(db, "shared_scouting_sheets", sheetID); 
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists() && docSnap.data().userIds) {
+            setUserIDs(docSnap.data().userIds);
+          } else {
+            console.log("Document does not exist or doesn't have userIDs.");
+            setUserIDs([]);
+          }
+        } 
+        catch (error) {
+          console.error("Error fetching document: ", error);
+          setUserIDs([]);
+        }
+      } 
+      else {
+      setUserIDs([]);
+      }
+    };
+
+    fetchUserIDs();
+  }, []);
+
+  // Deletes a specified document in firestore under the shared_sheets_collection
+  async function deleteDocument(docId: string) {
+    try {
+        await deleteDoc(doc(db, "shared_scouting_sheets", docId));
+        alert("Scouting sheet successfully deleted!");
+    } catch (error) {
+        console.error("Error removing document: ", error);
+    }
+  }
+ 
+  // DIAGNOSTICS:
+  // console.log("\n\ncurrent userID: " + currentUserID + "\nmodal index to delete: " + modalIndexToDelete + "\nisShared?: " + isShared + "\nsheetID: " + sheetID)
   // if(isShared){
   //   console.log("\nis shared! ownerId: " + globalSharedSheetsArray[modalIndexToDelete]?.ownerID)
+  //   console.log("\nis shared! userIDs: " + userIDs)
   // }else{
   //   console.log("\nis not shared! ownerId: " + globalScoutingSheetArray[modalIndexToDelete]?.ownerID)
   // }
 
- 
   const handleScoutingSheetDelete = () => {
     try{
       setModalVisible(!modalVisible)
       setLoadedEventData([])
       setPersistentTeamData({teamNumber : 0, extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : []})
-      //globalScoutingSheetArray.splice(modalIndexToDelete, 1); // 1 means you only remove one item
 
       // CASE 1:
-      // if globalScoutingSheetArray[modalIndexToDelete].ownerId = FIREBASE_AUTH.currentUser.uid
-      // if isShared = true 
-      // -> map through userIds and remove the scouting sheet for each user, then delete scouting sheet
+      // -> map through userIDs and remove the scouting sheet for each user, then delete scouting sheet
       if(sheetOwnerID == currentUserID && isShared){
         console.log("Deleting scouting sheets for everyone!")
+
+        const removeSheetFromUsers = async () => {
+          await Promise.all(userIDs.map(async (userID) => {
+            try {
+              // Fetch the user document
+              const userDocRef = doc(db, "user_data", userID);
+              const userDocSnap = await getDoc(userDocRef);
+    
+              if (userDocSnap.exists()) {
+                // Get the sharedSheets array
+                const userData = userDocSnap.data();
+                let sharedSheets = userData.sharedSheets || [];
+    
+                // Remove the sheetID from sharedSheets
+                sharedSheets = sharedSheets.filter((id: string) => id !== sheetID);
+    
+                // Update the user document with the modified sharedSheets array
+                await updateDoc(userDocRef, { sharedSheets });
+    
+              } else {
+                console.log(`User document for userID ${userID} does not exist.`);
+              }
+            } catch (error) {
+              console.error(`Error updating sharedSheets for userID ${userID}: `, error);
+            }
+          }));
+        };
+    
+        if (userIDs.length > 0) {
+          removeSheetFromUsers();
+        }
+
+        // finally, delete document on firestore
+        deleteDocument(globalSharedSheetsArray[modalIndexToDelete].sheetID)
       }
 
-
       // CASE 2:
-      // if ownerId = FIREBASE_AUTH.currentUser.uid
-      // if isShared = false 
       // ->  delete scouting sheet from user_data collection
       if(sheetOwnerID == currentUserID && !isShared){
         console.log("Deleting your local scouting sheet!")
+        globalScoutingSheetArray.splice(modalIndexToDelete, 1); // 1 means you only remove one item
+
+        // Push all changes to firestore 
+        if(FIREBASE_AUTH.currentUser){
+          const userRef = doc(db, 'user_data', currentUserID);
+          try {
+              updateDoc(userRef, { 
+                  userScoutingSheetArray: globalScoutingSheetArray, // gonna have to change based on whether isShared
+              });
+              alert("Scouting sheet successfully deleted!");
+          } 
+          catch (error) {
+              console.error("Error updating user document:", error);
+          }    
+        }
       }
 
       // CASE 3:
-      // if ownerId != FIREBASE_AUTH.currentUser.uid
-      // isShared = true 
       // -> remove yourself from userIds under a document in shared_scouting_sheets collection 
-      if(sheetOwnerID != currentUserID && isShared){
+      if(sheetOwnerID != currentUserID && isShared && currentUserID){
         console.log("removing you from userIDs in a document under shared_scouting_sheets collection!")
-      }
-      
-      // CASE 4:
-      // if ownerId != FIREBASE_AUTH.currentUser.uid
-      // if isShared = false
-      // -> scouting sheet doesn't exist!
 
-      if(FIREBASE_AUTH.currentUser){
-        const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-        try {
-            updateDoc(userRef, { 
-                userScoutingSheetArray: globalScoutingSheetArray,
-            });
-        } 
-        catch (error) {
-            console.error("Error updating user document:", error);
-        }    
+        const removeFromSharedSheets = async () => {
+          // Fetch the user document
+          const userDocRef = doc(db, "user_data", currentUserID);
+          const userDocSnap = await getDoc(userDocRef);
+      
+          if (userDocSnap.exists()) {
+            // Get the sharedSheets array
+            const userData = userDocSnap.data();
+            let sharedSheets = userData.sharedSheets || [];
+      
+            // Remove the sheetID from sharedSheets
+            sharedSheets = sharedSheets.filter((id: string) => id !== sheetID);
+      
+            // Update the user document with the modified sharedSheets array
+            await updateDoc(userDocRef, { sharedSheets });
+            alert("Scouting sheet successfully deleted!");
+          } else {
+            console.log(`User document for userID ${currentUserID} does not exist.`);
+          }
+        }
+
+        const removeFromUserIDs = async () => {
+          const docRef = doc(db, "shared_scouting_sheets", sheetID); 
+          const filteredUserIDs = userIDs.filter((id: string) => id !== currentUserID);
+
+          await updateDoc(docRef, {userIDs : filteredUserIDs})
+        }
+
+        removeFromSharedSheets()
+        removeFromUserIDs()
       }
+
     } catch(error : any){
-      alert('😓 Error:\n' + error.message)
+      alert('😓 Error deleting scouting sheet:\n' + error.message)
     } 
   }
 
