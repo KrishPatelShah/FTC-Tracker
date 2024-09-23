@@ -6,13 +6,15 @@ import TeamView from '@/app/screens/EventScoutingScreen/teamScoutingView';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-element-dropdown';
 import { atom, useAtom } from 'jotai'
-import { eventCodeAtom, persistentEventData, teamDataAtom, scoutingSheetArray, isSharedAtom } from '@/dataStore';
+import { eventCodeAtom, persistentEventData, teamDataAtom, scoutingSheetArray, isSharedAtom, sharedSheetsArrayAtom } from '@/dataStore';
 import { TeamEventData } from '../TeamScoutingScreen/teamView';
 import { useFocusEffect } from 'expo-router';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import ShareScoutingSheetModal from '../EventScoutingScreen/ShareScoutingSheetModal';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '@/app/navigation/types';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { FIRESTORE_DB } from '@/FirebaseConfig';
 
 
 type ScoutingSheetProps = {
@@ -35,9 +37,12 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
   const [eventName, setEventName] = useState("");
   const [teamArray, setTeamArray] = useState<Team[]>([]);
   const [eventData, setEventData] = useAtom(persistentEventData)
+  const [isShared, setIsShared] = useAtom(isSharedAtom)
   const [eventCodeJotai, setEventCodeAtom] = useAtom(eventCodeAtom)
   const [displayStats, setDisplayStats] = useState("TOTAL");
   const [stats, setStats] = useState("TOTAL");
+  const [globalSharedSheetsArray, setGlobalSharedSheetsArray] = useAtom(sharedSheetsArrayAtom)
+  const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
   const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
   const data = [
     { label: "AUTO", value: "AUTO" },
@@ -52,8 +57,35 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
     }
   }, [persistentTeamData])
 
+  
   // add useEffect to initialize listener for shared scouting sheet
   // we currently only check for changes while in teamview
+//   useEffect(() => {
+//     if(isShared){ 
+//         listenForUpdates(globalSharedSheetsArray[scoutingSheetArrayIndex].sheetID, updateCallback)
+//     }
+//   }, [])
+
+// const listenForUpdates = async (sheetID: string, updateCallback: (arg0: any) => void) => {
+//     const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
+
+//     // Listen for changes in the document
+//     const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
+//         if (doc.exists()) {
+//             updateCallback(doc.data());
+//         } else {
+//             //console.error('Document does not exist or has been deleted!');
+//         }
+//     }, (error) => {
+//         console.error('Error listening to document: ', error);
+//     });
+
+//   return unsubscribe;
+// };
+// const updateCallback = (docData : any) =>{
+//   // funny merge time 
+//   console.log("docData: ", docData)
+// }
 
   useEffect(() => {
     const fetchEventData = async () => {

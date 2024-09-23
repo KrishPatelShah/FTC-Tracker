@@ -178,7 +178,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
           const docRef = doc(db, "shared_scouting_sheets", sheetID); 
           const filteredUserIDs = userIDs.filter((id: string) => id !== currentUserID);
 
-          await updateDoc(docRef, {userIDs : filteredUserIDs})
+          await updateDoc(docRef, {userIds : filteredUserIDs})
         }
 
         removeFromSharedSheets()
