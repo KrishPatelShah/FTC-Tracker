@@ -111,6 +111,7 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
                       <TouchableOpacity style={styles.userSearchResult} onPress={() => 
                         {
                           shareScoutingSheet(sheetID, sheetIndex, item.id, ownerId, isShared, globalScoutingSheetArray);
+                          globalSharedSheetsArray.push(globalScoutingSheetArray.splice(sheetIndex, 1)[0])
                           setShareModalVisible(!shareModalVisible); // Close modal after sharing
                           setIsShared(true)
                           alert('Scouting Sheet Shared!');
