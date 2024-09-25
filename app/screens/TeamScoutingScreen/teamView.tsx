@@ -124,6 +124,41 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex; 
     const [unsubscribe, setUnsubscribe] = useState<(() => void) | null>(null);
 
+    useEffect(() => {
+        if(isShared){ 
+            // Async function to handle the subscription
+            const subscribeToUpdates = async () => {
+                const newUnsubscribe = await listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID);
+                setUnsubscribe(() => newUnsubscribe); // Set the unsubscribe function
+            }
+            subscribeToUpdates();
+
+            // only runs when the teamView component unmounts (aka stops being rendered)
+            return () => {
+                if(unsubscribe){
+                    unsubscribe(); 
+                }
+            };
+        }
+    }, [])
+
+    const listenForUpdates = async (sheetID: string) => {    
+        const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
+    
+        // Listen for changes in the document
+        const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
+            if (doc.exists()) {
+                const mergedSheet = mergeScoutingSheets(globalSharedSheetsArray[selectedScoutingSheetIndex], doc.data().sharedSheetData);
+                globalSharedSheetsArray[selectedScoutingSheetIndex] = mergedSheet;
+            } else {
+                //console.error('Document does not exist or has been deleted!');
+            }
+        }, (error) => {
+            console.error('Error listening to document: ', error);
+        });
+    
+      return unsubscribe;
+    };
 
     // Triggers when listener detecs an update
     const mergeScoutingSheets: (userScoutingSheet : ScoutingSheetArrayType, storedScoutingSheet : ScoutingSheetArrayType) => ScoutingSheetArrayType = (userScoutingSheet, storedScoutingSheet) => {
@@ -234,41 +269,6 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             };
         }, [])
     )
-
-    useEffect(() => {
-        if(isShared){ 
-            // Async function to handle the subscription
-            const subscribeToUpdates = async () => {
-                const newUnsubscribe = await listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID);
-                setUnsubscribe(() => newUnsubscribe); // Set the unsubscribe function
-            }
-            subscribeToUpdates();
-
-            // only runs when the teamView component unmounts (aka stops being rendered)
-            return () => {
-                if(unsubscribe){
-                    unsubscribe(); 
-                }
-            };
-        }
-    }, [])
-    
-    const listenForUpdates = async (sheetID: string) => {    
-        const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
-    
-        // Listen for changes in the document
-        const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
-            if (doc.exists()) {
-                mergeScoutingSheets(globalSharedSheetsArray[selectedScoutingSheetIndex], doc.data().sharedSheetData);
-            } else {
-                //console.error('Document does not exist or has been deleted!');
-            }
-        }, (error) => {
-            console.error('Error listening to document: ', error);
-        });
-    
-      return unsubscribe;
-    };
 
     useEffect(() => {
         if(shouldReRender){
