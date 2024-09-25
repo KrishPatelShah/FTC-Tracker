@@ -121,10 +121,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const [loading, setLoading] = useState(false)
     const [isShared, setIsShared] = useAtom(isSharedAtom)
     const [globalSharedSheetsArray, setGlobalSharedSheetsArray] = useAtom(sharedSheetsArrayAtom)
-    const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex; // is this in the right place?
+    const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex; 
+    const [unsubscribe, setUnsubscribe] = useState<(() => void) | null>(null);
 
 
-    // Triggers when the user backs out of team view screen
+    // Triggers when listener detecs an update
     const mergeScoutingSheets: (userScoutingSheet : ScoutingSheetArrayType, storedScoutingSheet : ScoutingSheetArrayType) => ScoutingSheetArrayType = (userScoutingSheet, storedScoutingSheet) => {
         type MergePair = {
             userSide : TeamEventData,
@@ -201,61 +202,64 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         React.useCallback(() => {
         console.log("Start")
 
-        return () => {
-            console.log("Back2")
-            if(FIREBASE_AUTH.currentUser){
-                if(isShared){ 
-                    // if( globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
-
-                    // I'm p sure that if isShared=true, userRef would have to change to sharedSheetRef so that when you back out from teamView,
-                    // it updates in the right place 
-                    const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
-                    try {
-                        console.log("updating in shared collection!")
-                        console.log("sharedSheet ID: ", globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
-                        updateDoc(userRef, { 
-                            sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
-                        });
+            return () => {
+                console.log("Back2")
+                if(FIREBASE_AUTH.currentUser){
+                    if(isShared && unsubscribe){ 
+                        const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
+                        try {
+                            console.log("updating in shared collection!")
+                            console.log("sharedSheet ID: ", globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
+                            updateDoc(userRef, { 
+                                sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
+                            });
+                            unsubscribe() // might not be necessary since unsub should run when teamView unmounts
+                        } 
+                        catch (error) {
+                            console.error("Error updating user document:", error);
+                        }  
+                    }else{
+                        const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+                        try {
+                            console.log("updating in local user_data collection!")
+                            updateDoc(userRef, { 
+                                userScoutingSheetArray: globalScoutingSheetArray,
+                            });
+                        } 
+                        catch (error) {
+                            console.error("Error updating user document:", error);
+                        }  
                     } 
-                    catch (error) {
-                        console.error("Error updating user document:", error);
-                    }  
-                }else{
-                    const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-                    try {
-                        console.log("updating in local user_data collection!")
-                        updateDoc(userRef, { 
-                            userScoutingSheetArray: globalScoutingSheetArray,
-                        });
-                    } 
-                    catch (error) {
-                        console.error("Error updating user document:", error);
-                    }  
-                } 
-            }
-          };
+                }
+            };
         }, [])
     )
 
     useEffect(() => {
         if(isShared){ 
-            listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID, updateCallback)
+            // Async function to handle the subscription
+            const subscribeToUpdates = async () => {
+                const newUnsubscribe = await listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID);
+                setUnsubscribe(() => newUnsubscribe); // Set the unsubscribe function
+            }
+            subscribeToUpdates();
+
+            // only runs when the teamView component unmounts (aka stops being rendered)
+            return () => {
+                if(unsubscribe){
+                    unsubscribe(); 
+                }
+            };
         }
     }, [])
     
-
-    const listenForUpdates = async (sheetID: string, updateCallback: (arg0: any) => void) => {
-        // onSnapshot returns a function (unsubscribe) that, when called, detaches the listener and stops receiving updates.
-        // listenForUpdates(sheetID, updateCallback) returns the unsubscribe function.
-            // I believe we have to declare something like const unsubscribe = listenForUpdates(sheetID, updateCallback); and then call unsubscribe();
-            // The unsubscribe function does not run automatically; it must be invoked manually.
-    
+    const listenForUpdates = async (sheetID: string) => {    
         const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
     
         // Listen for changes in the document
         const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
             if (doc.exists()) {
-                updateCallback(doc.data());
+                mergeScoutingSheets(globalSharedSheetsArray[selectedScoutingSheetIndex], doc.data().sharedSheetData);
             } else {
                 //console.error('Document does not exist or has been deleted!');
             }
@@ -265,16 +269,6 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     
       return unsubscribe;
     };
-    const updateCallback = (docData : any) =>{
-        // funny merge time 
-        console.log("docData: ", docData)
-    }
-   
-    const loadData = () => {
-        /* let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))
-        teamEventData.matchData = loadingTeamArray[0].matchData
-        //console.log(loadingTeamArray) */
-    }
 
     useEffect(() => {
         if(shouldReRender){
@@ -329,8 +323,6 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
           let storedTeamArray: number[] = []
           loadedEventData.map((item) => {storedTeamArray.push(item.teamNumber)})
           if(storedTeamArray.indexOf(teamEventData.teamNumber) >= 0){
-            
-            loadData();
             setIsLoadedFromMain("true")
           } else {
             
