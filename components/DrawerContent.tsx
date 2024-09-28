@@ -27,7 +27,7 @@ const DrawerList: DrawerListType[] = [
   { icon: 'account', label: 'Profile', navigateTo: 'Profile' },
   { icon: 'shield-check-outline', label: 'Privacy Policy', navigateTo: 'PrivacyPolicyScreen' },
   { icon: 'file-document-outline', label: 'Terms of Service', navigateTo: 'TermsOfServiceScreen' },
-  { icon: 'cog-outline', label: 'Settings', navigateTo: '' },
+  // { icon: 'cog-outline', label: 'Settings', navigateTo: '' },
 ];
 
 const DrawerLayout: React.FC<DrawerListType> = ({ icon, label, navigateTo }) => {
