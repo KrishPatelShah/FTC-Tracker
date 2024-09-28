@@ -56,16 +56,20 @@ type HomeScreenProps = {
   }
 
   type TeamMatchData = {
-    purplePixelCheck : string,
-    yellowPixelCheck : string,
-    parkCheck : string,
-    driveUnderStageDoorCheck : string,
-    cycle : string,
-    backDropLine : string,
-    mosaic : string,
-    climbCheck : string,
-    drone : string
+    auto_sample_net : string,
+    auto_sample_low : string,
+    auto_sample_high : string,
+    auto_specimen_low : string,
+    auto_specimen_high : string,
+    auto_park : string,
+    tele_sample_net : string,
+    tele_sample_low : string,
+    tele_sample_high : string,
+    tele_specimen_low : string,
+    tele_specimen_high : string,
+    endgame_park : string
   }
+
 
   export type TeamEventData = {
     teamNumber : number,
@@ -73,9 +77,13 @@ type HomeScreenProps = {
     extraNotes : string,
     intake : number,
     deposit : number,
-    drivetrain : number
+    drivetrain : number,
+    park : string,
+    sample_scoring : string,
+    specimen_scoring : string
   }
 
+  
 
   type dropdownMatches = {
     label : string,
@@ -89,12 +97,14 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const [teamNumber, setTeamNumber] = useAtom(teamNumberAtom)
     const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
     const [teamData, setTeamData] = useState<TeamData>({number : "", name : "", city : "", state : "", rookieYear : "", school : "", tot_opr : "", auto_opr : "", tele_opr : "", eg_opr : "", rank : "", matches : []})
-    const [teamEventData, setTeamEventData] = useState<TeamEventData>({teamNumber : Number(teamNumber), extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : []})
+    const [teamEventData, setTeamEventData] = useState<TeamEventData>({teamNumber : Number(teamNumber), extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : [], park : "", sample_scoring : "", specimen_scoring : ""})
     const loadedEventData = useAtomValue(persistentEventData)
     
     const [showingInfo, setShowingInfo] = useState(false)
     const [matchView, setMatchView] = useState("Match 1")
     const [displayMatchView, setDisplayMatchView] = useState("Match 1")
+
+    /** 
     const [purplePixelCheck, setPurplePixelCheck] = useState("n/a")
     const [yellowPixelCheck, setYellowPixelCheck] = useState("n/a")
     const [parkCheck, setParkCheck] = useState("n/a")
@@ -105,6 +115,34 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const [climbCheck, setClimbCheck] = useState("n/a")
     const [droneText, setDroneText] = useState("")
     const [extraNotes, setExtraNotes] = useState("")
+    */
+
+    const [auto_sample_net_value, set_auto_sample_net] = useState("")
+    const [auto_sample_low_value, set_auto_sample_low] = useState("")
+    const [auto_sample_high_value, set_auto_sample_high] = useState("")
+    const [auto_specimen_low_value, set_auto_specimen_low] = useState("")
+    const [auto_specimen_high_value, set_auto_specimen_high] = useState("")
+    const [auto_park_value, set_auto_park] = useState("")
+    const [tele_sample_net_value, set_tele_sample_net] = useState("")
+    const [tele_sample_low_value, set_tele_sample_low] = useState("")
+    const [tele_sample_high_value, set_tele_sample_high] = useState("")
+    const [tele_specimen_low_value, set_tele_specimen_low] = useState("")
+    const [tele_specimen_high_value, set_tele_specimen_high] = useState("")
+    const [endgame_park_value, set_endgame_park] = useState("")
+
+    const [ascent_park, set_ascent_park] = useState("")
+    const [sample_scoring, set_sample_scoring] = useState("")
+    const [specimen_scoring, set_specimen_scoring] = useState("")
+
+
+    const [extraNotes, setExtraNotes] = useState("")
+
+    let auto_park_options = [{label : "Park", value : "Park"}, {label : "Level 1", value : "Level 1"}]
+    let endgame_park_options = [{label : "Park", value : "Park"}, {label : "Level 1", value : "Level 1"}, {label : "Level 2", value : "Level 2"}, {label : "Level 3", value : "Level 3"}]
+
+    let ascent_park_options = [{label : "Park", value : "Park"}, {label : "Level 1", value : "Level 1"}, {label : "Level 2", value : "Level 2"}, {label : "Level 3", value : "Level 3"}]
+    let sample_scoring_options = [{label : "net Zone", value : "Net Zone"}, {label : "Low", value : "Low"}, {label : "High", value : "High"}, {label : "All", value : "All"}]
+    let specimen_scoring_options = [{label : "Low", value : "Low"}, {label : "High", value : "High"}, {label : "All", value : "All"}]
     
     const [intakeVal, setIntakeVal] = useState(5)
     const [depositVal, setDepositVal] = useState(5)
@@ -178,6 +216,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                 intake: item.userSide.intake || item.serverSide.intake,
                 deposit: item.userSide.deposit || item.serverSide.deposit,
                 drivetrain: item.userSide.drivetrain || item.serverSide.drivetrain,
+                park: item.userSide.park || item.serverSide.park,
+                sample_scoring: item.userSide.sample_scoring || item.serverSide.sample_scoring,
+                specimen_scoring: item.userSide.specimen_scoring || item.serverSide.specimen_scoring
             };
     
             mergedEventData.push(mergedTeamData);
@@ -281,15 +322,18 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         setIntakeVal(teamEventData.intake)
         setDepositVal(teamEventData.deposit)
         setDrivetrainVal(teamEventData.drivetrain)
-        setPurplePixelCheck(teamEventData.matchData[0].purplePixelCheck)
-        setYellowPixelCheck(teamEventData.matchData[0].yellowPixelCheck)
-        setParkCheck(teamEventData.matchData[0].parkCheck)
-        setDriveUnderStageDoorCheck(teamEventData.matchData[0].driveUnderStageDoorCheck)
-        setCyclesText(teamEventData.matchData[0].cycle)
-        setBackDropLineText(teamEventData.matchData[0].backDropLine)
-        setMosaicText(teamEventData.matchData[0].mosaic)
-        setClimbCheck(teamEventData.matchData[0].climbCheck)
-        setDroneText(teamEventData.matchData[0].drone)
+        set_auto_sample_net(teamEventData.matchData[0].auto_sample_net)
+        set_auto_sample_low(teamEventData.matchData[0].auto_sample_low)
+        set_auto_sample_high(teamEventData.matchData[0].auto_sample_high)
+        set_auto_specimen_low(teamEventData.matchData[0].auto_specimen_low)
+        set_auto_specimen_high(teamEventData.matchData[0].auto_specimen_high)
+        set_auto_park(teamEventData.matchData[0].auto_park)
+        set_tele_sample_net(teamEventData.matchData[0].tele_sample_net)
+        set_tele_sample_low(teamEventData.matchData[0].tele_sample_low)
+        set_tele_sample_high(teamEventData.matchData[0].tele_sample_high)
+        set_tele_specimen_low(teamEventData.matchData[0].tele_specimen_low)
+        set_tele_specimen_high(teamEventData.matchData[0].tele_specimen_high)
+        set_endgame_park(teamEventData.matchData[0].endgame_park)
         }
     }, [shouldReRender])
 
@@ -315,7 +359,19 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         if(isLoadedFromMain == "false"){
             console.log("match Nums " + matchNums)
             for(let i = 0; i< matchNums; i++){
-                teamEventData.matchData.push({purplePixelCheck : "n/a", yellowPixelCheck : "n/a", parkCheck : "n/a", driveUnderStageDoorCheck : "n/a", cycle : "", backDropLine : "", mosaic : "", climbCheck : "n/a", drone : ""})
+                teamEventData.matchData.push({auto_sample_net : "", 
+                    auto_sample_low : "",
+                    auto_sample_high : "",
+                    auto_specimen_low : "",
+                    auto_specimen_high : "",
+                    auto_park : "",
+                    tele_sample_net : "",
+                    tele_sample_low : "",
+                    tele_sample_high : "",
+                    tele_specimen_low : "",
+                    tele_specimen_high : "",
+                    endgame_park : ""
+                })
                 console.log("added")
             }
         }
@@ -357,19 +413,22 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     useEffect(() => {
         if(dataFetched){
-            //console.log(teamEventData.matchData)
+            console.log(matchView)
             let matchArr: string[] = []
             DropdownMatchView.map((item) => {matchArr.push(item.value)})
             let dropDownIndex = matchArr.indexOf(matchView)
-            setPurplePixelCheck(teamEventData.matchData[dropDownIndex].purplePixelCheck)
-            setYellowPixelCheck(teamEventData.matchData[dropDownIndex].yellowPixelCheck)
-            setParkCheck(teamEventData.matchData[dropDownIndex].parkCheck)
-            setDriveUnderStageDoorCheck(teamEventData.matchData[dropDownIndex].driveUnderStageDoorCheck)
-            setCyclesText(teamEventData.matchData[dropDownIndex].cycle)
-            setBackDropLineText(teamEventData.matchData[dropDownIndex].backDropLine)
-            setMosaicText(teamEventData.matchData[dropDownIndex].mosaic)
-            setClimbCheck(teamEventData.matchData[dropDownIndex].climbCheck)
-            setDroneText(teamEventData.matchData[dropDownIndex].drone)
+            set_auto_park(teamEventData.matchData[dropDownIndex].auto_park)
+            set_auto_sample_net(teamEventData.matchData[dropDownIndex].auto_sample_net)
+            set_auto_sample_low(teamEventData.matchData[dropDownIndex].auto_sample_low)
+            set_auto_sample_high(teamEventData.matchData[dropDownIndex].auto_sample_high)
+            set_auto_specimen_low(teamEventData.matchData[dropDownIndex].auto_specimen_low)
+            set_auto_specimen_high(teamEventData.matchData[dropDownIndex].auto_sample_high)
+            set_tele_sample_net(teamEventData.matchData[dropDownIndex].tele_sample_net)
+            set_tele_sample_low(teamEventData.matchData[dropDownIndex].tele_sample_low)
+            set_tele_sample_high(teamEventData.matchData[dropDownIndex].tele_sample_high)
+            set_tele_specimen_low(teamEventData.matchData[dropDownIndex].tele_specimen_low)
+            set_tele_specimen_high(teamEventData.matchData[dropDownIndex].tele_specimen_high)
+            set_endgame_park(teamEventData.matchData[dropDownIndex].endgame_park)
             setIntakeVal(teamEventData.intake)
             setDepositVal(teamEventData.deposit)
             setDrivetrainVal(teamEventData.drivetrain)
@@ -385,23 +444,26 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             let dropDownIndex = matchArr.indexOf(matchView)
             //console.log("index" + dropDownIndex)
             //console.log(teamEventData.matchData)
-            teamEventData.matchData[dropDownIndex].purplePixelCheck = purplePixelCheck
+            teamEventData.matchData[dropDownIndex].auto_park = auto_park_value
             //console.log("ran purple check")
-            teamEventData.matchData[dropDownIndex].yellowPixelCheck = yellowPixelCheck
-            teamEventData.matchData[dropDownIndex].parkCheck = parkCheck
-            teamEventData.matchData[dropDownIndex].driveUnderStageDoorCheck = driveUnderStageDoorCheck
-            teamEventData.matchData[dropDownIndex].cycle = cyclesText
-            teamEventData.matchData[dropDownIndex].backDropLine = backDropLineText
-            teamEventData.matchData[dropDownIndex].mosaic = mosaicText
-            teamEventData.matchData[dropDownIndex].climbCheck = climbCheck
-            teamEventData.matchData[dropDownIndex].drone = droneText
+            teamEventData.matchData[dropDownIndex].auto_sample_net = auto_sample_net_value
+            teamEventData.matchData[dropDownIndex].auto_sample_low = auto_sample_low_value
+            teamEventData.matchData[dropDownIndex].auto_sample_high = auto_sample_high_value
+            teamEventData.matchData[dropDownIndex].auto_specimen_low = auto_specimen_low_value
+            teamEventData.matchData[dropDownIndex].auto_specimen_high = auto_specimen_high_value
+            teamEventData.matchData[dropDownIndex].endgame_park = endgame_park_value
+            teamEventData.matchData[dropDownIndex].tele_sample_net = tele_sample_net_value
+            teamEventData.matchData[dropDownIndex].tele_sample_low = tele_sample_low_value
+            teamEventData.matchData[dropDownIndex].tele_sample_high = tele_sample_high_value
+            teamEventData.matchData[dropDownIndex].tele_specimen_low = tele_specimen_low_value
+            teamEventData.matchData[dropDownIndex].tele_specimen_high = tele_specimen_high_value
         }
         teamEventData.extraNotes = extraNotes
         teamEventData.intake = intakeVal
         teamEventData.deposit = depositVal
         teamEventData.drivetrain = drivetrainVal
 
-    }, [purplePixelCheck, yellowPixelCheck, parkCheck, driveUnderStageDoorCheck, cyclesText, backDropLineText, mosaicText, climbCheck, droneText, extraNotes, intakeVal, depositVal, drivetrainVal])
+    }, [auto_park_value, auto_sample_net_value, auto_sample_low_value, auto_sample_high_value, auto_specimen_low_value, auto_specimen_high_value, endgame_park_value, tele_sample_net_value, tele_sample_low_value, tele_sample_high_value, tele_specimen_low_value, tele_specimen_high_value, extraNotes, intakeVal, depositVal, drivetrainVal])
 
 
 
@@ -557,8 +619,27 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                     <EventStatsContainer teamData={teamData}></EventStatsContainer>
                     <EventDataHeader matchVar={matchView} setMatchVar={setMatchView} displayMatchVar={displayMatchView} setDisplayMatchVar={setDisplayMatchView} dropDownMatches={DropdownMatchView}></EventDataHeader>
                     <View style = {styles.eventDataContainer}>
+                        
                         <EventDataSubHeader headerName="Autonomous"></EventDataSubHeader>
-                            <EventDataFieldCheckBox name= "Purple Pixel" checkBoxBoolean = {purplePixelCheck} setCheckBoxBoolean={setPurplePixelCheck}></EventDataFieldCheckBox>
+                            <EventDataStatName headerName = "Sample Scoring"></EventDataStatName>
+                                <EventDataCounter headerName="Net Zone" counter_variable={auto_sample_net_value} set_counter_variable={set_auto_sample_net}></EventDataCounter>
+                                <EventDataCounter headerName="Low" counter_variable={auto_sample_low_value} set_counter_variable={set_auto_sample_low}></EventDataCounter>
+                                <EventDataCounter headerName="High" counter_variable={auto_sample_high_value} set_counter_variable={set_auto_sample_high}></EventDataCounter>
+                            <EventDataStatName headerName = "Specimen Scoring"></EventDataStatName>
+                                <EventDataCounter headerName="Low" counter_variable={auto_specimen_low_value} set_counter_variable={set_auto_specimen_low}></EventDataCounter>
+                                <EventDataCounter headerName="High" counter_variable={auto_specimen_high_value} set_counter_variable={set_auto_specimen_high}></EventDataCounter>
+                            <EventDataDropDown headerName="Ascent/Park" option_variable={auto_park_value} set_option_variable={set_auto_park} options={auto_park_options}></EventDataDropDown>
+                        <EventDataSubHeader headerName="TeleOp"></EventDataSubHeader>
+                            <EventDataStatName headerName = "Sample Scoring"></EventDataStatName>
+                                <EventDataCounter headerName="Net Zone" counter_variable={tele_sample_net_value} set_counter_variable={set_tele_sample_net}></EventDataCounter>
+                                <EventDataCounter headerName="Low" counter_variable={tele_sample_low_value} set_counter_variable={set_tele_sample_low}></EventDataCounter>
+                                <EventDataCounter headerName="High" counter_variable={tele_sample_high_value} set_counter_variable={set_tele_sample_high}></EventDataCounter>
+                            <EventDataStatName headerName = "Specimen Scoring"></EventDataStatName>
+                                <EventDataCounter headerName="Low" counter_variable={tele_specimen_low_value} set_counter_variable={set_tele_specimen_low}></EventDataCounter>
+                                <EventDataCounter headerName="High" counter_variable={tele_specimen_high_value} set_counter_variable={set_tele_specimen_high}></EventDataCounter>
+                        <EventDataSubHeader headerName="Endgame"></EventDataSubHeader>
+                            <EventDataDropDown headerName="Ascent/Park" option_variable={endgame_park_value} set_option_variable={set_endgame_park} options={endgame_park_options}></EventDataDropDown>
+                            {/*<EventDataFieldCheckBox name= "Purple Pixel" checkBoxBoolean = {purplePixelCheck} setCheckBoxBoolean={setPurplePixelCheck}></EventDataFieldCheckBox>
                             <EventDataFieldCheckBox name= "Yellow Pixel" checkBoxBoolean = {yellowPixelCheck} setCheckBoxBoolean={setYellowPixelCheck}></EventDataFieldCheckBox>
                             <EventDataFieldCheckBox name= "Park" checkBoxBoolean = {parkCheck} setCheckBoxBoolean={setParkCheck}></EventDataFieldCheckBox>
                         <EventDataSubHeader headerName="Tele-Op"></EventDataSubHeader>
@@ -569,7 +650,8 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                         <EventDataSubHeader headerName="Endgame"></EventDataSubHeader>
                             <EventDataFieldCheckBox name = "Climb" checkBoxBoolean={climbCheck} setCheckBoxBoolean={setClimbCheck}></EventDataFieldCheckBox>
                             <EventDataFieldTextBox name = "Drone" valueText={droneText} setValueText={setDroneText}></EventDataFieldTextBox>
-                            <EventDataFieldExtraNotes name = "Extra Notes" notesText={extraNotes} setNotesText={setExtraNotes}></EventDataFieldExtraNotes>
+                            <EventDataFieldExtraNotes name = "Extra Notes" notesText={extraNotes} setNotesText={setExtraNotes}></EventDataFieldExtraNotes> */}
+                            
                     </View>
                     <BotAnalysisHeader/>
                     <View style = {[styles.eventDataContainer, {top : 40}]}>
@@ -626,7 +708,6 @@ type EventDataHeaderProps = {
 const EventDataHeader: React.FC<EventDataHeaderProps> = ({matchVar, setMatchVar, displayMatchVar, setDisplayMatchVar, dropDownMatches}) => {
     return (
         <View style = {styles.eventHeader}>
-            <Entypo name="bar-graph" size={36} color="#328AFF"  style = {styles.eventIcon}/>
             <Text style = {styles.eventHeaderText}> Event Data </Text>
             <Dropdown 
                 style = {styles.matchDropdown}
@@ -644,6 +725,75 @@ const EventDataHeader: React.FC<EventDataHeaderProps> = ({matchVar, setMatchVar,
         </View>
     )
 }
+
+type EventDataStatNameType = {
+    headerName : string
+}
+
+const EventDataStatName: React.FC<EventDataStatNameType> = ({headerName}) => {
+    return (
+        <View style = {{}}>
+            <Text style = {{color : "white", fontSize : 18, paddingVertical : 6}}>{headerName}</Text>
+        </View>
+    )
+}
+
+type EventDataCounterType = {
+    headerName : string,
+    counter_variable : string,
+    set_counter_variable : (payload : string) => void
+}
+
+const EventDataCounter: React.FC<EventDataCounterType> = ({headerName, counter_variable, set_counter_variable}) => {
+    return (
+        <View style = {{display : "flex", flexDirection : "row"}}>
+            <View style = {{left : 12, width : "80%"}}>
+                <Text style = {{fontSize : 14, color : "white"}}> {headerName} </Text>
+            </View>
+            <TouchableOpacity onPress={() => set_counter_variable((parseInt(counter_variable == "" ? "0" : counter_variable) - 1).toString())}>
+                <AntDesign name="minus" size={28} color="white" />
+            </TouchableOpacity>
+            <View style = {{}}>
+                <Text style = {{fontSize : 14, color : "white"}}>
+                    {counter_variable == "" ? 0 : counter_variable}
+                </Text>
+            </View>
+            <TouchableOpacity onPress={() => set_counter_variable((parseInt(counter_variable == "" ? "0" : counter_variable) + 1).toString())}>
+                <AntDesign name="plus" size={28} color="white" />
+            </TouchableOpacity>
+        </View>
+    )
+}
+
+type EventDataDropDownType = {
+    headerName : string,
+    options : {label : string, value : string}[], 
+    option_variable : string,
+    set_option_variable : (payload : string) => void
+}
+
+const EventDataDropDown: React.FC<EventDataDropDownType> = ({headerName, options, option_variable, set_option_variable}) => {
+    return (
+        <View style = {{display : "flex", flexDirection : "row",alignItems : "center"}}>
+            <View style = {{width : "60%"}}>
+            <Text style = {{color : "white",fontSize : 18}}> {headerName} </Text>
+            </View>
+            <Dropdown 
+                style = {styles.matchDropdown}
+                placeholder={option_variable}
+                placeholderStyle={styles.dropDownText}
+                selectedTextStyle={styles.dropDownText}
+                data={options}
+                labelField="label"
+                valueField="value"
+                onChange={item => {
+                    set_option_variable(item.value);
+                    set_option_variable(item.value);
+                }}
+            />
+        </View>
+    )
+}   
 
 type Stats = {
     teamData : TeamData
@@ -686,10 +836,6 @@ const EventDataSubHeader: React.FC<EventDataSubHeaderName> = ({headerName}) => {
     return (
         <View style = {styles.eventDataSubHeaderContainer}>
             <Text style = {styles.eventDataSubHeader}>{headerName}</Text>
-            <View style = {styles.eventDataLabelContainer}>
-                <Text style = {styles.eventDataLabel}>Yes</Text>
-                <Text style = {[styles.eventDataLabel, {marginRight : 0}] }>No</Text>
-            </View>
             <View style={styles.eventDataSubheaderDivider}/>
         </View>
     )
@@ -1016,7 +1162,7 @@ const styles = StyleSheet.create({
         position: 'relative',
         flex : 1,
         flexGrow: 1,
-        paddingHorizontal: 10,
+        paddingHorizontal: 0,
     },
     eventDataLabel : {
         color : "white",
