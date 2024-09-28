@@ -278,7 +278,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             cursorColor={'#328aff'}
             onSubmitEditing={() => {
               if (textInputValue == "") {
-                console.log("set to invis");
                 setSearchDataVisible(false);
               }
               setSearchText(textInputValue);

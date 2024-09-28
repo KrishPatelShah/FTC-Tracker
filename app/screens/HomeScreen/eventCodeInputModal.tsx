@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { TextInput, View, StyleSheet, Modal, Text, FlatList } from "react-native";
+import { TextInput, View, StyleSheet, Modal, Text, FlatList, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { useAtom } from "jotai";
 import { NavigationProp } from "@react-navigation/native";
 import { eventCodeAtom, scoutingSheetArray } from "@/dataStore";
 import EventSearchView from "./EventSearchView";
 import { RootStackParamList } from "@/app/navigation/types";
+import { useHeaderHeight } from '@react-navigation/elements'
 
 type EventCodeInputProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -19,7 +20,7 @@ type EventSearchData = {
   code: string;
 };
 
-const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisible, setModalVisible }) => {
+const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisible, setModalVisible,}) => {
   const [eventCodeJotai, setEventCodeJotai] = useAtom(eventCodeAtom);
   const [searchData, setSearchData] = useState<EventSearchData[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -99,6 +100,9 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
 
   const renderItem = ({ item }: { item: EventSearchData }) => (
     <EventSearchView eventName={item.name} date={item.data} navigation={navigation} code={item.code} navigateTo={() => {
+      setTextInputValue(''); 
+      setSearchText(''); 
+      setSearchDataVisible(false); 
       navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex}) // previous error here, had to define scoutingSheetArrayIndex
       setModalVisible(false);
     }} location="modal"/>
@@ -113,6 +117,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
         setModalVisible(!modalVisible);
       }}
     >
+
       <View style={styles.centeredView}>
         <View style={searchDataVisible ? styles.textInputContainer : styles.textInputContainerInvisData}>
           <TextInput
@@ -142,7 +147,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
               />
             </View>
           )}
-          <TouchableOpacity onPress={() => { setModalVisible(false); }}>
+          <TouchableOpacity onPress={() => {setSearchDataVisible(false), setTextInputValue(''), setSearchText(''), setModalVisible(false);}}>
             <Text style={{ color: "#328AFF", fontSize: 20, top : searchDataVisible ? -20 : 20}}>Exit</Text>
           </TouchableOpacity>
         </View>
@@ -173,7 +178,6 @@ const styles = StyleSheet.create({
     maxHeight: "40%",
     minWidth: "90%",
   },
-
   textInputContainerInvisData: {
     display: "flex",
     flexDirection: "column",
