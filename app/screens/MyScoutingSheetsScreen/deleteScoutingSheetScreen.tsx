@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native'; 
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from 'react-native'; 
 import { useAtom } from 'jotai';
 import { persistentEventData, scoutingSheetArray, teamDataAtom, isSharedAtom, sharedSheetsArrayAtom, ScoutingSheetArrayType } from '@/dataStore';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
@@ -18,6 +18,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
   const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
   const [isShared, setIsShared] = useAtom(isSharedAtom)
   const [userIDs, setUserIDs] = useState<string[]>([]);
+  const [appLoading, setAppLoading] = useState(true);
   const db = getFirestore();
   const currentUserID = FIREBASE_AUTH.currentUser?.uid
 
@@ -57,6 +58,8 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
       else {
       setUserIDs([]);
       }
+
+      setAppLoading(false);
     };
 
     fetchUserIDs();
@@ -125,6 +128,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
 
         // finally, delete document on firestore
         deleteDocument(globalSharedSheetsArray[modalIndexToDelete].sheetID)
+        globalSharedSheetsArray.splice(modalIndexToDelete, 1); // 1 means you only remove one item
       }
 
       // CASE 2:
@@ -183,6 +187,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
 
         removeFromSharedSheets()
         removeFromUserIDs()
+        globalSharedSheetsArray.splice(modalIndexToDelete, 1); 
       }
 
     } catch(error : any){
@@ -201,20 +206,27 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={{color: 'white', fontSize: 25, marginBottom: 20}}>Delete Scouting Sheet?</Text>
+          {appLoading ?
+            (<>
+              <ActivityIndicator size="large" color='#fff'/>
+            </>) 
+            : 
+            (<> 
+            <Text style={{color: 'white', fontSize: 25, marginBottom: 20}}>Delete Scouting Sheet?</Text>
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={[styles.modalButton, {}]} onPress={() => setModalVisible(!modalVisible)}>
-              <Text style={[styles.resetButtonText, {color: '#1E90FF'}]}>Cancel</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={[styles.modalButton, {}]} onPress={() => setModalVisible(!modalVisible)}>
+                <Text style={[styles.resetButtonText, {color: '#1E90FF'}]}>Cancel</Text>
+              </TouchableOpacity>
 
-            <View style={{backgroundColor: 'grey', width: 1}}></View>
+              <View style={{backgroundColor: 'grey', width: 1}}></View>
 
-            <TouchableOpacity style={styles.modalButton} onPress={handleScoutingSheetDelete}>
-              <Text style={[styles.resetButtonText, {color:'red'}]}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-
+              <TouchableOpacity style={styles.modalButton} onPress={handleScoutingSheetDelete}>
+                <Text style={[styles.resetButtonText, {color:'red'}]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </>)
+          }
         </View>
       </View>
     </Modal>
