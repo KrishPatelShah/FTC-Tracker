@@ -207,7 +207,8 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   eventName: {
-    paddingTop: 60,
+    paddingTop: '20%',
+    marginBottom: '5%',
     color: "white",
     fontSize: 32
   },
