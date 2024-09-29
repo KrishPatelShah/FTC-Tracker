@@ -88,7 +88,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
     try{
       setModalVisible(!modalVisible)
       setLoadedEventData([])
-      setPersistentTeamData({teamNumber : 0, extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : []})
+      setPersistentTeamData({teamNumber : 0, extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : [], park : "", sample_scoring : "", specimen_scoring : ""})
 
       // CASE 1:
       // -> map through userIDs and remove the scouting sheet for each user, then delete scouting sheet
