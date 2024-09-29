@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal, KeyboardAvoidingView } from 'react-native';
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../../FirebaseConfig';
-import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, updateEmail } from 'firebase/auth';
 
 const ProfileScreen = () => {
   const [userName, setUserName] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [reauthType, setReauthType] = useState<'email' | 'password' | null>(null); // Track which action triggered reauth
+  const [reauthModalVisible, setReauthModalVisible] = useState<boolean>(false); // For reauth modal
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false); // For delete confirmation modal
+  const [reauthType, setReauthType] = useState<'email' | 'password' | null>(null); 
   const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
@@ -52,14 +53,27 @@ const ProfileScreen = () => {
     return false;
   };
 
+  const handleUpdateName = async () => {
+    const user = FIREBASE_AUTH.currentUser;
+    if (user) {
+      try {
+        const userRef = doc(FIRESTORE_DB, 'user_data', user.uid);
+        await updateDoc(userRef, { name: userName });
+        Alert.alert("Success", "Name updated successfully.");
+      } catch (error) {
+        Alert.alert("Error", "Failed to update name.");
+      }
+    }
+  };
+
   const handleUpdateEmail = async () => {
     setReauthType('email');
-    setModalVisible(true); // Show modal for reauth
+    setReauthModalVisible(true); // Show modal for reauth
   };
 
   const handleUpdatePassword = async () => {
     setReauthType('password');
-    setModalVisible(true); // Show modal for reauth
+    setReauthModalVisible(true); // Show modal for reauth
   };
 
   const handleReauthentication = async () => {
@@ -67,7 +81,7 @@ const ProfileScreen = () => {
     if (user) {
       const isReauthenticated = await reauthenticateUser();
       if (isReauthenticated) {
-        setModalVisible(false);
+        setReauthModalVisible(false); // Close reauth modal
         if (reauthType === 'email') {
           try {
             await updateEmail(user, userEmail);
@@ -96,6 +110,25 @@ const ProfileScreen = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const user = FIREBASE_AUTH.currentUser;
+    if (user) {
+      try {
+        const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
+        await deleteDoc(userDocRef);
+        await user.delete();
+        Alert.alert('Account Deleted', 'Your account has been deleted.');
+        FIREBASE_AUTH.signOut();
+      } catch (error) {
+        Alert.alert('Error', 'Failed to delete account.');
+      }
+    }
+  };
+
+  const confirmDeleteAccount = () => {
+    setDeleteModalVisible(true); // Show delete confirmation modal
+  };
+
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <Text style={styles.header}>Account Information</Text>
@@ -106,6 +139,10 @@ const ProfileScreen = () => {
         value={userName}
         onChangeText={setUserName}
       />
+
+      <TouchableOpacity style={styles.updateButton} onPress={handleUpdateName}>
+        <Text style={styles.buttonText}>Update Name</Text>
+      </TouchableOpacity>
 
       <Text style={styles.label}>Email</Text>
       <TextInput
@@ -132,13 +169,38 @@ const ProfileScreen = () => {
         <Text style={styles.buttonText}>Update Password</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.deleteButton} onPress={confirmDeleteAccount}>
+        <Text style={styles.deleteButtonText}>Delete Account</Text>
+      </TouchableOpacity>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={deleteModalVisible}
+        transparent={true}
+        animationType="slide"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Are you sure you want to delete your account?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.modalButton} onPress={handleDeleteAccount}>
+                <Text style={styles.modalButtonText}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={() => setDeleteModalVisible(false)}>
+                <Text style={styles.modalButtonText}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* Modal for Reauthentication */}
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
+        visible={reauthModalVisible}
         onRequestClose={() => {
-          setModalVisible(!modalVisible);
+          setReauthModalVisible(!reauthModalVisible);
         }}>
         <View style={styles.modalView}>
           <Text style={styles.modalText}>Re-enter Current Password</Text>
@@ -153,7 +215,7 @@ const ProfileScreen = () => {
           <TouchableOpacity style={styles.modalButton} onPress={handleReauthentication}>
             <Text style={styles.modalButtonText}>Confirm</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.modalButtonCancel} onPress={() => setModalVisible(false)}>
+          <TouchableOpacity style={styles.modalButtonCancel} onPress={() => setReauthModalVisible(false)}>
             <Text style={styles.modalButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -226,5 +288,25 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
