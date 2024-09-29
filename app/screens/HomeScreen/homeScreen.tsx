@@ -327,7 +327,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </View>
 
         {bookmarks.map((item, index) => (
-          <Bookmark name={item.name} code={item.code} key = {index} navigation={navigation} setToDelete={setBookmarkToDelete}></Bookmark>
+          item && 
+          (
+            <Bookmark name={item.name} code={item.code} key = {index} navigation={navigation} setToDelete={setBookmarkToDelete}></Bookmark>
+          )
         ))}
 
         <DeleteBookmark modalVisible = {bookmarkModalVisible} setModalVisible={setBookmarkModalVisible} bookmarkToDelete= {bookmarkToDelete} updateBookmarks={setBookmarks}></DeleteBookmark>
