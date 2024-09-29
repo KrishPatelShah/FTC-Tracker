@@ -37,6 +37,11 @@ const ProfileScreen = () => {
     fetchUserData();
   }, []);
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const reauthenticateUser = async () => {
     const user = FIREBASE_AUTH.currentUser;
     if (user) {
@@ -66,11 +71,19 @@ const ProfileScreen = () => {
   };
 
   const handleUpdateEmail = async () => {
+    if (!validateEmail(userEmail)) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return;
+    }
     setReauthType('email');
     setModalVisible(true);
   };
 
   const handleUpdatePassword = async () => {
+    if (newPassword.length < 6) {
+      Alert.alert("Weak Password", "Password must be at least 6 characters long.");
+      return;
+    }
     setReauthType('password');
     setModalVisible(true);
   };
