@@ -693,6 +693,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                         <EventDataDropDown headerName = "Ascent Park" option_variable={ascent_park} set_option_variable={set_ascent_park} options={ascent_park_options}></EventDataDropDown>
                         <EventDataDropDown headerName = "Sample Scoring" option_variable={sample_scoring} set_option_variable={set_sample_scoring} options={sample_scoring_options}></EventDataDropDown>
                         <EventDataDropDown headerName = "Specimen Scoring" option_variable={specimen_scoring} set_option_variable={set_specimen_scoring} options={specimen_scoring_options}></EventDataDropDown>
+                        <EventDataFieldExtraNotes name = "Extra Notes" notesText={extraNotes} setNotesText={setExtraNotes}></EventDataFieldExtraNotes>
                     </View>
                     <MatchScheduleHeader></MatchScheduleHeader>
                     <View style = {[styles.eventDataContainer, {top : 80}]}>
@@ -743,6 +744,7 @@ type EventDataHeaderProps = {
 const EventDataHeader: React.FC<EventDataHeaderProps> = ({matchVar, setMatchVar, displayMatchVar, setDisplayMatchVar, dropDownMatches}) => {
     return (
         <View style = {styles.eventHeader}>
+            <Entypo name="bar-graph" size={36} color="#328AFF"  style = {styles.eventIcon}/>
             <Text style = {styles.eventHeaderText}> Event Data </Text>
             <Dropdown 
                 style = {styles.matchDropdown}
