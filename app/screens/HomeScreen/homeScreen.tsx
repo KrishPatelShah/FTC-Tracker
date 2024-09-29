@@ -291,10 +291,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {searchDataVisible && <View style={styles.infoScreen}>
           <ScrollView style={styles.searchResults}>
             {active && searchData.map((item, index) => (
-              <EventSearchView eventName={item.name} date={item.data} key={index} navigation={navigation} code={item.code} navigateTo={() => { navigation.navigate("EventInfoScreen") }} location='main' />
+              <EventSearchView eventName={item.name} date={item.data} key={index} navigation={navigation} code={item.code} navigateTo={() => { navigation.navigate("EventInfoScreen") }} location='main' setInputText={setTextInputValue} setDataVisible={setSearchDataVisible} />
             ))}
             {!active && searchData.map((item, index) => (
-              <TeamSearchView teamName={item.name} number={item.data} key={index} navigation={navigation} />
+              <TeamSearchView teamName={item.name} number={item.data} key={index} navigation={navigation} setInputText={setTextInputValue} setDataVisible={setSearchDataVisible}/>
             ))}
           </ScrollView>
         </View>}

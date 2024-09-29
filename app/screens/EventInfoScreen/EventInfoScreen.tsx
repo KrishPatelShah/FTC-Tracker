@@ -224,7 +224,7 @@ const EventInfoScreen: React.FC = () => {
 
     return (
         <GestureHandlerRootView>
-        <View style={{ display: "flex", flex: 1, backgroundColor: "black", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", height : "100%", marginTop:'15%' }}>
+        <View style={{ display: "flex", flex: 1, backgroundColor: "#101010", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", height : "100%", marginTop:'15%' }}>
             <View style={{ marginTop: 32, top: 12, width: "95%", display: "flex", flexDirection: "column", marginBottom: 12, flexWrap: "wrap"}}>
                 <Text style={{ color: "white", fontSize: 36,width: "100%" }} onTextLayout={(e) => setEventNameLines(e.nativeEvent.lines.length)}>{eventData.name}</Text>
                 <View style = {{display : "flex", flexDirection : "row", alignItems : "center"}}>

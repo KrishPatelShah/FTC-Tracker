@@ -18,9 +18,11 @@ interface EventSearchViewProps {
     navigation : NavigationProp<RootStackParamList>;
     navigateTo : () => void;
     location : string
+    setInputText: React.Dispatch<React.SetStateAction<string>>;
+    setDataVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code, navigation, navigateTo, location}) => {
+const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code, navigation, navigateTo, location, setInputText, setDataVisible}) => {
 
     const [eventCode, setEventCode] = useAtom(eventCodeAtom)
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
@@ -39,6 +41,8 @@ const EventSearchView: React.FC<EventSearchViewProps> = ({eventName, date, code,
 
     const check = () => {
         setIsShared(false);
+        setInputText('');
+        setDataVisible(false);
         const scoutingSheetID = generateScoutingSheetID();
 
         setEventCode(code)

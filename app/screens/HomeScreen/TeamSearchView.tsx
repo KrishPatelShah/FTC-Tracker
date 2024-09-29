@@ -13,11 +13,12 @@ import { teamNumberAtom } from "@/dataStore";
 interface TeamSearchViewProps {
     teamName : string;
     number : string;
-    
     navigation : NavigationProp<RootStackParamList>;
+    setInputText: React.Dispatch<React.SetStateAction<string>>;
+    setDataVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TeamSearchView: React.FC<TeamSearchViewProps> = ({teamName, number, navigation}) => {
+const TeamSearchView: React.FC<TeamSearchViewProps> = ({teamName, number, navigation, setInputText, setDataVisible}) => {
 
     const [teamNumber, setTeamNumber] = useAtom(teamNumberAtom)
     
@@ -28,6 +29,8 @@ const TeamSearchView: React.FC<TeamSearchViewProps> = ({teamName, number, naviga
     const check = () => {
         console.log(teamName)
         setTeamNumber(number)
+        setInputText('')
+        setDataVisible(false)
         navigation.navigate("TeamInfoScreen")
     }
 

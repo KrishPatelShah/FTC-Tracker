@@ -315,7 +315,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             return () => {
                 console.log("Back2")
                 if(FIREBASE_AUTH.currentUser){
-                    if(isShared){ //
+                    if(isShared){ // && unsubscribe
                         const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
                         addTeamEventDataToGlobalSharedSheets()
                         try {
@@ -723,7 +723,7 @@ const EventStatsHeader: React.FC<LogFunction> = ({log}) => {
     return (
         <View style = {styles.eventHeader}>
             <MaterialCommunityIcons name="lightning-bolt" size={36} color="#328AFF" style = {styles.eventIcon}/>
-            <Text style = {styles.eventHeaderText}> Event OPR </Text>
+            <Text style = {[styles.eventHeaderText, {marginLeft:'-1.5%'}]}> Event OPR </Text>
                 <TouchableOpacity style = {{left : 80}} onPress={log}>
                     <View style = {{backgroundColor : "#328AFF", height : 30, width : 60, display : "flex", justifyContent : "center", alignItems : "center"}}>
                         <Text style = {{color : "white", fontSize : 20}}>Log</Text>
@@ -744,7 +744,7 @@ type EventDataHeaderProps = {
 const EventDataHeader: React.FC<EventDataHeaderProps> = ({matchVar, setMatchVar, displayMatchVar, setDisplayMatchVar, dropDownMatches}) => {
     return (
         <View style = {styles.eventHeader}>
-            <Entypo name="bar-graph" size={36} color="#328AFF"  style = {styles.eventIcon}/>
+            <Entypo name="bar-graph" size={30} color="#328AFF"  style = {[styles.eventIcon, {marginLeft: '5%'}]}/>
             <Text style = {styles.eventHeaderText}> Event Data </Text>
             <Dropdown 
                 style = {styles.matchDropdown}
@@ -770,7 +770,7 @@ type EventDataStatNameType = {
 const EventDataStatName: React.FC<EventDataStatNameType> = ({headerName}) => {
     return (
         <View style = {{}}>
-            <Text style = {{color : "white", fontSize : 18, paddingVertical : 6}}>{headerName}</Text>
+            <Text style = {{color : "white", fontSize : 20, paddingVertical : 6}}>{headerName}</Text>
         </View>
     )
 }
@@ -783,20 +783,20 @@ type EventDataCounterType = {
 
 const EventDataCounter: React.FC<EventDataCounterType> = ({headerName, counter_variable, set_counter_variable}) => {
     return (
-        <View style = {{display : "flex", flexDirection : "row"}}>
-            <View style = {{left : 12, width : "80%"}}>
-                <Text style = {{fontSize : 14, color : "white"}}> {headerName} </Text>
+        <View style = {{display : "flex", flexDirection : "row", alignItems:'center', marginBottom:'2%'}}>
+            <View style = {{left : 14, width : "80%"}}>
+                <Text style = {{fontSize : 17, color : "white"}}> {headerName} </Text>
             </View>
             <TouchableOpacity onPress={() => set_counter_variable((parseInt(counter_variable == "" ? "0" : counter_variable) - 1).toString())}>
-                <AntDesign name="minus" size={28} color="white" />
+                <AntDesign name="minus" size={25} color="#328AFF" />
             </TouchableOpacity>
-            <View style = {{}}>
-                <Text style = {{fontSize : 14, color : "white"}}>
+            <View style = {{marginLeft: '2%', marginRight: '2%'}}>
+                <Text style = {{fontSize : 19, color : "white"}}>
                     {counter_variable == "" ? 0 : counter_variable}
                 </Text>
             </View>
             <TouchableOpacity onPress={() => set_counter_variable((parseInt(counter_variable == "" ? "0" : counter_variable) + 1).toString())}>
-                <AntDesign name="plus" size={28} color="white" />
+                <AntDesign name="plus" size={25} color="#328AFF" />
             </TouchableOpacity>
         </View>
     )
@@ -811,7 +811,7 @@ type EventDataDropDownType = {
 
 const EventDataDropDown: React.FC<EventDataDropDownType> = ({headerName, options, option_variable, set_option_variable}) => {
     return (
-        <View style = {{display : "flex", flexDirection : "row",alignItems : "center"}}>
+        <View style = {{display : "flex", flexDirection : "row",alignItems : "center", marginTop: '2%', marginBottom:'2%', marginRight: '-13%'}}>
             <View style = {{width : "60%"}}>
             <Text style = {{color : "white",fontSize : 18}}> {headerName} </Text>
             </View>
@@ -871,7 +871,8 @@ type EventDataSubHeaderName = {
 
 const EventDataSubHeader: React.FC<EventDataSubHeaderName> = ({headerName}) => {
     return (
-        <View style = {styles.eventDataSubHeaderContainer}>
+    
+        <View style = {[styles.eventDataSubHeaderContainer, headerName === 'Autonomous' ? { marginTop: '-1%' } : null]}>
             <Text style = {styles.eventDataSubHeader}>{headerName}</Text>
             <View style={styles.eventDataSubheaderDivider}/>
         </View>
@@ -974,7 +975,7 @@ const EventDataFieldExtraNotes: React.FC<EventDataFieldExtraNotesProps> = ({name
 
     return (
         <View>
-            <Text style = {styles.eventDataFieldText}>{name}</Text>
+            <Text style = {[styles.eventDataFieldText, {marginBottom: '3%', marginTop: '3%'}]}>{name}</Text>
             <View style = {styles.extraNotesContainer}>
                 <TextInput
                     onKeyPress={handleKeyPress}
@@ -992,9 +993,9 @@ const EventDataFieldExtraNotes: React.FC<EventDataFieldExtraNotesProps> = ({name
 
 const BotAnalysisHeader = () => {
     return (
-        <View style = {[styles.eventHeader, {left : 20, top : 20}]}>
-            <FontAwesome6 name="gears" size={36} color="#328AFF" />
-            <Text style = {styles.eventHeaderText}> Bot Analysis </Text>
+        <View style = {[styles.eventHeader, {left : '.75%', top : 20}]}>
+            <FontAwesome6 name="gears" size={34} color="#328AFF" />
+            <Text style = {[styles.eventHeaderText, {marginLeft: '5%'}]}> Bot Analysis </Text>
         </View>
     )
 }
@@ -1046,13 +1047,14 @@ const Match: React.FC<matchViewProps> = ({match, viewingTeamNum}) => {
     
     let matchPrefix = match.matchType === "Quals" ? "Q" : match.matchType === "Semis" ? "SF" : "F"
     let whoWon = match.blueScore > match.redScore ? "Blue" : match.redScore > match.blueScore ? "Red" : "Tie"
+
     return (
-        <View style = {{display : "flex", flexDirection : "column"}}>
+        <View style = {{display : "flex", flexDirection : "column", marginBottom: '10%'}}>
             <View style = {{display : "flex", flexDirection : "row", justifyContent : "flex-start", alignItems : "center"}}>
                 <Text style = {{fontSize : 22, color : "white"}}>{matchPrefix}-{match.matchNum}</Text>
-                <View style = {{display : "flex", flexDirection : "row", left : 80, position : "absolute"}}>
-                <Text style = {whoWon == "Red" ? {fontSize : 18, color : "#CF3427", fontStyle : "italic", fontWeight : "bold"} : whoWon == "Tie" ? {fontSize : 18, color : "#7136bf"} : {fontSize : 18, color : "#CF3427"}}>{match.redScore}</Text>
-                    <Text style = {{fontSize : 18, color : "white"}}>-</Text>
+                <View style = {{display : "flex", flexDirection : "row", right : 5, position : "absolute"}}>
+                    <Text style = {whoWon == "Red" ? {fontSize : 18, color : "#CF3427", fontStyle : "italic", fontWeight : "bold"} : whoWon == "Tie" ? {fontSize : 18, color : "#7136bf"} : {fontSize : 18, color : "#CF3427"}}>{match.redScore}</Text>
+                    <Text style = {{fontSize : 18, color : "white", marginRight: '2%'}}>-</Text>
                     <Text style = {whoWon == "Blue" ? {fontSize : 18, color : "#328AFF", fontStyle : "italic", fontWeight : "bold"} : whoWon == "Tie" ? {fontSize : 18, color : "#7136bf"} : {fontSize : 18, color : "#328AFF"}}>{match.blueScore}</Text>
                 </View>
             </View>
@@ -1088,10 +1090,11 @@ const styles = StyleSheet.create({
         flexDirection : "column",
         justifyContent : "flex-start",
         backgroundColor : "#101010",
-        flex : 1
+        flex : 1,
     },
     view : {
         flex : 1,
+        top: '5%',
     },
     loadingStyle:{
         flexDirection:'column',
@@ -1117,7 +1120,7 @@ const styles = StyleSheet.create({
         backgroundColor : "#101010",
         left : 12,
         flexGrow : 0,
-        marginTop : 60,
+        marginTop : '13%',
         borderRadius : 12,
         margin : 12,
         width : "80%"
@@ -1143,16 +1146,18 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     eventIcon: {
-        margin : 20
+        margin : 20,
     },
     eventHeader : {
         backgroundColor : "#101010",
         display : "flex",
         flexDirection : "row",
-        alignItems : "center"
+        alignItems : "center",
+        marginTop: '5%',
     },
     eventHeaderText : {
         color : "white",
+        marginRight:'17.5%',
         fontSize : 26
     },
     eventStatsContainer : {
@@ -1188,7 +1193,7 @@ const styles = StyleSheet.create({
     },
     eventDataSubHeader : {
         color : "white",
-        fontSize : 20,
+        fontSize : 24,
         fontWeight : "bold"
     },
     eventDataSubHeaderContainer : {
@@ -1197,6 +1202,8 @@ const styles = StyleSheet.create({
         justifyContent : "space-between",
         alignItems: 'center',
         position: 'relative',
+        marginBottom: '2%',
+        marginTop: '5%',
         flex : 1,
         flexGrow: 1,
         paddingHorizontal: 0,
@@ -1237,7 +1244,7 @@ const styles = StyleSheet.create({
     eventDataFieldText : {
         color : "white",
         fontSize : 18,
-        paddingLeft : 10 
+        paddingLeft : 10, 
     },
     checkBoxContainer : {
         left : -2,

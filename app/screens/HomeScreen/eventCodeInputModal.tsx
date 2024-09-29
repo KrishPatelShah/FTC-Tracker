@@ -100,12 +100,9 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
 
   const renderItem = ({ item }: { item: EventSearchData }) => (
     <EventSearchView eventName={item.name} date={item.data} navigation={navigation} code={item.code} navigateTo={() => {
-      setTextInputValue(''); 
-      setSearchText(''); 
-      setSearchDataVisible(false); 
       navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex}) // previous error here, had to define scoutingSheetArrayIndex
       setModalVisible(false);
-    }} location="modal"/>
+    }} location="modal" setInputText={setTextInputValue} setDataVisible={setSearchDataVisible}/>
   );
 
   return (
