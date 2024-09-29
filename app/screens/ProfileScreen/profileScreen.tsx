@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal, KeyboardAvoidingView } from 'react-native';
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../../FirebaseConfig';
-import { collection, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { updatePassword, updateEmail } from 'firebase/auth';
+import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, updateEmail } from 'firebase/auth';
 
 const ProfileScreen = () => {
   const [userName, setUserName] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
-  
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [reauthType, setReauthType] = useState<'email' | 'password' | null>(null); // Track which action triggered reauth
+  const [currentPassword, setCurrentPassword] = useState<string>('');
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -22,8 +25,6 @@ const ProfileScreen = () => {
             setUserEmail(userData.email);
           } else {
             console.warn("No User Info");
-            setUserName("No Data");
-            setUserEmail("No Data");
           }
         } else {
           console.warn("No user logged in!");
@@ -36,79 +37,76 @@ const ProfileScreen = () => {
     fetchUserData();
   }, []);
 
-//   const [password, setPassword] = useState(''); 
-//   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
-
-//   const togglePasswordVisibility = () => {
-//     setIsPasswordHidden(!isPasswordHidden);
-//   };
-
-  const handleSaveChanges = async () => {
+  const reauthenticateUser = async () => {
     const user = FIREBASE_AUTH.currentUser;
-
     if (user) {
+      const credential = EmailAuthProvider.credential(user.email!, currentPassword);
       try {
-        await updateEmail(user, userEmail);
-        const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
-        await updateDoc(userDocRef, {
-          email: userEmail,
-          name: userName,
-        });
-
-        // if (password) {
-        //   await updatePassword(user, password); 
-        // }
-
-        Alert.alert('Success', 'Your profile has been updated.');
+        await reauthenticateWithCredential(user, credential);
+        return true;
       } catch (error) {
-        Alert.alert('Error', 'Failed to update profile.');
-        try {
-            const user = FIREBASE_AUTH.currentUser;
-            if (user) {
-              const userRef = doc(collection(FIRESTORE_DB, 'user_data'), user.uid);
-              const userDoc = await getDoc(userRef);
-              if (userDoc.exists()) {
-                const userData = userDoc.data();
-                setUserName(userData.name);
-                setUserEmail(userData.email);}}}
-        catch (error) {
-            console.error("Error fetching user data: ", error); }
+        Alert.alert("Reauthentication Failed", "Please make sure your current password is correct.");
+        return false;
       }
     }
+    return false;
   };
 
-  const handleDeleteAccount = async () => {
-    const user = FIREBASE_AUTH.currentUser;
+  const handleUpdateEmail = async () => {
+    setReauthType('email');
+    setModalVisible(true); // Show modal for reauth
+  };
 
+  const handleUpdatePassword = async () => {
+    setReauthType('password');
+    setModalVisible(true); // Show modal for reauth
+  };
+
+  const handleReauthentication = async () => {
+    const user = FIREBASE_AUTH.currentUser;
     if (user) {
-      try {
-        const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
-        await deleteDoc(userDocRef);
-        await user.delete();
-        FIREBASE_AUTH.signOut();
-        Alert.alert('Account Deleted', 'Your account has been deleted.');
-      } catch (error) {
-        Alert.alert('Error', 'Failed to delete account.');
+      const isReauthenticated = await reauthenticateUser();
+      if (isReauthenticated) {
+        setModalVisible(false);
+        if (reauthType === 'email') {
+          try {
+            await updateEmail(user, userEmail);
+            const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
+            await updateDoc(userDocRef, { email: userEmail });
+            Alert.alert("Success", "Email updated successfully.");
+          } catch (error: any) {
+            if (error.code === 'auth/email-already-in-use') {
+              Alert.alert("Error", "The email address is already in use by another account.");
+            } else if (error.code === 'auth/invalid-email') {
+              Alert.alert("Error", "The email address is not valid.");
+            } else {
+              Alert.alert("Error", "Failed to update email.");
+            }
+          }
+        } else if (reauthType === 'password') {
+          try {
+            await updatePassword(user, newPassword);
+            Alert.alert("Success", "Password updated successfully.");
+          } catch (error) {
+            Alert.alert("Error", "Failed to update password.");
+          }
+        }
+        setCurrentPassword(''); // Clear the current password field after reauth
       }
     }
-  };
-
-  const confirmDeleteAccount = () => {
-    setModalVisible(true);
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <Text style={styles.header}>Account Information</Text>
-      
+
       <Text style={styles.label}>Name</Text>
       <TextInput
         style={styles.input}
         value={userName}
         onChangeText={setUserName}
       />
-      
+
       <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
@@ -117,141 +115,116 @@ const ProfileScreen = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
-      {/* <Text style={styles.label}>Password</Text>
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={isPasswordHidden}
-        />
-        <TouchableOpacity onPress={togglePasswordVisibility}>
-          <Icon name={isPasswordHidden ? "eye-off-outline" : "eye-outline"} size={24} color="gray" />
-        </TouchableOpacity>
-      </View> */}
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
-        <Text style={styles.saveButtonText}>Save Changes</Text>
+      <TouchableOpacity style={styles.updateButton} onPress={handleUpdateEmail}>
+        <Text style={styles.buttonText}>Update Email</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.deleteButton} onPress={confirmDeleteAccount}>
-        <Text style={styles.deleteButtonText}>Delete Account</Text>
+      <Text style={styles.label}>New Password</Text>
+      <TextInput
+        style={styles.input}
+        secureTextEntry
+        value={newPassword}
+        onChangeText={setNewPassword}
+      />
+
+      <TouchableOpacity style={styles.updateButton} onPress={handleUpdatePassword}>
+        <Text style={styles.buttonText}>Update Password</Text>
       </TouchableOpacity>
 
-      {/* Delete Confirmation Modal */}
+      {/* Modal for Reauthentication */}
       <Modal
-        visible={modalVisible}
-        transparent={true}
         animationType="slide"
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Are you sure you want to delete your account?</Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.modalButton} onPress={handleDeleteAccount}>
-                <Text style={styles.modalButtonText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
-                <Text style={styles.modalButtonText}>No</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>Re-enter Current Password</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+            placeholder="Current Password"
+            placeholderTextColor="#ccc"
+          />
+          <TouchableOpacity style={styles.modalButton} onPress={handleReauthentication}>
+            <Text style={styles.modalButtonText}>Confirm</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.modalButtonCancel} onPress={() => setModalVisible(false)}>
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
       </Modal>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 export default ProfileScreen;
 
-
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 20,
-      backgroundColor: '#000',
-    },
-    header: {
-      fontSize: 24,
-      marginBottom: 20,
-      color: '#fff',
-    },
-    label: {
-      fontSize: 16,
-      color: '#0096FF',
-      alignSelf: 'flex-start',
-      marginBottom: 5,
-    },
-    input: {
-      width: '100%',
-      borderBottomWidth: 1,
-      borderBottomColor: '#ddd',
-      paddingVertical: 5,
-      marginBottom: 20,
-      color: '#fff',
-    },
-    passwordContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      width: '100%',
-      borderBottomWidth: 1,
-      borderBottomColor: '#ddd',
-      marginBottom: 20,
-    },
-    saveButton: {
-      width: '100%',
-      padding: 15,
-      backgroundColor: '#0096FF',
-      alignItems: 'center',
-      borderRadius: 5,
-      marginBottom: 20,
-    },
-    saveButtonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-    },
-    deleteButton: {
-      width: '100%',
-      padding: 15,
-      backgroundColor: '#FF3B30',
-      alignItems: 'center',
-      borderRadius: 5,
-    },
-    deleteButtonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalView: {
-      width: 300,
-      padding: 20,
-      backgroundColor: '#fff',
-      borderRadius: 10,
-    },
-    modalText: {
-      fontSize: 16,
-      marginBottom: 20,
-    },
-    modalButtons: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    modalButton: {
-      padding: 10,
-      backgroundColor: '#0096FF',
-      borderRadius: 5,
-    },
-    modalButtonText: {
-      color: '#fff',
-    },
-  });
-  
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#000',
+  },
+  header: {
+    fontSize: 24,
+    color: '#fff',
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    color: '#0096FF',
+    marginBottom: 5,
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingVertical: 5,
+    marginBottom: 20,
+    color: '#fff',
+  },
+  updateButton: {
+    backgroundColor: '#0096FF',
+    padding: 15,
+    alignItems: 'center',
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  modalText: {
+    color: '#fff',
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#0096FF',
+    padding: 15,
+    alignItems: 'center',
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  modalButtonCancel: {
+    backgroundColor: '#ff3b30',
+    padding: 15,
+    alignItems: 'center',
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});
