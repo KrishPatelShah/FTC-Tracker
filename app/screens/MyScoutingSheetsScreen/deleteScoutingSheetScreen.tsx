@@ -142,7 +142,7 @@ const DeleteScoutingSheetScreen: React.FC<deleteScoutingSheetScreenProps> = ({ m
           const userRef = doc(db, 'user_data', currentUserID);
           try {
               updateDoc(userRef, { 
-                  userScoutingSheetArray: globalScoutingSheetArray, // gonna have to change based on whether isShared
+                userScoutingSheetArray: globalScoutingSheetArray,
               });
               alert("Scouting sheet successfully deleted!");
           } 

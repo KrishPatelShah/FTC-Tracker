@@ -315,7 +315,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             return () => {
                 console.log("Back2")
                 if(FIREBASE_AUTH.currentUser){
-                    if(isShared){ 
+                    if(isShared){ //
                         const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
                         addTeamEventDataToGlobalSharedSheets()
                         try {
@@ -324,7 +324,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                             updateDoc(userRef, { 
                                 sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
                             });
-                            unsubscribe() // might not be necessary since unsub should run when teamView unmounts
+                            // unsubscribe() // might not be necessary since unsub should run when teamView unmounts
                         } 
                         catch (error) {
                             console.error("Error updating user document:", error);

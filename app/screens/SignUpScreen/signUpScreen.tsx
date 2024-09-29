@@ -38,7 +38,9 @@ export default function SignUpScreen() {
         await setDoc(userRef, {
           email: email,
           name: name,
-        });
+          bookmarks: [''],
+          userScoutingSheetArray: [{code: '', date: "", eventData: [],  isShared: false, name: '', ownerID : '', sheetID: ''}],
+        })
       }
 
       alert('Account created!');
