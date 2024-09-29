@@ -8,9 +8,8 @@ const ProfileScreen = () => {
   const [userName, setUserName] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
-  const [reauthModalVisible, setReauthModalVisible] = useState<boolean>(false); // For reauth modal
-  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false); // For delete confirmation modal
-  const [reauthType, setReauthType] = useState<'email' | 'password' | null>(null); 
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [reauthType, setReauthType] = useState<'email' | 'password' | null>(null);
   const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
@@ -68,12 +67,12 @@ const ProfileScreen = () => {
 
   const handleUpdateEmail = async () => {
     setReauthType('email');
-    setReauthModalVisible(true); // Show modal for reauth
+    setModalVisible(true);
   };
 
   const handleUpdatePassword = async () => {
     setReauthType('password');
-    setReauthModalVisible(true); // Show modal for reauth
+    setModalVisible(true);
   };
 
   const handleReauthentication = async () => {
@@ -81,7 +80,7 @@ const ProfileScreen = () => {
     if (user) {
       const isReauthenticated = await reauthenticateUser();
       if (isReauthenticated) {
-        setReauthModalVisible(false); // Close reauth modal
+        setModalVisible(false);
         if (reauthType === 'email') {
           try {
             await updateEmail(user, userEmail);
@@ -105,7 +104,7 @@ const ProfileScreen = () => {
             Alert.alert("Error", "Failed to update password.");
           }
         }
-        setCurrentPassword(''); // Clear the current password field after reauth
+        setCurrentPassword('');
       }
     }
   };
@@ -126,7 +125,7 @@ const ProfileScreen = () => {
   };
 
   const confirmDeleteAccount = () => {
-    setDeleteModalVisible(true); // Show delete confirmation modal
+    setModalVisible(true);
   };
 
   return (
@@ -173,51 +172,30 @@ const ProfileScreen = () => {
         <Text style={styles.deleteButtonText}>Delete Account</Text>
       </TouchableOpacity>
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        visible={deleteModalVisible}
-        transparent={true}
-        animationType="slide"
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Are you sure you want to delete your account?</Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.modalButton} onPress={handleDeleteAccount}>
-                <Text style={styles.modalButtonText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={() => setDeleteModalVisible(false)}>
-                <Text style={styles.modalButtonText}>No</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
       {/* Modal for Reauthentication */}
       <Modal
         animationType="slide"
         transparent={true}
-        visible={reauthModalVisible}
-        onRequestClose={() => {
-          setReauthModalVisible(!reauthModalVisible);
-        }}>
-        <View style={styles.modalView}>
-          <Text style={styles.modalText}>Re-enter Current Password</Text>
-          <TextInput
-            style={styles.input}
-            secureTextEntry
-            value={currentPassword}
-            onChangeText={setCurrentPassword}
-            placeholder="Current Password"
-            placeholderTextColor="#ccc"
-          />
-          <TouchableOpacity style={styles.modalButton} onPress={handleReauthentication}>
-            <Text style={styles.modalButtonText}>Confirm</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalButtonCancel} onPress={() => setReauthModalVisible(false)}>
-            <Text style={styles.modalButtonText}>Cancel</Text>
-          </TouchableOpacity>
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(!modalVisible)}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Re-enter Current Password</Text>
+            <TextInput
+              style={styles.input}
+              secureTextEntry
+              value={currentPassword}
+              onChangeText={setCurrentPassword}
+              placeholder="Current Password"
+              placeholderTextColor="#ccc"
+            />
+            <TouchableOpacity style={styles.resetButton} onPress={handleReauthentication}>
+              <Text style={styles.resetButtonText}>Confirm</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.backToSignInText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </KeyboardAvoidingView>
@@ -261,34 +239,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  modalView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.7)',
-  },
-  modalText: {
-    color: '#fff',
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: '#0096FF',
-    padding: 15,
-    alignItems: 'center',
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  modalButtonCancel: {
-    backgroundColor: '#ff3b30',
-    padding: 15,
-    alignItems: 'center',
-    borderRadius: 5,
-  },
-  modalButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
   deleteButton: {
     backgroundColor: '#FF3B30',
     padding: 15,
@@ -299,14 +249,50 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
-  modalContainer: {
+  centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  modalView: {
+    width: '90%',
+    backgroundColor: '#191919',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 24,
+    color: '#fff',
+    marginBottom: 15,
+  },
+  resetButton: {
+    backgroundColor: '#1E90FF',
+    borderRadius: 5,
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    marginVertical: 15,
+    width: '100%',
+    alignItems: 'center',
+  },
+  resetButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  backToSignInText: {
+    color: '#1E90FF',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
