@@ -50,11 +50,14 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
     {label : "RANK", value: "RANK"}
   ];
   useEffect(() => {
+    console.log("Added team to persistent team data")
     let storedTeamArray: number[] = []
     eventData.map((item) => {storedTeamArray.push(item.teamNumber)})
     if(storedTeamArray.indexOf(persistentTeamData.teamNumber) < 0){
       eventData.push(persistentTeamData)
+      console.log("Added NEW **NEW** team to persistent team data")
     }
+
   }, [persistentTeamData])
 
   
