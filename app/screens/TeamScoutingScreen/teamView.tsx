@@ -141,9 +141,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     let endgame_park_options = [{label : "Park", value : "Park"}, {label : "Level 1", value : "Level 1"}, {label : "Level 2", value : "Level 2"}, {label : "Level 3", value : "Level 3"}]
 
     let ascent_park_options = [{label : "Park", value : "Park"}, {label : "Level 1", value : "Level 1"}, {label : "Level 2", value : "Level 2"}, {label : "Level 3", value : "Level 3"}]
-    let sample_scoring_options = [{label : "net Zone", value : "Net Zone"}, {label : "Low", value : "Low"}, {label : "High", value : "High"}, {label : "All", value : "All"}]
+    let sample_scoring_options = [{label : "Net Zone", value : "Net Zone"}, {label : "Low", value : "Low"}, {label : "High", value : "High"}, {label : "All", value : "All"}]
     let specimen_scoring_options = [{label : "Low", value : "Low"}, {label : "High", value : "High"}, {label : "All", value : "All"}]
-    
+
     const [intakeVal, setIntakeVal] = useState(5)
     const [depositVal, setDepositVal] = useState(5)
     const [drivetrainVal, setDrivetrainVal] = useState(5)
@@ -313,6 +313,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     useEffect(() => {
         if(shouldReRender){
+            console.log(teamEventData)
         setIntakeVal(teamEventData.intake)
         setDepositVal(teamEventData.deposit)
         setDrivetrainVal(teamEventData.drivetrain)
@@ -334,6 +335,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     useEffect(() => {
         if(isLoadedFromMain === "true"){
             let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))
+            console.log()
             teamEventData.matchData = loadingTeamArray[0].matchData
             teamEventData.intake = loadingTeamArray[0].intake
             teamEventData.deposit = loadingTeamArray[0].deposit
@@ -449,12 +451,12 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             teamEventData.matchData[dropDownIndex].tele_sample_high = tele_sample_high_value
             teamEventData.matchData[dropDownIndex].tele_specimen_low = tele_specimen_low_value
             teamEventData.matchData[dropDownIndex].tele_specimen_high = tele_specimen_high_value
+            teamEventData.extraNotes = extraNotes
+            teamEventData.intake = intakeVal
+            console.log(intakeVal)
+            teamEventData.deposit = depositVal
+            teamEventData.drivetrain = drivetrainVal
         }
-        teamEventData.extraNotes = extraNotes
-        teamEventData.intake = intakeVal
-        teamEventData.deposit = depositVal
-        teamEventData.drivetrain = drivetrainVal
-
     }, [auto_park_value, auto_sample_net_value, auto_sample_low_value, auto_sample_high_value, auto_specimen_low_value, auto_specimen_high_value, endgame_park_value, tele_sample_net_value, tele_sample_low_value, tele_sample_high_value, tele_specimen_low_value, tele_specimen_high_value, extraNotes, intakeVal, depositVal, drivetrainVal])
 
 
@@ -650,6 +652,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                         <BotAnalysisSlider name = "Intake Mechanism" sliderVal={intakeVal} setSliderVal={setIntakeVal}></BotAnalysisSlider>
                         <BotAnalysisSlider name = "Deposit Mechanism" sliderVal={depositVal} setSliderVal={setDepositVal}></BotAnalysisSlider>
                         <BotAnalysisSlider name = "Drivetrain" sliderVal={drivetrainVal} setSliderVal={setDrivetrainVal}></BotAnalysisSlider>
+                        <EventDataDropDown headerName = "Ascent Park" option_variable={ascent_park} set_option_variable={set_ascent_park} options={ascent_park_options}></EventDataDropDown>
+                        <EventDataDropDown headerName = "Sample Scoring" option_variable={sample_scoring} set_option_variable={set_sample_scoring} options={sample_scoring_options}></EventDataDropDown>
+                        <EventDataDropDown headerName = "Specimen Scoring" option_variable={specimen_scoring} set_option_variable={set_specimen_scoring} options={specimen_scoring_options}></EventDataDropDown>
                     </View>
                     <MatchScheduleHeader></MatchScheduleHeader>
                     <View style = {[styles.eventDataContainer, {top : 80}]}>
