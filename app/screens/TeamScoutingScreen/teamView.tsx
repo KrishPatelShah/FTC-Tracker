@@ -166,6 +166,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         if(isShared){ 
             // Async function to handle the subscription
             const subscribeToUpdates = async () => {
+                console.log("SUBSCRIPTION SET!")
                 const newUnsubscribe = await listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID);
                 setUnsubscribe(() => newUnsubscribe); // Set the unsubscribe function
             }
@@ -174,6 +175,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             // only runs when the teamView component unmounts (aka stops being rendered)
             return () => {
                 if(unsubscribe){
+                    console.log("UNSUBSCRIBING!")
                     unsubscribe(); 
                 }
             };
@@ -182,14 +184,19 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     const listenForUpdates = async (sheetID: string) => {    
         const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
+        console.log("LISTENING FOR UPDATES")
     
         // Listen for changes in the document
         const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
             if (doc.exists()) {
+                console.log("MERGING SHEETS")
+                // console.log("doc.data(): ", doc.data().sharedSheetData)
+                // console.log("globalSharedSheetsArray[selectedScoutingSheetIndex]: ", globalSharedSheetsArray[selectedScoutingSheetIndex])
+
                 const mergedSheet = mergeScoutingSheets(globalSharedSheetsArray[selectedScoutingSheetIndex], doc.data().sharedSheetData);
                 globalSharedSheetsArray[selectedScoutingSheetIndex] = mergedSheet;
             } else {
-                //console.error('Document does not exist or has been deleted!');
+                // console.error('Document does not exist or has been deleted!');
             }
         }, (error) => {
             console.error('Error listening to document: ', error);
@@ -225,7 +232,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         })
 
         needToMerge.map((item) => {
-            let mergedMatchData = item.userSide.matchData.map((userMatch, index) => {
+            let mergedMatchData = item.userSide.matchData.map((userMatch, index) => { // Cannot convert undefined value to object
                 let serverMatch = item.serverSide.matchData[index];
                 let mergedMatch: TeamMatchData = { ...serverMatch };
     
