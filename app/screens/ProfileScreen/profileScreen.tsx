@@ -9,7 +9,8 @@ const ProfileScreen = () => {
   const [userEmail, setUserEmail] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [reauthType, setReauthType] = useState<'email' | 'password' | null>(null);
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false); // Second modal for confirming delete
+  const [reauthType, setReauthType] = useState<'email' | 'password' | 'delete' | null>(null); // Added 'delete'
   const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
@@ -89,36 +90,32 @@ const ProfileScreen = () => {
   };
 
   const handleReauthentication = async () => {
-    const user = FIREBASE_AUTH.currentUser;
-    if (user) {
-      const isReauthenticated = await reauthenticateUser();
-      if (isReauthenticated) {
-        setModalVisible(false);
-        if (reauthType === 'email') {
-          try {
-            await updateEmail(user, userEmail);
-            const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
-            await updateDoc(userDocRef, { email: userEmail });
-            Alert.alert("Success", "Email updated successfully.");
-          } catch (error: any) {
-            if (error.code === 'auth/email-already-in-use') {
-              Alert.alert("Error", "The email address is already in use by another account.");
-            } else if (error.code === 'auth/invalid-email') {
-              Alert.alert("Error", "The email address is not valid.");
-            } else {
-              Alert.alert("Error", "Failed to update email.");
-            }
-          }
-        } else if (reauthType === 'password') {
-          try {
-            await updatePassword(user, newPassword);
-            Alert.alert("Success", "Password updated successfully.");
-          } catch (error) {
-            Alert.alert("Error", "Failed to update password.");
-          }
+    const isReauthenticated = await reauthenticateUser();
+    if (isReauthenticated) {
+      setModalVisible(false);
+      if (reauthType === 'email') {
+        try {
+          const user = FIREBASE_AUTH.currentUser;
+          await updateEmail(user!, userEmail);
+          const userDocRef = doc(FIRESTORE_DB, 'user_data', user!.uid);
+          await updateDoc(userDocRef, { email: userEmail });
+          Alert.alert("Success", "Email updated successfully.");
+        } catch (error: any) {
+          Alert.alert("Error", error.message);
         }
-        setCurrentPassword('');
+      } else if (reauthType === 'password') {
+        try {
+          const user = FIREBASE_AUTH.currentUser;
+          await updatePassword(user!, newPassword);
+          Alert.alert("Success", "Password updated successfully.");
+        } catch (error) {
+          Alert.alert("Error", "Failed to update password.");
+        }
+      } else if (reauthType === 'delete') {
+        // After reauthentication, show the second modal for delete confirmation
+        setConfirmDeleteVisible(true);
       }
+      setCurrentPassword('');
     }
   };
 
@@ -127,10 +124,10 @@ const ProfileScreen = () => {
     if (user) {
       try {
         const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
-        await deleteDoc(userDocRef);
-        await user.delete();
+        await deleteDoc(userDocRef); // Delete user data from Firestore
+        await user.delete(); // Delete user account from Firebase Auth
         Alert.alert('Account Deleted', 'Your account has been deleted.');
-        FIREBASE_AUTH.signOut();
+        FIREBASE_AUTH.signOut(); // Sign out user
       } catch (error) {
         Alert.alert('Error', 'Failed to delete account.');
       }
@@ -138,20 +135,17 @@ const ProfileScreen = () => {
   };
 
   const confirmDeleteAccount = () => {
-    setModalVisible(true);
+    setReauthType('delete'); // Set reauth type to 'delete'
+    setModalVisible(true); // Open reauthentication modal
   };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <Text style={styles.header}>Account Information</Text>
 
+      {/* Inputs and update buttons */}
       <Text style={styles.label}>Name</Text>
-      <TextInput
-        style={styles.input}
-        value={userName}
-        onChangeText={setUserName}
-      />
-
+      <TextInput style={styles.input} value={userName} onChangeText={setUserName} />
       <TouchableOpacity style={styles.updateButton} onPress={handleUpdateName}>
         <Text style={styles.buttonText}>Update Name</Text>
       </TouchableOpacity>
@@ -164,7 +158,6 @@ const ProfileScreen = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-
       <TouchableOpacity style={styles.updateButton} onPress={handleUpdateEmail}>
         <Text style={styles.buttonText}>Update Email</Text>
       </TouchableOpacity>
@@ -176,11 +169,11 @@ const ProfileScreen = () => {
         value={newPassword}
         onChangeText={setNewPassword}
       />
-
       <TouchableOpacity style={styles.updateButton} onPress={handleUpdatePassword}>
         <Text style={styles.buttonText}>Update Password</Text>
       </TouchableOpacity>
 
+      {/* Delete Account Button */}
       <TouchableOpacity style={styles.deleteButton} onPress={confirmDeleteAccount}>
         <Text style={styles.deleteButtonText}>Delete Account</Text>
       </TouchableOpacity>
@@ -211,11 +204,32 @@ const ProfileScreen = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Modal for Confirming Account Deletion */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmDeleteVisible}
+        onRequestClose={() => setConfirmDeleteVisible(false)}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Confirm Account Deletion</Text>
+            <Text style={styles.modalText}>Are you sure you want to delete your account?</Text>
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
+              <Text style={styles.deleteButtonText}>Yes, Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setConfirmDeleteVisible(false)}>
+              <Text style={styles.backToSignInText}>No, Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };
 
 export default ProfileScreen;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -261,6 +275,7 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
   },
   centeredView: {
     flex: 1,
@@ -288,6 +303,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 15,
   },
+  modalText: {
+    fontSize: 18,
+    color: '#fff',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  
   resetButton: {
     backgroundColor: '#1E90FF',
     borderRadius: 5,
