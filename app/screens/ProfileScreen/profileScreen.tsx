@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal, KeyboardAvoidingView } from 'react-native';
-import { FIREBASE_AUTH, FIRESTORE_DB } from '../../../FirebaseConfig';
+import { FIREBASE_AUTH, ASYNC_STORAGE,FIRESTORE_DB } from '../../../FirebaseConfig';
 import { collection, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, updateEmail } from 'firebase/auth';
+
+const handleSignOut = async () => {
+  FIREBASE_AUTH.signOut();
+  await ASYNC_STORAGE.setItem('auth_persistence', JSON.stringify({ email: null, password: null }));
+};
 
 const ProfileScreen = () => {
   const [userName, setUserName] = useState<string>('');
@@ -127,7 +132,9 @@ const ProfileScreen = () => {
         await deleteDoc(userDocRef); // Delete user data from Firestore
         await user.delete(); // Delete user account from Firebase Auth
         Alert.alert('Account Deleted', 'Your account has been deleted.');
-        FIREBASE_AUTH.signOut(); // Sign out user
+        await handleSignOut(); // Sign out user
+        console.log("hi")
+        
       } catch (error) {
         Alert.alert('Error', 'Failed to delete account.');
       }
