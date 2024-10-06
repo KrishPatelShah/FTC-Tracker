@@ -190,7 +190,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     const listenForUpdates = async (sheetID: string) => {    
         const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
-        //console.log("LISTENING FOR UPDATES")
+        console.log("LISTENING FOR UPDATES")
     
         // Listen for changes in the document
         const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
@@ -201,6 +201,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
                 const mergedSheet = mergeScoutingSheets(globalSharedSheetsArray[selectedScoutingSheetIndex], doc.data().sharedSheetData);
                 globalSharedSheetsArray[selectedScoutingSheetIndex] = mergedSheet;
+                mergedSheet.eventData.map((item) => {
+                    if(item.teamNumber.toLocaleString() == teamNumber){
+                        setTeamEventData(item)
+                    }
+                })
             } else {
                 // console.error('Document does not exist or has been deleted!');
             }
@@ -217,7 +222,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             userSide : TeamEventData,
             serverSide : TeamEventData
         }
-
+        console.log("merging now")
+        console.log("server")
+        console.log(storedScoutingSheet.eventData);
+        console.log("user")
+        console.log(userScoutingSheet.eventData)
         let needToMerge: MergePair[] = []
         let mergedEventData: TeamEventData[] = []
         let allUserNumbers: number[] = userScoutingSheet.eventData.map((item) => item.teamNumber)
@@ -239,6 +248,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                 mergedEventData.push(item)
             }
         })
+
         //console.log("started merging")
         //console.log(needToMerge)
         needToMerge.map((item) => {
@@ -302,7 +312,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             isShared: false,
             ownerID: sheetOwnerID
         };
-    
+        console.log(mergedScoutingSheet.eventData)
         return mergedScoutingSheet;
     }
 
