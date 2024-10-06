@@ -64,16 +64,7 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
   }, [persistentTeamData])
 
 
-  useFocusEffect(
-    React.useCallback(() => {
-      /* console.log(loadedEventData) */
-
-      return () => {
-        console.log("exiting")
-        //console.log(teamEventData)
-      };
-    }, [])
-  );
+  useEffect(() => {setEventData([]); console.log("running EMPTY")}, []);
 
   
   // add useEffect to initialize listener for shared scouting sheet

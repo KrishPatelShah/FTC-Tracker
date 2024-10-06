@@ -456,6 +456,10 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             
             setIsLoadedFromMain("false")
           }
+
+          
+
+
           /* console.log(loadedEventData) */
     
           return () => {

@@ -6,7 +6,7 @@ import { doc, getFirestore, setDoc, getDoc, updateDoc, DocumentData } from 'fire
 import { NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '@/app/navigation/types';
 import { Ionicons } from '@expo/vector-icons';
-import { eventCodeAtom, persistentEventData, scoutingSheetArray, ScoutingSheetArrayType, isSharedAtom, sharedSheetsArrayAtom } from '@/dataStore';
+import { eventCodeAtom, persistentEventData, scoutingSheetArray, ScoutingSheetArrayType, isSharedAtom, sharedSheetsArrayAtom, teamDataAtom } from '@/dataStore';
 import { useAtom } from 'jotai';
 import DeleteScoutingSheetScreen from '../MyScoutingSheetsScreen/deleteScoutingSheetScreen';
 
@@ -28,6 +28,7 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalIndexToDelete, setModalIndexToDelete] = useState(0);
+  const [persistentTeamData, setPersistentTeamData] = useAtom(teamDataAtom)
 
   const handleLongPress = (scoutingSheetArrayIndex : number, isShared : boolean) => {
     setModalIndexToDelete(scoutingSheetArrayIndex)
@@ -91,6 +92,9 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
     console.log("Global scouting sheet")
     console.log(globalScoutingSheetArray)
     
+    console.log("emptying team data")
+    console.log(persistentTeamData)
+    setPersistentTeamData({teamNumber : 0, extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : [], park : "", sample_scoring : "", specimen_scoring : ""})
     console.log("opening item")
     console.log(item)
     setEventCode(item.code)
