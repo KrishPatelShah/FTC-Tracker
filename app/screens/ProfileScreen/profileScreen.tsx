@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal, KeyboardAvoidingView } from 'react-native';
 import { FIREBASE_AUTH, ASYNC_STORAGE,FIRESTORE_DB } from '../../../FirebaseConfig';
-import { collection, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, updateEmail } from 'firebase/auth';
 
 const handleSignOut = async () => {
@@ -117,7 +117,7 @@ const ProfileScreen = () => {
           Alert.alert("Error", "Failed to update password.");
         }
       } else if (reauthType === 'delete') {
-        // After reauthentication, show the second modal for delete confirmation
+        // show the second modal for delete confirmation after reauthentication
         setConfirmDeleteVisible(true);
       }
       setCurrentPassword('');
@@ -129,14 +129,31 @@ const ProfileScreen = () => {
     if (user) {
       try {
         const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
-        await deleteDoc(userDocRef); // Delete user data from Firestore
-        await user.delete(); // Delete user account from Firebase Auth
-        Alert.alert('Account Deleted', 'Your account has been deleted.');
-        await handleSignOut(); // Sign out user
-        console.log("hi")
+        
+        const sharedSheetsQuery = collection(FIRESTORE_DB, "shared_scouting_sheets");
+        const sharedSheetsSnapshot = await getDocs(sharedSheetsQuery);
+  
+        const removeUserFromSharedSheets = async () => {
+          await Promise.all(sharedSheetsSnapshot.docs.map(async (docSnapshot) => {
+            const sheetData = docSnapshot.data();
+            const userIds = sheetData.userIds || [];
+            
+            if (userIds.includes(user.uid)) {
+              const updatedUserIds = userIds.filter((id: string) => id !== user.uid);
+              await updateDoc(doc(FIRESTORE_DB, 'shared_scouting_sheets', docSnapshot.id), { userIds: updatedUserIds });
+            }
+          }));
+        };
+  
+        await removeUserFromSharedSheets();
+        await deleteDoc(userDocRef);
+        await user.delete();
+        Alert.alert('Account Deleted', 'Your account and related data have been deleted.');
+        await handleSignOut();
         
       } catch (error) {
         Alert.alert('Error', 'Failed to delete account.');
+        console.error("Error deleting account: ", error);
       }
     }
   };
