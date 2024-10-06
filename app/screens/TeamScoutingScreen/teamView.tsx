@@ -205,7 +205,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                     console.log("comparing server side " + item.teamNumber.toString() + " to local " + teamNumber)
                     if(item.teamNumber.toString() == teamNumber){
                         console.log("set event data")
-                        setTeamEventData(item)
+                        //setTeamEventData(item)
                     }
                 })
             } else {
@@ -456,6 +456,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     }, [isMatchNumsFinished])
 
     useEffect(() => {
+        /*
         console.log("changing event data")
         console.log(teamEventData)
         
@@ -479,7 +480,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         set_tele_specimen_low(teamEventData.matchData[0]?.tele_specimen_low)
         set_tele_specimen_high(teamEventData.matchData[0]?.tele_specimen_high)
         set_endgame_park(teamEventData.matchData[0]?.endgame_park)
-        
+        */
     }, [teamEventData])
 
     useFocusEffect(
