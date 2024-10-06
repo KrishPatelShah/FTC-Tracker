@@ -168,6 +168,12 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             : globalScoutingSheetArray[selectedScoutingSheetIndex]?.ownerID || ''
     });
 
+
+    useEffect(() => {
+        //data fetch happens here
+    }, [])
+
+    /*
     useEffect(() => {
         if(isShared){ 
             // Async function to handle the subscription
@@ -188,6 +194,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         }
     }, [])
 
+    
     const listenForUpdates = async (sheetID: string) => {    
         const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
         console.log("LISTENING FOR UPDATES")
@@ -218,6 +225,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
       return unsubscribe;
     };
 
+    
     // Triggers when listener detecs an update
     const mergeScoutingSheets: (userScoutingSheet : ScoutingSheetArrayType, storedScoutingSheet : ScoutingSheetArrayType) => ScoutingSheetArrayType = (userScoutingSheet, storedScoutingSheet) => {
         type MergePair = {
@@ -317,6 +325,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         console.log(mergedScoutingSheet.eventData)
         return mergedScoutingSheet;
     }
+    */
+
+
 
     const addTeamEventDataToGlobalSharedSheets = () => {
         //console.log("adding to global");
@@ -455,33 +466,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         }
     }, [isMatchNumsFinished])
 
-    useEffect(() => {
-        /*
-        console.log("changing event data")
-        console.log(teamEventData)
-        
-        
-        
-        setIntakeVal(teamEventData.intake)
-        setDepositVal(teamEventData.deposit)
-        setDrivetrainVal(teamEventData.drivetrain)
-
-
-        
-        set_auto_sample_net(teamEventData.matchData[0]?.auto_sample_net)
-        set_auto_sample_low(teamEventData.matchData[0]?.auto_sample_low)
-        set_auto_sample_high(teamEventData.matchData[0]?.auto_sample_high)
-        set_auto_specimen_low(teamEventData.matchData[0]?.auto_specimen_low)
-        set_auto_specimen_high(teamEventData.matchData[0]?.auto_specimen_high)
-        set_auto_park(teamEventData.matchData[0]?.auto_park)
-        set_tele_sample_net(teamEventData.matchData[0]?.tele_sample_net)
-        set_tele_sample_low(teamEventData.matchData[0]?.tele_sample_low)
-        set_tele_sample_high(teamEventData.matchData[0]?.tele_sample_high)
-        set_tele_specimen_low(teamEventData.matchData[0]?.tele_specimen_low)
-        set_tele_specimen_high(teamEventData.matchData[0]?.tele_specimen_high)
-        set_endgame_park(teamEventData.matchData[0]?.endgame_park)
-        */
-    }, [teamEventData])
+    
 
     useFocusEffect(
         React.useCallback(() => {
