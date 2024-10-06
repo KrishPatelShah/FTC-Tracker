@@ -215,12 +215,15 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         let needToMerge: MergePair[] = []
         let mergedEventData: TeamEventData[] = []
         let allUserNumbers: number[] = userScoutingSheet.eventData.map((item) => item.teamNumber)
+        console.log("fetched user numbers")
         let allStoredNumbers: number[] = storedScoutingSheet.eventData.map((item) => item.teamNumber)
-
+        console.log("fetched team numbers");
         userScoutingSheet.eventData.map((item) => {
             if(allStoredNumbers.includes(item.teamNumber)){
                 let serverData = storedScoutingSheet.eventData.filter((server) => server.teamNumber = item.teamNumber)[0]
-                needToMerge.push({userSide : item, serverSide : serverData})
+                if(item && serverData){
+                    needToMerge.push({userSide : item, serverSide : serverData})
+                }
             } else {
                 mergedEventData.push(item)
             }
@@ -230,17 +233,34 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                 mergedEventData.push(item)
             }
         })
-
+        //console.log("started merging")
+        //console.log(needToMerge)
         needToMerge.map((item) => {
+            //console.log("server side")
+            //console.log(item.serverSide)
+            //console.log("team number on server : " + item.serverSide.teamNumber)
+            //console.log("team number on user : " + item.userSide.teamNumber)
+            //console.log("Server + ")
+            //console.log(item.serverSide.matchData)
+            //console.log("ran log serverside matchdata")
+            //console.log(item.userSide.matchData)
+            //console.log("ran log userside matchdata")
+            //console.log("length" + item.userSide.matchData.length)
             let mergedMatchData = item.userSide.matchData.map((userMatch, index) => { // Cannot convert undefined value to object
                 let serverMatch = item.serverSide.matchData[index];
+                //console.log("trying to find matches from server : ")
+                //console.log(serverMatch)
                 let mergedMatch: TeamMatchData = { ...serverMatch };
-    
+                //console.log("ran create merged data")
                 for (const key in userMatch) {
-                    if (userMatch.hasOwnProperty(key)) {
+                    if (userMatch.hasOwnProperty(key) && serverMatch) {
+                        //console.log("user")
+                        //console.log(userMatch)
+                        //console.log("server")
+                        //console.log(serverMatch)
                         const userValue = userMatch[key as keyof TeamMatchData];
                         const serverValue = serverMatch[key as keyof TeamMatchData];
-    
+                        //console.log("ran")
                         if (userValue !== "" && userValue !== "n/a") {
                             mergedMatch[key as keyof TeamMatchData] = userValue;
                         } else if (serverValue) {
@@ -251,7 +271,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     
                 return mergedMatch;
             });
-    
+            console.log("creating object to merge")
             let mergedTeamData: TeamEventData = {
                 teamNumber: item.userSide.teamNumber,
                 matchData: mergedMatchData,
