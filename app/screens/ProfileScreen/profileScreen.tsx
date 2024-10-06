@@ -180,8 +180,8 @@ const ProfileScreen = () => {
   
 
   const confirmDeleteAccount = () => {
-    setReauthType('delete'); // Set reauth type to 'delete'
-    setModalVisible(true); // Open reauthentication modal
+    setReauthType('delete'); 
+    setModalVisible(true); // open reauthentication modal
   };
 
   return (
