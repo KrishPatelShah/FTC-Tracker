@@ -27,9 +27,9 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
     // accesses globalSharedSheetsArray to use sheetIndex to retrive the ID of the scouting sheet the user is currently on
     const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
     const [globalSharedSheetsArray, setSharedScoutingSheetArray] = useAtom(sharedSheetsArrayAtom)
-    console.log("user's scouting sheet array: ", globalScoutingSheetArray)
-    console.log("Index of Scouting Sheet Selected:" + sheetArrayIndex) 
-    console.log("isShared?: " + isShared)   
+    //console.log("user's scouting sheet array: ", globalScoutingSheetArray)
+    //console.log("Index of Scouting Sheet Selected:" + sheetArrayIndex) 
+    //console.log("isShared?: " + isShared)   
 
 
     // Initialize state based on the value of isShared, before the first render
@@ -45,8 +45,8 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
             : globalScoutingSheetArray[sheetArrayIndex]?.ownerID || '';
     });
     
-    console.log("sheetID: " + sheetID)
-    console.log("ownerId: " + ownerId)
+    //console.log("sheetID: " + sheetID)
+    //console.log("ownerId: " + ownerId)
 
     type firestoreUser = {
       name: string,
@@ -136,9 +136,9 @@ const ShareScoutingSheetModal: React.FC<ShareScoutingSheetProps> = ({shareModalV
 }
 
 const shareScoutingSheet = async (sheetID: string, sheetIndex: number, recipientUserId: string, ownerId: string, isShared: boolean, globalScoutingSheetArray : ScoutingSheetArrayType[]) => {
-  console.log("isShared?: " + isShared) 
-  console.log("sheetID:" + sheetID)
-  console.log("recipientUserId:" + recipientUserId)
+  //console.log("isShared?: " + isShared) 
+  //console.log("sheetID:" + sheetID)
+  //console.log("recipientUserId:" + recipientUserId)
 
   if(FIREBASE_AUTH.currentUser){
     const userRef = doc(FIRESTORE_DB, 'user_data', FIREBASE_AUTH.currentUser.uid);

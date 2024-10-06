@@ -32,7 +32,7 @@ type Team = {
 
 const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) => {
   const scoutingSheetArrayIndex = route.params?.scoutingSheetArrayIndex
-  console.log("scoutingSheetArrayIndex: " + scoutingSheetArrayIndex)
+  //console.log("scoutingSheetArrayIndex: " + scoutingSheetArrayIndex)
   const [shareModalVisible, setShareModalVisible] = useState(false)
   const [eventName, setEventName] = useState("");
   const [teamArray, setTeamArray] = useState<Team[]>([]);
@@ -52,13 +52,28 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
   useEffect(() => {
     console.log("Added team to persistent team data")
     let storedTeamArray: number[] = []
-    eventData.map((item) => {storedTeamArray.push(item.teamNumber)})
+    console.log("adding to this thing")
+    console.log(eventData)
+    eventData.map((item) => {storedTeamArray.push(item.teamNumber); console.log(item)})
     if(storedTeamArray.indexOf(persistentTeamData.teamNumber) < 0){
       eventData.push(persistentTeamData)
       console.log("Added NEW **NEW** team to persistent team data")
     }
-
+    console.log("eventData")
+    console.log(eventData)
   }, [persistentTeamData])
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      /* console.log(loadedEventData) */
+
+      return () => {
+        console.log("exiting")
+        //console.log(teamEventData)
+      };
+    }, [])
+  );
 
   
   // add useEffect to initialize listener for shared scouting sheet

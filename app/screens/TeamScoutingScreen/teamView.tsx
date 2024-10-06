@@ -172,7 +172,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         if(isShared){ 
             // Async function to handle the subscription
             const subscribeToUpdates = async () => {
-                console.log("SUBSCRIPTION SET!")
+                //console.log("SUBSCRIPTION SET!")
                 const newUnsubscribe = await listenForUpdates(globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID);
                 setUnsubscribe(() => newUnsubscribe); // Set the unsubscribe function
             }
@@ -181,7 +181,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             // only runs when the teamView component unmounts (aka stops being rendered)
             return () => {
                 if(unsubscribe){
-                    console.log("UNSUBSCRIBING!")
+                    //console.log("UNSUBSCRIBING!")
                     unsubscribe(); 
                 }
             };
@@ -190,12 +190,12 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     const listenForUpdates = async (sheetID: string) => {    
         const sharedSheetRef = doc(FIRESTORE_DB, 'shared_scouting_sheets', sheetID);
-        console.log("LISTENING FOR UPDATES")
+        //console.log("LISTENING FOR UPDATES")
     
         // Listen for changes in the document
         const unsubscribe = onSnapshot(sharedSheetRef, (doc) => {
             if (doc.exists()) {
-                console.log("MERGING SHEETS")
+                //console.log("MERGING SHEETS")
                 // console.log("doc.data(): ", doc.data().sharedSheetData)
                 // console.log("globalSharedSheetsArray[selectedScoutingSheetIndex]: ", globalSharedSheetsArray[selectedScoutingSheetIndex])
 
@@ -205,7 +205,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                 // console.error('Document does not exist or has been deleted!');
             }
         }, (error) => {
-            console.error('Error listening to document: ', error);
+            //console.error('Error listening to document: ', error);
         });
     
       return unsubscribe;
@@ -221,9 +221,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         let needToMerge: MergePair[] = []
         let mergedEventData: TeamEventData[] = []
         let allUserNumbers: number[] = userScoutingSheet.eventData.map((item) => item.teamNumber)
-        console.log("fetched user numbers")
+        //console.log("fetched user numbers")
         let allStoredNumbers: number[] = storedScoutingSheet.eventData.map((item) => item.teamNumber)
-        console.log("fetched team numbers");
+        //console.log("fetched team numbers");
         userScoutingSheet.eventData.map((item) => {
             if(allStoredNumbers.includes(item.teamNumber)){
                 let serverData = storedScoutingSheet.eventData.filter((server) => server.teamNumber = item.teamNumber)[0]
@@ -277,7 +277,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     
                 return mergedMatch;
             });
-            console.log("creating object to merge")
+            //console.log("creating object to merge")
             let mergedTeamData: TeamEventData = {
                 teamNumber: item.userSide.teamNumber,
                 matchData: mergedMatchData,
@@ -307,7 +307,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     }
 
     const addTeamEventDataToGlobalSharedSheets = () => {
-        console.log("adding to global");
+        //console.log("adding to global");
         let event:ScoutingSheetArrayType = globalSharedSheetsArray[selectedScoutingSheetIndex]
         if (event) {
             const existingTeamIndex = event.eventData.findIndex(
@@ -315,16 +315,16 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             );
             if (existingTeamIndex !== -1) {
                 event.eventData[existingTeamIndex] = teamEventData;
-                console.log("existing team");
+                //console.log("existing team");
             } else {
                 event.eventData.push(teamEventData);
-                console.log("new team");
+                //console.log("new team");
             }
         }
     };
 
     const addTeamEventDataToGlobalUserSheets = () => {
-        console.log("adding to global");
+        //console.log("adding to global");
         let event:ScoutingSheetArrayType = globalScoutingSheetArray.filter((item) => item.code == eventCode)[0];
         if (event) {
             const existingTeamIndex = event.eventData.findIndex(
@@ -332,10 +332,10 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             );
             if (existingTeamIndex !== -1) {
                 event.eventData[existingTeamIndex] = teamEventData;
-                console.log("existing team");
+                //console.log("existing team");
             } else {
                 event.eventData.push(teamEventData);
-                console.log("new team");
+                //console.log("new team");
             }
         }
     };
@@ -343,37 +343,37 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     useFocusEffect(
         React.useCallback(() => {
-        console.log("Start")
+        //console.log("Start")
 
             return () => {
-                console.log("Back2")
+                //console.log("Back2")
                 if(FIREBASE_AUTH.currentUser){
                     if(isShared){ // && unsubscribe
                         const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
                         addTeamEventDataToGlobalSharedSheets()
                         try {
-                            console.log("updating in shared collection!")
-                            console.log("sharedSheet ID: ", globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
+                            //console.log("updating in shared collection!")
+                            //console.log("sharedSheet ID: ", globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
                             updateDoc(userRef, { 
                                 sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
                             });
                             // unsubscribe() // might not be necessary since unsub should run when teamView unmounts
                         } 
                         catch (error) {
-                            console.error("Error updating user document:", error);
+                            //console.error("Error updating user document:", error);
                         }  
                     }else{
                         const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
-                        console.log("global scouting sheet array")
+                        //console.log("global scouting sheet array")
                         addTeamEventDataToGlobalUserSheets()
                         try {
-                            console.log("updating in local user_data collection!")
+                            //console.log("updating in local user_data collection!")
                             updateDoc(userRef, { 
                                 userScoutingSheetArray: globalScoutingSheetArray,
                             });
                         } 
                         catch (error) {
-                            console.error("Error updating user document:", error);
+                            //console.error("Error updating user document:", error);
                         }  
                     } 
                 }
@@ -383,7 +383,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     useEffect(() => {
         if(shouldReRender){
-        console.log(teamEventData)
+        //console.log(teamEventData)
         setIntakeVal(teamEventData.intake)
         setDepositVal(teamEventData.deposit)
         setDrivetrainVal(teamEventData.drivetrain)
@@ -405,25 +405,25 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     useEffect(() => {
         if(isLoadedFromMain === "true"){
             let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))
-            console.log()
+            //console.log()
             teamEventData.matchData = loadingTeamArray[0].matchData
             teamEventData.intake = loadingTeamArray[0].intake
             teamEventData.deposit = loadingTeamArray[0].deposit
             teamEventData.drivetrain = loadingTeamArray[0].drivetrain
-            console.log("Found")
-            console.log("Loading Intake : " + loadingTeamArray[0].intake)
+            //console.log("Found")
+            //console.log("Loading Intake : " + loadingTeamArray[0].intake)
             setShouldReRender(true)
         }else if (isLoadedFromMain === "false"){
-            console.log("Not Found")
+            //console.log("Not Found")
         }
-        console.log("Main " + teamEventData.intake)
+        //console.log("Main " + teamEventData.intake)
         
     }, [isLoadedFromMain])
 
     useEffect(() => {
-        console.log("running add matches")
+       // console.log("running add matches")
         if(isLoadedFromMain == "false"){
-            console.log("match Nums " + matchNums)
+            //console.log("match Nums " + matchNums)
             for(let i = 0; i< matchNums; i++){
                 teamEventData.matchData.push({auto_sample_net : "", 
                     auto_sample_low : "",
@@ -438,7 +438,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                     tele_specimen_high : "",
                     endgame_park : ""
                 })
-                console.log("added")
+                //console.log("added")
             }
         }
     }, [isMatchNumsFinished])
@@ -446,7 +446,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     useFocusEffect(
         React.useCallback(() => {
           
-          console.log('Screen is focused');
+          //console.log('Screen is focused');
           setDataFetched(false)
           let storedTeamArray: number[] = []
           loadedEventData.map((item) => {storedTeamArray.push(item.teamNumber)})
@@ -477,7 +477,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     useEffect(() => {
         if(dataFetched){
-            console.log(matchView)
+            //console.log(matchView)
             let matchArr: string[] = []
             DropdownMatchView.map((item) => {matchArr.push(item.value)})
             let dropDownIndex = matchArr.indexOf(matchView)
@@ -501,7 +501,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     useEffect(() => {
         if(dataFetched){
-            console.log("changed team event data")
+            //console.log("changed team event data")
             //console.log(teamEventData.matchData)
             let matchArr: string[] = []
             DropdownMatchView.map((item) => {matchArr.push(item.value)})
@@ -524,7 +524,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             teamEventData.matchData[dropDownIndex].tele_specimen_high = tele_specimen_high_value
             teamEventData.extraNotes = extraNotes
             teamEventData.intake = intakeVal
-            console.log(intakeVal)
+            //console.log(intakeVal)
             teamEventData.deposit = depositVal
             teamEventData.drivetrain = drivetrainVal
         }

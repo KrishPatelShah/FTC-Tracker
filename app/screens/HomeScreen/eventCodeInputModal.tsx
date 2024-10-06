@@ -95,7 +95,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
   };
 
   useEffect(() => {
-    console.log("TextInput value changed:", textInputValue);
+    //console.log("TextInput value changed:", textInputValue);
   }, [textInputValue]);
 
   const renderItem = ({ item }: { item: EventSearchData }) => (

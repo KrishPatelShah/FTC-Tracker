@@ -88,11 +88,19 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   }, [mySharedSheetIDs]) 
 
   const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number, isShared : boolean) => void = (item, scoutingSheetArrayIndex, isShared) => {
+    console.log("Global scouting sheet")
+    console.log(globalScoutingSheetArray)
+    
+    console.log("opening item")
+    console.log(item)
     setEventCode(item.code)
+    console.log("opening event data")
+    console.log(item.eventData)
     setEventData(item.eventData)
     setIsShared(isShared)
     console.log("Clicked")
     console.log("scoutingSheetArrayIndex: ", scoutingSheetArrayIndex)
+    
     navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex})
   }
 
