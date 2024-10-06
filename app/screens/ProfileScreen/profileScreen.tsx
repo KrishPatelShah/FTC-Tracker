@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Modal, KeyboardAvoidingView } from 'react-native';
 import { FIREBASE_AUTH, ASYNC_STORAGE,FIRESTORE_DB } from '../../../FirebaseConfig';
-import { collection, doc, getDoc, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, QueryDocumentSnapshot, getDoc, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, updateEmail } from 'firebase/auth';
 
 const handleSignOut = async () => {
@@ -129,34 +129,55 @@ const ProfileScreen = () => {
     if (user) {
       try {
         const userDocRef = doc(FIRESTORE_DB, 'user_data', user.uid);
-        
+  
+        // fetch all scouting sheets
         const sharedSheetsQuery = collection(FIRESTORE_DB, "shared_scouting_sheets");
         const sharedSheetsSnapshot = await getDocs(sharedSheetsQuery);
   
         const removeUserFromSharedSheets = async () => {
-          await Promise.all(sharedSheetsSnapshot.docs.map(async (docSnapshot) => {
+          await Promise.all(sharedSheetsSnapshot.docs.map(async (docSnapshot: QueryDocumentSnapshot) => {
             const sheetData = docSnapshot.data();
             const userIds = sheetData.userIds || [];
-            
+            const sharedSheetData = sheetData.sharedSheetData || {};
+            const ownerID = sharedSheetData.ownerID;
+  
+            // check if the user is part of this sheet
             if (userIds.includes(user.uid)) {
               const updatedUserIds = userIds.filter((id: string) => id !== user.uid);
-              await updateDoc(doc(FIRESTORE_DB, 'shared_scouting_sheets', docSnapshot.id), { userIds: updatedUserIds });
+  
+              if (ownerID === user.uid) {
+                // fi user is owner and no other users, delete the sheet
+                if (updatedUserIds.length === 0) {
+                  await deleteDoc(doc(FIRESTORE_DB, 'shared_scouting_sheets', docSnapshot.id));
+                } else {
+                  // if other users, assign the ownerID to one of them
+                  await updateDoc(doc(FIRESTORE_DB, 'shared_scouting_sheets', docSnapshot.id), {
+                    userIds: updatedUserIds,
+                    'sharedSheetData.ownerID': updatedUserIds[0],  // Assign to the first user in the updated list
+                  });
+                }
+              } else {
+                // if  user is not the owner, update the userIds list
+                await updateDoc(doc(FIRESTORE_DB, 'shared_scouting_sheets', docSnapshot.id), { userIds: updatedUserIds });
+              }
             }
           }));
         };
   
         await removeUserFromSharedSheets();
         await deleteDoc(userDocRef);
+        // delete user account from firebase
         await user.delete();
+  
         Alert.alert('Account Deleted', 'Your account and related data have been deleted.');
         await handleSignOut();
-        
       } catch (error) {
         Alert.alert('Error', 'Failed to delete account.');
         console.error("Error deleting account: ", error);
       }
     }
   };
+  
 
   const confirmDeleteAccount = () => {
     setReauthType('delete'); // Set reauth type to 'delete'
