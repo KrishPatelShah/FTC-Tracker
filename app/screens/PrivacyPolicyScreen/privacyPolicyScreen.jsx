@@ -46,7 +46,7 @@ export default function PrivacyPolicyScreen() {
       <Paragraph style={styles.paragraph}>
         <Text style={styles.sectionTitle}>6. Contact Us</Text>
         {'\n'}
-        If you have any questions about this Privacy Policy, please contact us at [your contact email].
+        If you have any questions about this Privacy Policy, please contact us at krish.patelshah@gmail.com.
       </Paragraph>
     </ScrollView>
   );
