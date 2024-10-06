@@ -364,7 +364,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                         try {
                             //console.log("updating in shared collection!")
                             //console.log("sharedSheet ID: ", globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
-                            updateDoc(userRef, { 
+                            updateDoc(userRef, {  
                                 sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
                             });
                             // unsubscribe() // might not be necessary since unsub should run when teamView unmounts
