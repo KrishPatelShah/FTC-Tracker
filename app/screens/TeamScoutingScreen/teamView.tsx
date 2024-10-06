@@ -202,7 +202,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                 const mergedSheet = mergeScoutingSheets(globalSharedSheetsArray[selectedScoutingSheetIndex], doc.data().sharedSheetData);
                 globalSharedSheetsArray[selectedScoutingSheetIndex] = mergedSheet;
                 mergedSheet.eventData.map((item) => {
-                    if(item.teamNumber.toLocaleString() == teamNumber){
+                    console.log("comparing server side " + item.teamNumber.toString() + " to local " + teamNumber)
+                    if(item.teamNumber.toString() == teamNumber){
+                        console.log("set event data")
                         setTeamEventData(item)
                     }
                 })
@@ -292,9 +294,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                 teamNumber: item.userSide.teamNumber,
                 matchData: mergedMatchData,
                 extraNotes: item.userSide.extraNotes || item.serverSide.extraNotes,
-                intake: item.userSide.intake || item.serverSide.intake,
-                deposit: item.userSide.deposit || item.serverSide.deposit,
-                drivetrain: item.userSide.drivetrain || item.serverSide.drivetrain,
+                intake: item.serverSide.intake || item.userSide.intake,
+                deposit: item.serverSide.deposit || item.userSide.deposit,
+                drivetrain: item.serverSide.drivetrain || item.userSide.drivetrain,
                 park: item.userSide.park || item.serverSide.park,
                 sample_scoring: item.userSide.sample_scoring || item.serverSide.sample_scoring,
                 specimen_scoring: item.userSide.specimen_scoring || item.serverSide.specimen_scoring
@@ -364,6 +366,8 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                         try {
                             //console.log("updating in shared collection!")
                             //console.log("sharedSheet ID: ", globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
+                            console.log("pushing this")
+                            console.log(globalSharedSheetsArray[selectedScoutingSheetIndex])
                             updateDoc(userRef, { 
                                 sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
                             });
@@ -452,6 +456,33 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             }
         }
     }, [isMatchNumsFinished])
+
+    useEffect(() => {
+        console.log("changing event data")
+        console.log(teamEventData)
+        
+        
+        
+        setIntakeVal(teamEventData.intake)
+        setDepositVal(teamEventData.deposit)
+        setDrivetrainVal(teamEventData.drivetrain)
+
+
+        
+        set_auto_sample_net(teamEventData.matchData[0]?.auto_sample_net)
+        set_auto_sample_low(teamEventData.matchData[0]?.auto_sample_low)
+        set_auto_sample_high(teamEventData.matchData[0]?.auto_sample_high)
+        set_auto_specimen_low(teamEventData.matchData[0]?.auto_specimen_low)
+        set_auto_specimen_high(teamEventData.matchData[0]?.auto_specimen_high)
+        set_auto_park(teamEventData.matchData[0]?.auto_park)
+        set_tele_sample_net(teamEventData.matchData[0]?.tele_sample_net)
+        set_tele_sample_low(teamEventData.matchData[0]?.tele_sample_low)
+        set_tele_sample_high(teamEventData.matchData[0]?.tele_sample_high)
+        set_tele_specimen_low(teamEventData.matchData[0]?.tele_specimen_low)
+        set_tele_specimen_high(teamEventData.matchData[0]?.tele_specimen_high)
+        set_endgame_park(teamEventData.matchData[0]?.endgame_park)
+        
+    }, [teamEventData])
 
     useFocusEffect(
         React.useCallback(() => {
