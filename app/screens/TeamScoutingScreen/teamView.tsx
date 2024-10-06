@@ -239,6 +239,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             set_tele_specimen_low(teamData.matchData[0].tele_specimen_low)
             set_tele_specimen_high(teamData.matchData[0].tele_specimen_high)
             set_endgame_park(teamData.matchData[0].endgame_park)
+            setExtraNotes(teamData.extraNotes)
         }else{
             setIntakeVal(5)
             setDepositVal(5)
@@ -255,6 +256,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             set_tele_specimen_low('')
             set_tele_specimen_high('')
             set_endgame_park('')
+            setExtraNotes("")
         }
       },[globalSharedSheetsArray])
 
