@@ -22,7 +22,7 @@ export default function LoginPage() {
     <View style={styles.container}>
       <View style={styles.logoContainer}>
         <Image
-          source={require("@/assets/images/logo.png")}
+          source={require("@/assets/images/logoNew.png")}
           style={styles.logo}
         />
         <Text style={styles.title}>FTC Tracker</Text>

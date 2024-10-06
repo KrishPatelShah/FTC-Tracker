@@ -11,7 +11,7 @@ export default function LoadingScreen() {
     return(
         <View style = {styles.container}>
             <Image
-                source={require("@/assets/images/UpdatedFTCTrackerLogo.png")}
+                source={require("@/assets/images/logoNew.png")}
                 style={styles.logo}
             />
         </View>
