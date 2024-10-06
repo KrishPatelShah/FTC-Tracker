@@ -20,15 +20,15 @@
     ],
     "ios": {
       "supportsTablet": true,
-       "bundleIdentifier": "com.ftctracker.ftctracker"
+      "bundleIdentifier": "com.ftctracker.ftctracker"
     },
     "android": {
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logoNew.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.ftctracker.ftctracker"
-
     },
     "web": {
       "bundler": "metro",
@@ -40,6 +40,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2c4dd67a-5c2c-405e-9215-e73add4da03b"
+      }
     }
   }
 }
