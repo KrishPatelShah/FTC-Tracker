@@ -221,7 +221,9 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
       useEffect(()=>{
         const teamData = globalSharedSheetsArray[selectedScoutingSheetIndex].eventData.filter(data => data.teamNumber.toString()==teamNumber)[0];
-        if(teamData){
+        console.log("opening team data")
+        console.log(teamData)
+        if(teamData && teamData.matchData.length != 0){
             setIntakeVal(teamData.intake)
             setDepositVal(teamData.deposit)
             setDrivetrainVal(teamData.drivetrain)
