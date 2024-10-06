@@ -161,6 +161,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const [globalSharedSheetsArray, setGlobalSharedSheetsArray] = useAtom(sharedSheetsArrayAtom)
     const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex; 
     const [unsubscribe, setUnsubscribe] = useState<(() => void) | null>(null);
+    const [mySharedSheetIDs, setMySharedSheetIDs] = useState<string[]>()
 
     const [sheetOwnerID, setSheetOwnerID] = useState(() => {
         return isShared
@@ -168,10 +169,74 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             : globalScoutingSheetArray[selectedScoutingSheetIndex]?.ownerID || ''
     });
 
+    const fetchUserFirebaseData = async ()=>{
+        if(FIREBASE_AUTH.currentUser){
+          const userRef = doc(db, 'user_data', FIREBASE_AUTH.currentUser.uid);
+    
+          try {
+            const docSnap = await getDoc(userRef);
+              if (docSnap.exists()) {
+                const userData = docSnap.data() as DocumentData 
+                setMySharedSheetIDs(userData.sharedSheets)
+                console.log("Successfully retrieved sharedSheetIDs!")
+              } 
+          } 
+          catch (error) {
+            console.error("😓 Error retrieving document:", error);
+          }
+    
+        }
+      }
+    
+      const fetchSharedData = async () => {
+        if (FIREBASE_AUTH.currentUser && mySharedSheetIDs) {
+          try {
+            const sharedDataPromises = mySharedSheetIDs.map(async (item) => {
+              const sharedRef = doc(db, 'shared_scouting_sheets', item);
+              const docSnap = await getDoc(sharedRef);
+              if (docSnap.exists()) {
+                return docSnap.data().sharedSheetData as ScoutingSheetArrayType;
+              }
+              return null;
+            });
+      
+            const sharedDataArray = await Promise.all(sharedDataPromises);
+      
+            // Filter out any null values (in case some docs didn't exist)
+            const validSharedData = sharedDataArray.filter(data => data !== null) as ScoutingSheetArrayType[];
+            setGlobalSharedSheetsArray(validSharedData);
+          } catch (error) {
+            console.error("😓 Error retrieving shared data:", error);
+          }
+        }
+      };
+    
+      useEffect( () => {
+        fetchUserFirebaseData()
+      }, [])
+    
+      useEffect(()=>{
+        fetchSharedData()
+      }, [mySharedSheetIDs])
 
-    useEffect(() => {
-        //data fetch happens here
-    }, [])
+      useEffect(()=>{
+        const teamData = globalSharedSheetsArray[selectedScoutingSheetIndex].eventData.filter(data => data.teamNumber.toString()==teamNumber)[0];
+        setIntakeVal(teamData.intake)
+        setDepositVal(teamData.deposit)
+        setDrivetrainVal(teamData.drivetrain)
+        set_auto_sample_net(teamData.matchData[0].auto_sample_net)
+        set_auto_sample_low(teamData.matchData[0].auto_sample_low)
+        set_auto_sample_high(teamData.matchData[0].auto_sample_high)
+        set_auto_specimen_low(teamData.matchData[0].auto_specimen_low)
+        set_auto_specimen_high(teamData.matchData[0].auto_specimen_high)
+        set_auto_park(teamData.matchData[0].auto_park)
+        set_tele_sample_net(teamData.matchData[0].tele_sample_net)
+        set_tele_sample_low(teamData.matchData[0].tele_sample_low)
+        set_tele_sample_high(teamData.matchData[0].tele_sample_high)
+        set_tele_specimen_low(teamData.matchData[0].tele_specimen_low)
+        set_tele_specimen_high(teamData.matchData[0].tele_specimen_high)
+        set_endgame_park(teamData.matchData[0].endgame_park)
+      },[globalSharedSheetsArray])
 
     /*
     useEffect(() => {
@@ -371,16 +436,14 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             return () => {
                 //console.log("Back2")
                 if(FIREBASE_AUTH.currentUser){
-                    if(isShared){ // && unsubscribe
+                    if(isShared){ 
                         const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
                         addTeamEventDataToGlobalSharedSheets()
                         try {
-                            //console.log("updating in shared collection!")
-                            //console.log("sharedSheet ID: ", globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID)
+                            console.log("globalSharedSheetsArray[selectedScoutingSheetIndex]: ", globalSharedSheetsArray[selectedScoutingSheetIndex])
                             updateDoc(userRef, {  
                                 sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
                             });
-                            // unsubscribe() // might not be necessary since unsub should run when teamView unmounts
                         } 
                         catch (error) {
                             //console.error("Error updating user document:", error);
