@@ -20,14 +20,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-       "bundleIdentifier": "com.yourname.ftctracker"
+       "bundleIdentifier": "com.ftctracker.ftctracker"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logoNew.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.yourname.ftctracker"
+      "package": "com.ftctracker.ftctracker"
 
     },
     "web": {
