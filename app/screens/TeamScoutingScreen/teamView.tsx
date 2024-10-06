@@ -162,6 +162,12 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const selectedScoutingSheetIndex = route.params?.selectedScoutingSheetIndex; 
     const [unsubscribe, setUnsubscribe] = useState<(() => void) | null>(null);
 
+    const [sheetOwnerID, setSheetOwnerID] = useState(() => {
+        return isShared
+            ? globalSharedSheetsArray[selectedScoutingSheetIndex]?.ownerID || ''
+            : globalScoutingSheetArray[selectedScoutingSheetIndex]?.ownerID || ''
+    });
+
     useEffect(() => {
         if(isShared){ 
             // Async function to handle the subscription
@@ -294,7 +300,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             sheetID: userScoutingSheet.sheetID,
             eventData: mergedEventData,
             isShared: false,
-            ownerID: ""
+            ownerID: sheetOwnerID
         };
     
         return mergedScoutingSheet;
