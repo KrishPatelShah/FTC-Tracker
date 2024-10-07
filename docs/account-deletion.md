@@ -1,3 +1,7 @@
+---
+layout: default
+title: FTC Tracker Account Deletion
+---
 # FTC Tracker Account Deletion
 
 If you wish to delete your FTC Tracker account, please follow these steps:
