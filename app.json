@@ -29,7 +29,8 @@
         "foregroundImage": "./assets/images/logoNew.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.ftctracker.ftctracker"
+      "package": "com.ftctracker.ftctracker",
+      "permissions": []
     },
     "web": {
       "bundler": "metro",
