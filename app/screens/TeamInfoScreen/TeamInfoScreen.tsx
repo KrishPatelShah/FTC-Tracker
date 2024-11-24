@@ -93,12 +93,11 @@ const TeamInfoScreen : React.FC = () => {
                         start
                     }
                     stats {
-                        ... on TeamEventStats2023{
+                        ... on TeamEventStats2024{
                             opr {
                                 totalPointsNp
                                 autoPoints
                                 dcPoints
-                                egPoints
                             }
                             rank 
                             wins
@@ -120,7 +119,7 @@ const TeamInfoScreen : React.FC = () => {
                             }
                             tournamentLevel
                             scores {
-                                ... on MatchScores2023{
+                                ... on MatchScores2024{
                                     red{
                                         totalPoints
                                     }
@@ -139,11 +138,12 @@ const TeamInfoScreen : React.FC = () => {
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({ query, variables: {number: teamNumber, season: 2023} })
+            body: JSON.stringify({ query, variables: {number: teamNumber, season: 2024} })
         });
         const data = await response.json();
-        //console.log(data.data.teamByNumber.awards)
+        console.log(data.data.teamByNumber.name)
         setTeamName(data.data.teamByNumber.name)
+
         if(data.data.teamByNumber.quickStats != null){
             setOverallOPR({
                 total : data.data.teamByNumber.quickStats.tot.value,

@@ -82,7 +82,7 @@ const EventInfoScreen: React.FC = () => {
                             name
                         }
                         stats{
-                            ... on TeamEventStats2023{
+                            ... on TeamEventStats2024{
                                 opr {
                                     totalPointsNp
                                 }
@@ -113,7 +113,7 @@ const EventInfoScreen: React.FC = () => {
                             }
                             tournamentLevel
                             scores {
-                                ... on MatchScores2023{
+                                ... on MatchScores2024{
                                     red{
                                         totalPoints
                                     }
@@ -133,7 +133,7 @@ const EventInfoScreen: React.FC = () => {
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({ query, variables: {season: 2023, code: eventCode} })
+            body: JSON.stringify({ query, variables: {season: 2024, code: eventCode} })
         });
         const data = await response.json();
 

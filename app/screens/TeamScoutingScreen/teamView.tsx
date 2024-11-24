@@ -134,6 +134,8 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
     const [sample_scoring, set_sample_scoring] = useState("")
     const [specimen_scoring, set_specimen_scoring] = useState("")
 
+    const [serverData, setServerData] = useState<TeamMatchData[]>([]); 
+
 
     const [extraNotes, setExtraNotes] = useState("")
 
@@ -178,11 +180,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
               if (docSnap.exists()) {
                 const userData = docSnap.data() as DocumentData 
                 setMySharedSheetIDs(userData.sharedSheets)
-                console.log("Successfully retrieved sharedSheetIDs!")
+                //console.log("Successfully retrieved sharedSheetIDs!")
               } 
           } 
           catch (error) {
-            console.error("😓 Error retrieving document:", error);
+            //console.error("😓 Error retrieving document:", error);
           }
     
         }
@@ -203,10 +205,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             const sharedDataArray = await Promise.all(sharedDataPromises);
       
             // Filter out any null values (in case some docs didn't exist)
+            //console.log("filter not running at firestore fetch")
             const validSharedData = sharedDataArray.filter(data => data !== null) as ScoutingSheetArrayType[];
             setGlobalSharedSheetsArray(validSharedData);
           } catch (error) {
-            console.error("😓 Error retrieving shared data:", error);
+            //console.error("😓 Error retrieving shared data:", error);
           }
         }
       };
@@ -220,13 +223,41 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
       }, [mySharedSheetIDs])
 
       useEffect(()=>{
+
+        //console.log("filter not running at team data setup")
+        //console.log(globalSharedSheetsArray)
+        //console.log(globalSharedSheetsArray[selectedScoutingSheetIndex])
+        //console.log(globalSharedSheetsArray[selectedScoutingSheetIndex].eventData)
         const teamData = globalSharedSheetsArray[selectedScoutingSheetIndex].eventData.filter(data => data.teamNumber.toString()==teamNumber)[0];
-        console.log("opening team data")
-        console.log(teamData)
+        //console.log("opening team data")
+        //console.log(teamData)
         if(teamData && teamData.matchData.length != 0){
             setIntakeVal(teamData.intake)
             setDepositVal(teamData.deposit)
             setDrivetrainVal(teamData.drivetrain)
+            //console.log("opening this : " + teamData)
+            for(let i = 0; i < teamData.matchData.length; i++){
+                //console.log("adding")
+                if(serverData.length < matchNums){
+               serverData.push({
+                    
+                   auto_sample_net: teamData.matchData[i].auto_sample_net,
+                   auto_sample_low: teamData.matchData[i].auto_sample_low,
+                   auto_sample_high: teamData.matchData[i].auto_sample_high,
+                   auto_specimen_low: teamData.matchData[i].auto_specimen_low,
+                   auto_specimen_high: teamData.matchData[i].auto_specimen_high,
+                   auto_park: teamData.matchData[i].auto_park,
+                   tele_sample_net: teamData.matchData[i].tele_sample_net,
+                   tele_sample_low: teamData.matchData[i].tele_sample_low,
+                   tele_sample_high: teamData.matchData[i].tele_sample_high,
+                   tele_specimen_low: teamData.matchData[i].tele_specimen_low,
+                   tele_specimen_high: teamData.matchData[i].tele_specimen_high,
+                   endgame_park: teamData.matchData[i].endgame_park
+               }) 
+            }
+            }
+            //console.log("server data at init")
+            //console.log(serverData)
             set_auto_sample_net(teamData.matchData[0].auto_sample_net)
             set_auto_sample_low(teamData.matchData[0].auto_sample_low)
             set_auto_sample_high(teamData.matchData[0].auto_sample_high)
@@ -241,6 +272,8 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             set_endgame_park(teamData.matchData[0].endgame_park)
             setExtraNotes(teamData.extraNotes)
         }else{
+            //console.log("team data not found")
+            console.log("reseting")
             setIntakeVal(5)
             setDepositVal(5)
             setDrivetrainVal(5)
@@ -259,6 +292,8 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             setExtraNotes("")
         }
       },[globalSharedSheetsArray])
+
+
 
     /*
     useEffect(() => {
@@ -457,14 +492,63 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
             return () => {
                 //console.log("Back2")
+
+                if(isShared){
+                    let index = globalSharedSheetsArray[selectedScoutingSheetIndex].eventData.findIndex((item) => item.teamNumber.toString() == teamNumber)
+                    //console.log("trying to push")
+                    //console.log(index)
+                    //console.log(serverData)
+                    if(index < 0){
+                        globalSharedSheetsArray[selectedScoutingSheetIndex].eventData.push({
+                            deposit: depositVal, intake: intakeVal, drivetrain: drivetrainVal,
+                            teamNumber: parseInt(teamNumber),
+                            matchData: serverData,
+                            extraNotes: extraNotes,
+                            park: "",
+                            sample_scoring: "",
+                            specimen_scoring: ""
+                        })
+                    } else {
+                        //console.log("team already exists")
+                        //console.log("initial")
+                        //console.log(globalSharedSheetsArray[selectedScoutingSheetIndex].eventData[index])
+                        //console.log("length of server data")
+                        //console.log(serverData.length)
+                        globalSharedSheetsArray[selectedScoutingSheetIndex].eventData[index].matchData = serverData
+                        //console.log("after changing")
+                        //console.log(globalSharedSheetsArray[selectedScoutingSheetIndex].eventData[index])
+                    }
+                } else {
+                    let index = globalScoutingSheetArray[selectedScoutingSheetIndex].eventData.findIndex((item) => item.teamNumber.toString() == teamNumber)
+
+                    if(index < 0){
+                        globalScoutingSheetArray[selectedScoutingSheetIndex].eventData.push({
+                            deposit: depositVal, intake: intakeVal, drivetrain: drivetrainVal,
+                            teamNumber: parseInt(teamNumber),
+                            matchData: serverData,
+                            extraNotes: extraNotes,
+                            park: "",
+                            sample_scoring: "",
+                            specimen_scoring: ""
+                        })
+                    }
+
+                }
+
+
+
                 if(FIREBASE_AUTH.currentUser){
                     if(isShared){ 
                         const userRef = doc(db, 'shared_scouting_sheets', globalSharedSheetsArray[selectedScoutingSheetIndex].sheetID) 
-                        addTeamEventDataToGlobalSharedSheets()
+                        //addTeamEventDataToGlobalSharedSheets()
+
+
+
                         try {
-                            console.log("globalSharedSheetsArray[selectedScoutingSheetIndex]: ", globalSharedSheetsArray[selectedScoutingSheetIndex])
+                            //console.log("globalSharedSheetsArray[selectedScoutingSheetIndex]: ", globalSharedSheetsArray[selectedScoutingSheetIndex])
                             updateDoc(userRef, {  
                                 sharedSheetData: globalSharedSheetsArray[selectedScoutingSheetIndex]
+                                
                             });
                         } 
                         catch (error) {
@@ -489,29 +573,37 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         }, [])
     )
 
+
+    /*
+
     useEffect(() => {
         if(shouldReRender){
         //console.log(teamEventData)
         setIntakeVal(teamEventData.intake)
         setDepositVal(teamEventData.deposit)
         setDrivetrainVal(teamEventData.drivetrain)
-        set_auto_sample_net(teamEventData.matchData[0].auto_sample_net)
-        set_auto_sample_low(teamEventData.matchData[0].auto_sample_low)
-        set_auto_sample_high(teamEventData.matchData[0].auto_sample_high)
-        set_auto_specimen_low(teamEventData.matchData[0].auto_specimen_low)
-        set_auto_specimen_high(teamEventData.matchData[0].auto_specimen_high)
-        set_auto_park(teamEventData.matchData[0].auto_park)
-        set_tele_sample_net(teamEventData.matchData[0].tele_sample_net)
-        set_tele_sample_low(teamEventData.matchData[0].tele_sample_low)
-        set_tele_sample_high(teamEventData.matchData[0].tele_sample_high)
-        set_tele_specimen_low(teamEventData.matchData[0].tele_specimen_low)
-        set_tele_specimen_high(teamEventData.matchData[0].tele_specimen_high)
-        set_endgame_park(teamEventData.matchData[0].endgame_park)
+        console.log("opening this at shouldReRender: " + serverData)
+        set_auto_sample_net(serverData[0].auto_sample_net)
+        set_auto_sample_low(serverData[0].auto_sample_low)
+        set_auto_sample_high(serverData[0].auto_sample_high)
+        set_auto_specimen_low(serverData[0].auto_specimen_low)
+        set_auto_specimen_high(serverData[0].auto_specimen_high)
+        set_auto_park(serverData[0].auto_park)
+        set_tele_sample_net(serverData[0].tele_sample_net)
+        set_tele_sample_low(serverData[0].tele_sample_low)
+        set_tele_sample_high(serverData[0].tele_sample_high)
+        set_tele_specimen_low(serverData[0].tele_specimen_low)
+        set_tele_specimen_high(serverData[0].tele_specimen_high)
+        set_endgame_park(serverData[0].endgame_park)
         }
     }, [shouldReRender])
 
+    */
+
+    /*
     useEffect(() => {
         if(isLoadedFromMain === "true"){
+            //console.log("filter not running at old team event loading")
             let loadingTeamArray = loadedEventData.filter((item) => (item.teamNumber == teamEventData.teamNumber))
             //console.log()
             teamEventData.matchData = loadingTeamArray[0].matchData
@@ -527,9 +619,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
         //console.log("Main " + teamEventData.intake)
         
     }, [isLoadedFromMain])
+    */
 
     useEffect(() => {
        // console.log("running add matches")
+       /*
         if(isLoadedFromMain == "false"){
             //console.log("match Nums " + matchNums)
             for(let i = 0; i< matchNums; i++){
@@ -549,6 +643,27 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                 //console.log("added")
             }
         }
+            
+        */
+        for(let i = 0; i < matchNums; i++){
+            if(serverData.length < matchNums){
+            console.log("adding for " +  matchNums)
+            serverData.push({
+                auto_sample_net: "",
+                auto_sample_low: "",
+                auto_sample_high: "",
+                auto_specimen_low: "",
+                auto_specimen_high: "",
+                auto_park: "",
+                tele_sample_net: "",
+                tele_sample_low: "",
+                tele_sample_high: "",
+                tele_specimen_low: "",
+                tele_specimen_high: "",
+                endgame_park: ""
+            }) 
+            }
+         }
     }, [isMatchNumsFinished])
 
     
@@ -573,7 +688,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
           /* console.log(loadedEventData) */
     
           return () => {
-            setPersistentTeamData(teamEventData)
+            //setPersistentTeamData(teamEventData)
             //console.log(teamEventData)
           };
         }, [])
@@ -591,22 +706,29 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
     useEffect(() => {
         if(dataFetched){
+            //console.log("printing matchView")
             //console.log(matchView)
             let matchArr: string[] = []
             DropdownMatchView.map((item) => {matchArr.push(item.value)})
             let dropDownIndex = matchArr.indexOf(matchView)
-            set_auto_park(teamEventData.matchData[dropDownIndex].auto_park)
-            set_auto_sample_net(teamEventData.matchData[dropDownIndex].auto_sample_net)
-            set_auto_sample_low(teamEventData.matchData[dropDownIndex].auto_sample_low)
-            set_auto_sample_high(teamEventData.matchData[dropDownIndex].auto_sample_high)
-            set_auto_specimen_low(teamEventData.matchData[dropDownIndex].auto_specimen_low)
-            set_auto_specimen_high(teamEventData.matchData[dropDownIndex].auto_sample_high)
-            set_tele_sample_net(teamEventData.matchData[dropDownIndex].tele_sample_net)
-            set_tele_sample_low(teamEventData.matchData[dropDownIndex].tele_sample_low)
-            set_tele_sample_high(teamEventData.matchData[dropDownIndex].tele_sample_high)
-            set_tele_specimen_low(teamEventData.matchData[dropDownIndex].tele_specimen_low)
-            set_tele_specimen_high(teamEventData.matchData[dropDownIndex].tele_specimen_high)
-            set_endgame_park(teamEventData.matchData[dropDownIndex].endgame_park)
+
+            //console.log("server data at access")
+            //console.log(serverData)
+
+            set_auto_park(serverData[dropDownIndex].auto_park)
+            console.log("opening this at match view : " + dropDownIndex)
+            console.log(serverData[dropDownIndex])
+            set_auto_sample_net(serverData[dropDownIndex].auto_sample_net)
+            set_auto_sample_low(serverData[dropDownIndex].auto_sample_low)
+            set_auto_sample_high(serverData[dropDownIndex].auto_sample_high)
+            set_auto_specimen_low(serverData[dropDownIndex].auto_specimen_low)
+            set_auto_specimen_high(serverData[dropDownIndex].auto_sample_high)
+            set_tele_sample_net(serverData[dropDownIndex].tele_sample_net)
+            set_tele_sample_low(serverData[dropDownIndex].tele_sample_low)
+            set_tele_sample_high(serverData[dropDownIndex].tele_sample_high)
+            set_tele_specimen_low(serverData[dropDownIndex].tele_specimen_low)
+            set_tele_specimen_high(serverData[dropDownIndex].tele_specimen_high)
+            set_endgame_park(serverData[dropDownIndex].endgame_park)
             setIntakeVal(teamEventData.intake)
             setDepositVal(teamEventData.deposit)
             setDrivetrainVal(teamEventData.drivetrain)
@@ -622,20 +744,22 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
             //console.log(DropdownMatchView)
             let dropDownIndex = matchArr.indexOf(matchView)
             //console.log("index" + dropDownIndex)
+            //console.log("old team event data")
             //console.log(teamEventData.matchData)
-            teamEventData.matchData[dropDownIndex].auto_park = auto_park_value
-            //console.log("ran purple check")
-            teamEventData.matchData[dropDownIndex].auto_sample_net = auto_sample_net_value
-            teamEventData.matchData[dropDownIndex].auto_sample_low = auto_sample_low_value
-            teamEventData.matchData[dropDownIndex].auto_sample_high = auto_sample_high_value
-            teamEventData.matchData[dropDownIndex].auto_specimen_low = auto_specimen_low_value
-            teamEventData.matchData[dropDownIndex].auto_specimen_high = auto_specimen_high_value
-            teamEventData.matchData[dropDownIndex].endgame_park = endgame_park_value
-            teamEventData.matchData[dropDownIndex].tele_sample_net = tele_sample_net_value
-            teamEventData.matchData[dropDownIndex].tele_sample_low = tele_sample_low_value
-            teamEventData.matchData[dropDownIndex].tele_sample_high = tele_sample_high_value
-            teamEventData.matchData[dropDownIndex].tele_specimen_low = tele_specimen_low_value
-            teamEventData.matchData[dropDownIndex].tele_specimen_high = tele_specimen_high_value
+
+            serverData[dropDownIndex].auto_park = auto_park_value
+            //console.log("openign this at normal update" + serverData)
+            serverData[dropDownIndex].auto_sample_net = auto_sample_net_value
+            serverData[dropDownIndex].auto_sample_low = auto_sample_low_value
+            serverData[dropDownIndex].auto_sample_high = auto_sample_high_value
+            serverData[dropDownIndex].auto_specimen_low = auto_specimen_low_value
+            serverData[dropDownIndex].auto_specimen_high = auto_specimen_high_value
+            serverData[dropDownIndex].endgame_park = endgame_park_value
+            serverData[dropDownIndex].tele_sample_net = tele_sample_net_value
+            serverData[dropDownIndex].tele_sample_low = tele_sample_low_value
+            serverData[dropDownIndex].tele_sample_high = tele_sample_high_value
+            serverData[dropDownIndex].tele_specimen_low = tele_specimen_low_value
+            serverData[dropDownIndex].tele_specimen_high = tele_specimen_high_value
             teamEventData.extraNotes = extraNotes
             teamEventData.intake = intakeVal
             //console.log(intakeVal)
@@ -664,12 +788,11 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                         events(season: $season){
                             eventCode
                             stats {
-                                ... on TeamEventStats2023{
+                                ... on TeamEventStats2024{
                                     opr {
                                         totalPointsNp
                                         autoPoints
                                         dcPoints
-                                        egPoints
                                     }
                                     rank 
                                 }
@@ -690,7 +813,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                                     }
                                 }
                                 scores {
-                                    ... on MatchScores2023{
+                                    ... on MatchScores2024{
                                         red{
                                             totalPoints
                                         }
@@ -708,7 +831,7 @@ const TeamScoutingScreen: React.FC<HomeScreenProps> = ({navigation, route}) => {
                     headers: {
                       "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ query, variables: { season: 2023, number: teamNumber, eventCode : eventCode } })
+                    body: JSON.stringify({ query, variables: { season: 2024, number: teamNumber, eventCode : eventCode } })
                 });
                 const data = await response.json();
                 let eventStats : any[] = data.data.teamByNumber.events
