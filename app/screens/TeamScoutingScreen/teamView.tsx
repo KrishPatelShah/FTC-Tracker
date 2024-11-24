@@ -994,11 +994,11 @@ const EventStatsHeader: React.FC<LogFunction> = ({log}) => {
         <View style = {styles.eventHeader}>
             <MaterialCommunityIcons name="lightning-bolt" size={36} color="#328AFF" style = {styles.eventIcon}/>
             <Text style = {[styles.eventHeaderText, {marginLeft:'-1.5%'}]}> Event OPR </Text>
-                <TouchableOpacity style = {{left : 80}} onPress={log}>
+                {/* <TouchableOpacity style = {{left : 80}} onPress={log}>
                     <View style = {{backgroundColor : "#328AFF", height : 30, width : 60, display : "flex", justifyContent : "center", alignItems : "center"}}>
                         <Text style = {{color : "white", fontSize : 20}}>Log</Text>
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
         </View>
     )
 }
@@ -1525,6 +1525,7 @@ const styles = StyleSheet.create({
     },
     matchDropdown: {
         borderColor: "gray",
+       
         borderWidth: 0.5,
         borderRadius: 8,
         width: 120,

@@ -347,7 +347,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: "center",
     backgroundColor: '#101010',
-    paddingTop: 100,
     flex: 1
   },
   scrollContainer: {
@@ -364,7 +363,7 @@ const styles = StyleSheet.create({
     width: "90%",
     height: windowHeight / 17,
     borderRadius: 10,
-    marginTop: '-5.5%',
+    marginTop: '2.5%',
   },
   iconStyling: {
     position: 'relative',

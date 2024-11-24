@@ -13,7 +13,7 @@ import {Dimensions} from 'react-native';
 
 const windowWidth = Dimensions.get('window').width;
 const height = 48;
-const width = windowWidth/1.1;
+const width = windowWidth/1.15;
 const switchTrackLength = width/2.014218009;
 const borderRadius = 6;
 
@@ -65,7 +65,7 @@ const CustomSwitch: React.FC<SwitchProps> = ({activeColor, inactiveColor, active
 
     return( 
         <View>
-            <Pressable onPress={() => {setActive(!active)}}>   
+            <Pressable style={styles.press} onPress={() => {setActive(!active)}}>   
                 <Animated.View style={[styles.container, backgroundColorStyle]}> 
                     <Animated.View style={[styles.circle, customSpringStyles]}/>
                 </Animated.View>
@@ -80,10 +80,14 @@ const CustomSwitch: React.FC<SwitchProps> = ({activeColor, inactiveColor, active
 }
 
 const styles = StyleSheet.create({
+    press:{
+        height: height,
+        marginTop: '25%',
+    },
     textPositioning:{
         flexDirection: 'row',
-        bottom: '10%', //height/1.215, //42
         justifyContent: 'space-around',
+        bottom: '10%', 
     },
     container:{
         width: width,
@@ -92,10 +96,9 @@ const styles = StyleSheet.create({
     },
     circle:{
         width:width/2,
-        height:height,
+        height: '100%',
         backgroundColor: '#328aff',
         borderRadius: borderRadius, 
-        shadowColor: 'black',
         shadowOffset: {
             width: 0,
             height: 2
