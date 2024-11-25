@@ -1,50 +1,10 @@
-# Welcome to your Expo app 👋
+## **Overview**  
+FTC Tracker is a mobile application designed to make scouting and data management for FTC (FIRST Tech Challenge) teams efficient and user-friendly. The app integrates real-time data, offline algorithms, and customizable tools to enhance match preparation and performance evaluation.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
-
-1. Install dependencies 
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### **Key Features**  
+- **Real-Time Synchronization**: Leverage Google Firebase for seamless data updates.  
+- **Offline Functionality**: Scout matches and log data even without an internet connection.  
+- **REST API Integration**: Pull real-time data from FTC APIs (ftcscout.org and FIRST) for team stats and event schedules.  
+- **Custom Notes**: Record personalized insights for teams and matches.  
+- **State Management**: Redux & Jotai power the app's performance and dynamic user experience.  
+- **Cross-Team Collaboration**: Share and merge scouting data for a unified team strategy.
