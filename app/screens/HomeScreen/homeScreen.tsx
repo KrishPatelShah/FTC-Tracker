@@ -163,7 +163,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ query: eventCodeQuery, variables: { season: 2023, code: searchText } })
+        body: JSON.stringify({ query: eventCodeQuery, variables: { season: 2024, code: searchText } })
       });
       let data = await response.json();
       //console.log("Code")
@@ -182,7 +182,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ query: active ? eventQuery : teamQuery, variables: { season: 2023, searchText: searchText, limit: 10, region: regionDropdown } })
+        body: JSON.stringify({ query: active ? eventQuery : teamQuery, variables: { season: 2024, searchText: searchText, limit: 10, region: regionDropdown } })
       });
       let data = await response.json();
       if (active) {

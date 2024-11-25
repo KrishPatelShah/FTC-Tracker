@@ -50,17 +50,17 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
     {label : "RANK", value: "RANK"}
   ];
   useEffect(() => {
-    console.log("Added team to persistent team data")
+    //console.log("Added team to persistent team data")
     let storedTeamArray: number[] = []
-    console.log("adding to this thing")
-    console.log(eventData)
+    //console.log("adding to this thing")
+    //console.log(eventData)
     eventData.map((item) => {storedTeamArray.push(item.teamNumber); console.log(item)})
     if(storedTeamArray.indexOf(persistentTeamData.teamNumber) < 0){
       eventData.push(persistentTeamData)
-      console.log("Added NEW **NEW** team to persistent team data")
+      //console.log("Added NEW **NEW** team to persistent team data")
     }
-    console.log("eventData")
-    console.log(eventData)
+    //console.log("eventData")
+    //console.log(eventData)
   }, [persistentTeamData])
 
 
@@ -109,7 +109,7 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
                   name
                 }
                 stats {
-                    ... on TeamEventStats2023{
+                    ... on TeamEventStats2024{
                         opr {
                             totalPointsNp
                             autoPoints
@@ -126,7 +126,7 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ query, variables: { season: 2023, code: eventCodeJotai } })
+          body: JSON.stringify({ query, variables: { season: 2024, code: eventCodeJotai } })
         });
         const data = await response.json();
         //console.log(data.data.eventByCode.teams)

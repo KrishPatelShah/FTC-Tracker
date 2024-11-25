@@ -73,6 +73,8 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   
         // Filter out any null values (in case some docs didn't exist)
         const validSharedData = sharedDataArray.filter(data => data !== null) as ScoutingSheetArrayType[];
+        console.log('validSharedData')
+        console.log(validSharedData)
         setGlobalSharedSheetsArray(validSharedData);
       } catch (error) {
         console.error("😓 Error retrieving shared data:", error);
@@ -89,21 +91,21 @@ const MyScoutingSheetsScreen: React.FC<MyScoutingSheetsScreenProps> = ({navigati
   }, [mySharedSheetIDs]) 
 
   const run: (arg0: ScoutingSheetArrayType, scoutingSheetArrayIndex : number, isShared : boolean) => void = (item, scoutingSheetArrayIndex, isShared) => {
-    console.log("Global scouting sheet")
+    //console.log("Global scouting sheet")
     console.log(globalScoutingSheetArray)
     
-    console.log("emptying team data")
+    //console.log("emptying team data")
     console.log(persistentTeamData)
     setPersistentTeamData({teamNumber : 0, extraNotes : "", intake : 5,  deposit : 5, drivetrain : 5, matchData : [], park : "", sample_scoring : "", specimen_scoring : ""})
-    console.log("opening item")
+    //console.log("opening item")
     console.log(item)
     setEventCode(item.code)
-    console.log("opening event data")
+    //console.log("opening event data")
     console.log(item.eventData)
     setEventData(item.eventData)
     setIsShared(isShared)
-    console.log("Clicked")
-    console.log("scoutingSheetArrayIndex: ", scoutingSheetArrayIndex)
+    //console.log("Clicked")
+    //console.log("scoutingSheetArrayIndex: ", scoutingSheetArrayIndex)
     
     navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex})
   }
