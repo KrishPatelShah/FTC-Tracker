@@ -62,7 +62,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ query: eventCodeQuery, variables: { season: 2023, code: searchText } })
+        body: JSON.stringify({ query: eventCodeQuery, variables: { season: 2024, code: searchText } })
       });
       const data = await response.json();
       if (data.data.eventByCode) {
@@ -77,7 +77,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ query: eventQuery, variables: { season: 2023, searchText: searchText, limit: 10, region: "All" } })
+          body: JSON.stringify({ query: eventQuery, variables: { season: 2024, searchText: searchText, limit: 10, region: "All" } })
         });
         const data = await response.json();
         const dataArray: any[] = data.data.eventsSearch;

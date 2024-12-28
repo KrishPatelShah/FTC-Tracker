@@ -126,10 +126,13 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ query, variables: { season: 2024, code: eventCodeJotai } })
+          body: JSON.stringify({ query, variables: { code: eventCodeJotai, season: 2024 } })
         });
         const data = await response.json();
-        //console.log(data.data.eventByCode.teams)
+
+        // Log the response data to check its structure
+        console.log("API response data:", data);
+        
         let teamArray = data.data.eventByCode.teams;
         let formattedTeamArray: Team[] = [];
         teamArray.map((team: any) => {
@@ -146,6 +149,8 @@ const EventScoutingScreen: React.FC<ScoutingSheetProps> = ({navigation, route}) 
     };
 
     const unsubscribe = navigation.addListener('focus', () => {
+      console.log("Event Code:", eventCodeJotai);
+      console.log("Screen focused");
       fetchEventData();
     });
 
