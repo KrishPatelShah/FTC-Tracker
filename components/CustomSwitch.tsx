@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     textPositioning:{
         flexDirection: 'row',
         justifyContent: 'space-around',
-        bottom: '10%', 
+        bottom: '12%', 
     },
     container:{
         width: width,
