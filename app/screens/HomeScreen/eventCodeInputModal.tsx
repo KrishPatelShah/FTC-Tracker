@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { TextInput, View, StyleSheet, Modal, Text, FlatList, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { TouchableOpacity } from "react-native";
+import {
+  TextInput,
+  View,
+  StyleSheet,
+  Modal,
+  Text,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { useAtom } from "jotai";
 import { NavigationProp } from "@react-navigation/native";
 import { eventCodeAtom, scoutingSheetArray } from "@/dataStore";
 import EventSearchView from "./EventSearchView";
 import { RootStackParamList } from "@/app/navigation/types";
-import { useHeaderHeight } from '@react-navigation/elements'
 
 type EventCodeInputProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -20,30 +26,20 @@ type EventSearchData = {
   code: string;
 };
 
-const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisible, setModalVisible,}) => {
+const EventCodeInput: React.FC<EventCodeInputProps> = ({
+  navigation,
+  modalVisible,
+  setModalVisible,
+}) => {
   const [eventCodeJotai, setEventCodeJotai] = useAtom(eventCodeAtom);
   const [searchData, setSearchData] = useState<EventSearchData[]>([]);
   const [searchText, setSearchText] = useState("");
   const [searchDataVisible, setSearchDataVisible] = useState(false);
   const [textInputValue, setTextInputValue] = useState("");
-  const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(scoutingSheetArray)
-  const scoutingSheetArrayIndex = globalScoutingSheetArray.length // don't have to -1 because scouting sheet array has not appended sheet yet
-
-  const eventQuery = `query eventsSearch($season: Int!, $searchText: String!, $limit: Int!, $region: RegionOption!) {
-    eventsSearch(season: $season, searchText: $searchText, limit: $limit, region: $region) {
-      name
-      start
-      code
-    }
-  }`;
-
-  const eventCodeQuery = `query getEventByCode($season: Int!, $code: String!) {
-    eventByCode(season: $season, code: $code) {
-      name
-      start
-      code
-    }
-  }`;
+  const [globalScoutingSheetArray, setGlobalScoutingSheetArray] = useAtom(
+    scoutingSheetArray
+  );
+  const scoutingSheetArrayIndex = globalScoutingSheetArray.length;
 
   useEffect(() => {
     if (searchText) {
@@ -55,18 +51,31 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
     setSearchData([]);
     let formattedEventData: EventSearchData[] = [];
     let foundByCode = false;
-    
+
     try {
       const response = await fetch("https://api.ftcscout.org/graphql", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ query: eventCodeQuery, variables: { season: 2023, code: searchText } })
+        body: JSON.stringify({
+          query: `query getEventByCode($season: Int!, $code: String!) {
+            eventByCode(season: $season, code: $code) {
+              name
+              start
+              code
+            }
+          }`,
+          variables: { season: 2023, code: searchText },
+        }),
       });
       const data = await response.json();
       if (data.data.eventByCode) {
-        const newEvent: EventSearchData = { name: data.data.eventByCode.name, data: data.data.eventByCode.start, code: data.data.eventByCode.code };
+        const newEvent: EventSearchData = {
+          name: data.data.eventByCode.name,
+          data: data.data.eventByCode.start,
+          code: data.data.eventByCode.code,
+        };
         formattedEventData.push(newEvent);
         foundByCode = true;
       }
@@ -75,14 +84,32 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
         const response = await fetch("https://api.ftcscout.org/graphql", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ query: eventQuery, variables: { season: 2023, searchText: searchText, limit: 10, region: "All" } })
+          body: JSON.stringify({
+            query: `query eventsSearch($season: Int!, $searchText: String!, $limit: Int!, $region: RegionOption!) {
+              eventsSearch(season: $season, searchText: $searchText, limit: $limit, region: $region) {
+                name
+                start
+                code
+              }
+            }`,
+            variables: {
+              season: 2023,
+              searchText: searchText,
+              limit: 10,
+              region: "All",
+            },
+          }),
         });
         const data = await response.json();
         const dataArray: any[] = data.data.eventsSearch;
         dataArray.forEach((item) => {
-          const newData: EventSearchData = { name: item.name, data: item.start, code: item.code };
+          const newData: EventSearchData = {
+            name: item.name,
+            data: item.start,
+            code: item.code,
+          };
           formattedEventData.push(newData);
         });
       }
@@ -94,15 +121,22 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
     }
   };
 
-  useEffect(() => {
-    //console.log("TextInput value changed:", textInputValue);
-  }, [textInputValue]);
-
   const renderItem = ({ item }: { item: EventSearchData }) => (
-    <EventSearchView eventName={item.name} date={item.data} navigation={navigation} code={item.code} navigateTo={() => {
-      navigation.navigate("EventScoutingScreen", {scoutingSheetArrayIndex}) // previous error here, had to define scoutingSheetArrayIndex
-      setModalVisible(false);
-    }} location="modal" setInputText={setTextInputValue} setDataVisible={setSearchDataVisible}/>
+    <EventSearchView
+      eventName={item.name}
+      date={item.data}
+      navigation={navigation}
+      code={item.code}
+      navigateTo={() => {
+        navigation.navigate("EventScoutingScreen", {
+          scoutingSheetArrayIndex,
+        });
+        setModalVisible(false);
+      }}
+      location="modal"
+      setInputText={setTextInputValue}
+      setDataVisible={setSearchDataVisible}
+    />
   );
 
   return (
@@ -114,9 +148,8 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
         setModalVisible(!modalVisible);
       }}
     >
-
       <View style={styles.centeredView}>
-        <View style={searchDataVisible ? styles.textInputContainer : styles.textInputContainerInvisData}>
+        <View style={styles.textInputContainer}>
           <TextInput
             style={styles.textInput}
             placeholder={"Enter Event"}
@@ -127,9 +160,8 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
             }}
             cursorColor={"#328aff"}
             onSubmitEditing={() => {
-              if(textInputValue == ""){
-                console.log("set to invis")
-                setSearchDataVisible(false)
+              if (textInputValue === "") {
+                setSearchDataVisible(false);
               }
               setSearchText(textInputValue);
             }}
@@ -144,8 +176,16 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
               />
             </View>
           )}
-          <TouchableOpacity onPress={() => {setSearchDataVisible(false), setTextInputValue(''), setSearchText(''), setModalVisible(false);}}>
-            <Text style={{ color: "#328AFF", fontSize: 20, top : searchDataVisible ? -20 : 20}}>Exit</Text>
+          <TouchableOpacity
+            style={styles.exitButton}
+            onPress={() => {
+              setSearchDataVisible(false);
+              setTextInputValue("");
+              setSearchText("");
+              setModalVisible(false);
+            }}
+          >
+            <Text style={styles.exitButtonText}>Exit</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -161,54 +201,36 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   textInputContainer: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    position: "absolute",
+    width: "50%",
+    padding: 17,
     backgroundColor: "#191919",
-    borderWidth: 2,
     borderRadius: 12,
-    borderColor: "#328AFF",
-    maxWidth: "90%",
-    minHeight: "30%",
-    maxHeight: "40%",
-    minWidth: "90%",
-  },
-  textInputContainerInvisData: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
     alignItems: "center",
-    position: "absolute",
-    backgroundColor: "#191919",
     borderWidth: 2,
-    borderRadius: 12,
     borderColor: "#328AFF",
-    height: "10%",
-    width: "60%",
   },
-
   textInput: {
-    top: 10,
-    borderBottomColor: 'grey',
+    width: "100%",
+    borderBottomColor: "grey",
     borderBottomWidth: 1,
-    textAlign:'center',
     paddingHorizontal: 10,
     color: "white",
     fontSize: 20,
-    borderRadius: 4,
-  },
-  searchResults: {
-    flex: 1,
-    width: "100%",
   },
   infoScreen: {
-    alignSelf: "center",
-    width: "90%",
-    height: "70%",
-    borderRadius: 12,
-    marginVertical : 30
+    width: "100%",
+    maxHeight: 200,
+    marginVertical: 20,
+  },
+  exitButton: {
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 8,
+  },
+  exitButtonText: {
+    color: "#328AFF",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });
 
