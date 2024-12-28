@@ -6,7 +6,6 @@ import { NavigationProp } from "@react-navigation/native";
 import { eventCodeAtom, scoutingSheetArray } from "@/dataStore";
 import EventSearchView from "./EventSearchView";
 import { RootStackParamList } from "@/app/navigation/types";
-import { useHeaderHeight } from '@react-navigation/elements'
 
 type EventCodeInputProps = {
   navigation: NavigationProp<RootStackParamList>;
@@ -116,7 +115,7 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
     >
 
       <View style={styles.centeredView}>
-        <View style={searchDataVisible ? styles.textInputContainer : styles.textInputContainerInvisData}>
+        <View style={styles.textInputContainer}>
           <TextInput
             style={styles.textInput}
             placeholder={"Enter Event"}
@@ -144,8 +143,16 @@ const EventCodeInput: React.FC<EventCodeInputProps> = ({ navigation, modalVisibl
               />
             </View>
           )}
-          <TouchableOpacity onPress={() => {setSearchDataVisible(false), setTextInputValue(''), setSearchText(''), setModalVisible(false);}}>
-            <Text style={{ color: "#328AFF", fontSize: 20, top : searchDataVisible ? -20 : 20}}>Exit</Text>
+          <TouchableOpacity
+            style={styles.exitButton}
+            onPress={() => {
+              setSearchDataVisible(false);
+              setTextInputValue('');
+              setSearchText('');
+              setModalVisible(false);
+            }}
+          >
+            <Text style={styles.exitButtonText}>Exit</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -158,58 +165,47 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", 
   },
   textInputContainer: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    position: "absolute",
+    width: "51%", 
+    height: 100, 
     backgroundColor: "#191919",
-    borderWidth: 2,
     borderRadius: 12,
-    borderColor: "#328AFF",
-    maxWidth: "90%",
-    minHeight: "30%",
-    maxHeight: "40%",
-    minWidth: "90%",
-  },
-  textInputContainerInvisData: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
     alignItems: "center",
-    position: "absolute",
-    backgroundColor: "#191919",
     borderWidth: 2,
-    borderRadius: 12,
     borderColor: "#328AFF",
-    height: "10%",
-    width: "60%",
+    elevation: 5, 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    padding: 20, 
   },
-
   textInput: {
-    top: 10,
-    borderBottomColor: 'grey',
+    width: "100%",
+    borderBottomColor: "grey",
     borderBottomWidth: 1,
-    textAlign:'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 33,
+    paddingBottom: 1,
     color: "white",
     fontSize: 20,
-    borderRadius: 4,
-  },
-  searchResults: {
-    flex: 1,
-    width: "100%",
+    marginBottom: 15,
   },
   infoScreen: {
-    alignSelf: "center",
-    width: "90%",
-    height: "70%",
-    borderRadius: 12,
-    marginVertical : 30
+    width: "100%",
+    maxHeight: 100, 
+    marginVertical: 10,
+  },
+  exitButton: {
+    borderRadius: 8,
+  },
+  exitButtonText: {
+    color: "#328AFF",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });
+
 
 export default EventCodeInput;
