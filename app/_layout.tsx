@@ -28,6 +28,7 @@ import { useNavigation } from '@react-navigation/native';
 import TermsOfServiceScreen from './screens/TermsOfServiceScreen/termsOfServiceScreen';
 import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen/privacyPolicyScreen';
 import ProfileScreen from './screens/ProfileScreen/profileScreen';
+import React from 'react';
 
 function InsideLayout() {
   const colorScheme = useColorScheme();
